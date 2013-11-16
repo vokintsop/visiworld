@@ -311,6 +311,13 @@ CommandLine="&quot;C:\Program Files (x86)\CMake 2.8\bin\cmake.exe&quot; -E make_
 				RelativePath="D:\projects\visiworld\trunk\prj.sandbox\simeion\src\main.cpp">
 			</File>
 		</Filter>
+		<Filter
+			Name="Header Files"
+			Filter="">
+			<File
+				RelativePath="D:\projects\visiworld\trunk\prj.sandbox\simeion\src\cover_tree.h">
+			</File>
+		</Filter>
 	</Files>
 	<Globals>
 	</Globals>
