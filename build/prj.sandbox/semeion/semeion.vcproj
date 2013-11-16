@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="9.00"
 	Name="semeion"
-	ProjectGUID="{85DCDA9E-65C2-4867-87E0-AA486CB7C48A}"
+	ProjectGUID="{CBB952C5-7BD3-4151-9C75-509896336C3D}"
 	Keyword="Win32Proj">
 	<Platforms>
 		<Platform
