@@ -16,19 +16,16 @@ using namespace std;
 using namespace cv;
 
 
-vector< pair< cv::Mat, int > > samples;
+vector< pair< int, cv::Mat > > samples;  // image, class_num
 
-int main( int argc, char* argv[] )
+bool read_samples( const char* path )
 {
-  string exe  = argv[0];
-  string data = exe + "/../../../testdata/simeion/simeion.data";
-  //freopen( data.c_str(), "r", stdin );
-  ifstream in( data.c_str() );
+  ifstream in( path );
 
   if (!in.is_open())
   {
-    cout << "Can't open " << data << endl;
-    return -1;
+    cout << "Can't open " << path << endl;
+    return false;
   }
 
   while (in.good())
@@ -58,29 +55,40 @@ int main( int argc, char* argv[] )
     getline( in, dummy ); // skip cr-lf
 
     if (chr>=0 && chr <=9)
-      samples.push_back( make_pair( mat, chr ) );
+      samples.push_back( make_pair( chr, mat ) );
     else
       break;
-
-    Mat matx;
-    resize( mat, matx, Size(), 8., 8. );
-
-    imshow( "letter", matx );
-    waitKey(1);
   }
 
+  cout << samples.size() << " samples read from " << path << endl;;
 
-  /*
+  return true;
+}
+
+int main( int argc, char* argv[] )
+{
+  string exe  = argv[0];
+  string data = exe + "/../../../testdata/simeion/simeion.data";
+  if (!read_samples(data.c_str()))
+    return -1;
 
 
-
-  
-  for ( int frame =0, int key=0; key != 27 && frame < lines.size(); frame = frame ++)
+  int key=-1;
+  for ( int frame =0; key != 27 && frame < int( samples.size() ); )
   {
-    cv::Mat mat = line2mat( lines[i] );
-    imshow( "letter", mat );
-    key = waitKey(0);
+    Mat matx;
+    resize( samples[frame].second, matx, Size(), 16., 16. );
+
+    imshow( "sample", matx );
+    key = waitKey(50);
+    switch (key)
+    {
+    case 27: break;
+    default:
+      frame = (frame+1) % samples.size();
+    }
   }
-  */
+
+
 	return 0;
 }
