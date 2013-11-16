@@ -12,8 +12,12 @@
 
 #include <cassert>
 
+#include "cover_tree.h"
+
 using namespace std;
 using namespace cv;
+
+
 
 
 vector< pair< int, cv::Mat > > samples;  // image, class_num
@@ -65,12 +69,47 @@ bool read_samples( const char* path )
   return true;
 }
 
+class Metr1
+{
+public:
+  double computeDistance( const int& i1,  const int& i2 )  // индексы к samples[]
+  {
+    double dst=0;
+    Mat m1 = samples[i1].second;
+    Mat m2 = samples[i2].second;
+    for ( int y=0; y<16; y++ )
+    {
+      for ( int x=0; x<16; x++ )
+      {
+        if (m1.at<uchar>( y, x ) != m2.at<uchar>( y, x ) )
+          dst += 1;
+      }
+    }
+    return dst;
+  }
+};
+
+
+void explore_cover_tree()
+{
+
+  Metr1 ruler;
+  CoverTree< int, Metr1 > tree( &ruler, 1000, 1 );
+  for (int i=0; i< int( samples.size() ); i++)
+    tree.insert( i );
+
+  tree.reportStatistics( 0, 3 ); 
+
+}
+
 int main( int argc, char* argv[] )
 {
   string exe  = argv[0];
   string data = exe + "/../../../testdata/simeion/simeion.data";
   if (!read_samples(data.c_str()))
     return -1;
+
+  explore_cover_tree();
 
 
   int key=-1;

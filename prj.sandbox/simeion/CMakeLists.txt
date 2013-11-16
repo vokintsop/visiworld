@@ -2,6 +2,7 @@ IF( MSVC )
   PROJECT( simeion )
   
   SET( SOURCES
+    src/cover_tree.h
     src/main.cpp 
     )
 
