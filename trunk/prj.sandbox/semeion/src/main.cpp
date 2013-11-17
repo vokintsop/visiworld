@@ -24,6 +24,7 @@ using namespace cv;
 
 
 vector< pair< int, cv::Mat > > samples;  // image, class_num
+vector< pair< int, cv::Mat > > samples_dilated;  // image, class_num
 
 bool read_samples( const char* path )
 {
@@ -72,7 +73,28 @@ bool read_samples( const char* path )
   return true;
 }
 
-class Metr1
+void dilate_samples()
+{
+  samples_dilated.resize(0);
+  int an = 1;
+  int element_shape = MORPH_CROSS; // MORPH_RECT;
+  Mat element = getStructuringElement(element_shape, Size(an*2+1, an*2+1), Point(an, an) );
+  for (int i=0; i< int( samples.size() ); i++)
+  {
+    Mat m( 16, 16, CV_8UC1 );
+    dilate( samples[i].second, m, element, Point( an, an ) );
+#if 0
+    Mat mx1; resize( m, mx1, Size(), 16, 16, INTER_AREA  );
+    Mat mx2; resize( samples[i].second, mx2, Size(), 16, 16, INTER_AREA  );
+    imshow("initial", mx2 );
+    imshow("dilated", mx1 );
+    waitKey(0);
+#endif
+    samples_dilated.push_back( make_pair( samples[i].first, m ) );
+  }
+}
+
+class Metr1 // simple hamming
 {
 public:
   double computeDistance( const int& i1,  const int& i2 )  // индексы к samples[]
@@ -93,11 +115,34 @@ public:
 };
 
 
+class Metr2 // A intersect dilated(B) + B intersect dilated(A)
+{
+public:
+  double computeDistance( const int& i1,  const int& i2 )  // индексы к samples[]
+  {
+    double dst=0;
+    Mat m1 = samples[i1].second;    Mat m1ex = samples_dilated[i1].second; 
+    Mat m2 = samples[i2].second;    Mat m2ex = samples_dilated[i2].second; 
+    for ( int y=0; y<16; y++ )
+    {
+      for ( int x=0; x<16; x++ )
+      {
+        if (m1.at<uchar>( y, x ) == 255 && m2ex.at<uchar>( y, x ) != 255 )
+          dst += 1;
+        if (m2.at<uchar>( y, x ) == 255 && m1ex.at<uchar>( y, x ) != 255 )
+          dst += 1;
+      }
+    }
+    return dst;
+  }
+};
+
 void explore_cover_tree()
 {
 
-  Metr1 ruler;
-  CoverTree< int, Metr1 > tree( &ruler, 1000, 1 );
+  //Metr1 ruler;  CoverTree< int, Metr1 > tree( &ruler, 1000, 1 );
+  Metr2 ruler;  CoverTree< int, Metr2 > tree( &ruler, 1000, 1 );
+
   for (int i=0; i< int( samples.size() ); i++)
     tree.insert( i );
 
@@ -112,8 +157,9 @@ int main( int argc, char* argv[] )
   if (!read_samples(data.c_str()))
     return -1;
 
-  explore_cover_tree();
+  dilate_samples();
 
+  explore_cover_tree();
 
   int key=-1;
   for ( int frame =0; key != 27 && frame < int( samples.size() ); )
