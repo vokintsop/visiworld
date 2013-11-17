@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="9.00"
 	Name="mnist"
-	ProjectGUID="{74C92FD3-D8D9-42A7-998E-8CF4D857A030}"
+	ProjectGUID="{AED6ADDA-0622-4057-8DFF-8A8E8D557CAE}"
 	Keyword="Win32Proj">
 	<Platforms>
 		<Platform
