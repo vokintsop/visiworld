@@ -20,54 +20,56 @@
 using namespace std;
 using namespace cv;
 
+int SAMPLE_SIZE = 28;
+
 
 // ..................... remake below ..................
 
-vector< pair< int, cv::Mat > > samples;  // image, class_num
+vector< pair< int, cv::Mat > > samples;  //class_num image, 
 
 bool read_samples( const char* path )
 {
-  ifstream in( path );
+  //////////ifstream in( path );
 
-  if (!in.is_open())
-  {
-    cout << "Can't open " << path << endl;
-    return false;
-  }
+  //////////if (!in.is_open())
+  //////////{
+  //////////  cout << "Can't open " << path << endl;
+  //////////  return false;
+  //////////}
 
-  while (in.good())
-  {
-    Mat mat( 16, 16, CV_8UC1 );
-    for ( int y=0; y<16; y++ )
-    {
-      for ( int x=0; x<16; x++ )
-      {
-        double val=0.5;
-        in >> val;
-        mat.at<uchar>( y, x ) = cvRound( 255*val );
-      }
-    }
-    
-    int chr=-1;
-    for ( int c=0; c<10; c++ )
-    {
-      int cc = -1;
-      in >> cc;
-      if (cc == 1)
-        chr = c;
-      else
-        assert( cc == 0 );
-    }
-    string dummy;
-    getline( in, dummy ); // skip cr-lf
+  //////////while (in.good())
+  //////////{
+  //////////  Mat mat( SAMPLE_SIZE, SAMPLE_SIZE, CV_8UC1 );
+  //////////  for ( int y=0; y<SAMPLE_SIZE; y++ )
+  //////////  {
+  //////////    for ( int x=0; x<SAMPLE_SIZE; x++ )
+  //////////    {
+  //////////      double val=0.5;
+  //////////      in >> val;
+  //////////      mat.at<uchar>( y, x ) = cvRound( 255*val );
+  //////////    }
+  //////////  }
+  //////////  
+  //////////  int chr=-1;
+  //////////  for ( int c=0; c<10; c++ )
+  //////////  {
+  //////////    int cc = -1;
+  //////////    in >> cc;
+  //////////    if (cc == 1)
+  //////////      chr = c;
+  //////////    else
+  //////////      assert( cc == 0 );
+  //////////  }
+  //////////  string dummy;
+  //////////  getline( in, dummy ); // skip cr-lf
 
-    if (chr>=0 && chr <=9)
-      samples.push_back( make_pair( chr, mat ) );
-    else
-      break;
-  }
+  //////////  if (chr>=0 && chr <=9)
+  //////////    samples.push_back( make_pair( chr, mat ) );
+  //////////  else
+  //////////    break;
+  //////////}
 
-  cout << samples.size() << " samples read from " << path << endl;;
+  //////////cout << samples.size() << " samples read from " << path << endl;;
 
   return true;
 }
@@ -80,9 +82,9 @@ public:
     double dst=0;
     Mat m1 = samples[i1].second;
     Mat m2 = samples[i2].second;
-    for ( int y=0; y<16; y++ )
+    for ( int y=0; y<SAMPLE_SIZE; y++ )
     {
-      for ( int x=0; x<16; x++ )
+      for ( int x=0; x<SAMPLE_SIZE; x++ )
       {
         if (m1.at<uchar>( y, x ) != m2.at<uchar>( y, x ) )
           dst += 1;
@@ -119,7 +121,7 @@ int main( int argc, char* argv[] )
   for ( int frame =0; key != 27 && frame < int( samples.size() ); )
   {
     Mat matx;
-    resize( samples[frame].second, matx, Size(), 16., 16. );
+    resize( samples[frame].second, matx, Size(), 16., 16., INTER_AREA ); // расширяем в 16 раз для удобного просмотра
 
     imshow( "sample", matx );
     key = waitKey(50);
