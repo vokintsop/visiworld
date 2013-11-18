@@ -1,6 +1,3 @@
-// explore mnist dataset
-// http://yann.lecun.com/exdb/mnist/
-
 #include <opencv/cv.h>
 #include <opencv/highgui.h>
 
@@ -16,17 +13,13 @@
 #include <cassert>
 
 
-#include "cover_tree.h"
-//#include <Winsock2.h>
+#include "cover_net.h"
 
 using namespace std;
 using namespace cv;
 
 int SAMPLE_HEIGHT = 0;
 int SAMPLE_WIDTH = 0;
-
-
-// ..................... remake below ..................
 
 vector< pair< int, cv::Mat > > samples;  //class_num image, 
 
@@ -125,11 +118,11 @@ void explore_cover_tree()
 {
 
   Metr1 ruler;
-  CoverTree< int, Metr1 > tree( &ruler, 256*256, 1 );
+  CoverNet< int, Metr1 > cvnet( &ruler, 256*256, 1 );
   for (int i=0; i< int( samples.size() ); i+=16)
-    tree.insert( i );
+    cvnet.insert( i );
 
-  tree.reportStatistics( 0, 3 ); 
+  cvnet.reportStatistics( 0, 3 ); 
 
 }
 
