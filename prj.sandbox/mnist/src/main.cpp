@@ -109,8 +109,11 @@ public:
     {
       for ( int x=0; x< SAMPLE_WIDTH; x++ )
       {
-        if (m1.at<uchar>( y, x ) != m2.at<uchar>( y, x ) )
-          dst += 1;
+        //if (m1.at<uchar>( y, x ) != m2.at<uchar>( y, x ) )
+        //  dst += 1;
+        int d1 = m1.at<uchar>( y, x );
+        int d2 = m2.at<uchar>( y, x );
+        dst += abs(d1-d2);
       }
     }
     return dst;
@@ -122,7 +125,7 @@ void explore_cover_tree()
 {
 
   Metr1 ruler;
-  CoverTree< int, Metr1 > tree( &ruler, 1000, 1 );
+  CoverTree< int, Metr1 > tree( &ruler, 256*256, 1 );
   for (int i=0; i< int( samples.size() ); i++)
     tree.insert( i );
 
