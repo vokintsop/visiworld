@@ -15,63 +15,81 @@
 
 #include <cassert>
 
+
 #include "cover_tree.h"
+//#include <Winsock2.h>
 
 using namespace std;
 using namespace cv;
 
-int SAMPLE_SIZE = 28;
+int SAMPLE_SIZE = 16;
 
 
 // ..................... remake below ..................
 
 vector< pair< int, cv::Mat > > samples;  //class_num image, 
 
-bool read_samples( const char* path )
+//only for intel O_O
+inline unsigned long ntohl(unsigned long n) {
+  return ((n & 0xFF) << 24) | ((n & 0xFF00) << 8) | ((n & 0xFF0000) >> 8) | ((n & 0xFF000000) >> 24);
+}
+bool read_samples()
 {
-  //////////ifstream in( path );
 
-  //////////if (!in.is_open())
-  //////////{
-  //////////  cout << "Can't open " << path << endl;
-  //////////  return false;
-  //////////}
+	string data = "C:/visiroad_3/visiworld/testdata/mnist/train-images.idx3-ubyte";
+	string data1 = "C:/visiroad_3/visiworld/testdata/mnist/train-labels.idx1-ubyte";
+	
+	ifstream in(data.c_str(), ios::binary|ios::in);
+	ifstream in1(data1.c_str(), ios::binary|ios::in);
+	
+	if (!in.is_open() || !in.is_open())
+	{
+		cout << "no file" << endl;
+		return false;
+	}
+ 	
+	int magic_number;
+    in.read(reinterpret_cast<char*>(&magic_number), sizeof(magic_number));
+	magic_number = ntohl(magic_number);
 
-  //////////while (in.good())
-  //////////{
-  //////////  Mat mat( SAMPLE_SIZE, SAMPLE_SIZE, CV_8UC1 );
-  //////////  for ( int y=0; y<SAMPLE_SIZE; y++ )
-  //////////  {
-  //////////    for ( int x=0; x<SAMPLE_SIZE; x++ )
-  //////////    {
-  //////////      double val=0.5;
-  //////////      in >> val;
-  //////////      mat.at<uchar>( y, x ) = cvRound( 255*val );
-  //////////    }
-  //////////  }
-  //////////  
-  //////////  int chr=-1;
-  //////////  for ( int c=0; c<10; c++ )
-  //////////  {
-  //////////    int cc = -1;
-  //////////    in >> cc;
-  //////////    if (cc == 1)
-  //////////      chr = c;
-  //////////    else
-  //////////      assert( cc == 0 );
-  //////////  }
-  //////////  string dummy;
-  //////////  getline( in, dummy ); // skip cr-lf
+	int magic_number1;
+    in1.read(reinterpret_cast<char*>(&magic_number1), sizeof(magic_number1));
+	magic_number1 = ntohl(magic_number1);
 
-  //////////  if (chr>=0 && chr <=9)
-  //////////    samples.push_back( make_pair( chr, mat ) );
-  //////////  else
-  //////////    break;
-  //////////}
+	int img_num;
+    in.read(reinterpret_cast<char*>(&img_num), sizeof(img_num));
+	img_num = ntohl(img_num);
 
-  //////////cout << samples.size() << " samples read from " << path << endl;;
+	int img_num1;
+    in1.read(reinterpret_cast<char*>(&img_num1), sizeof(img_num1));
+	img_num1 = ntohl(img_num1);
 
-  return true;
+	int rows;
+	in.read(reinterpret_cast<char*>(&rows), sizeof(rows));
+	rows = ntohl(rows);
+	
+	int cols;
+	in.read(reinterpret_cast<char*>(&cols), sizeof(cols));
+	cols = ntohl(cols);
+
+	for (int i = 0; i < img_num; ++i)
+	{
+		Mat1b mymat(rows, cols);
+		unsigned char label;
+		in1.read(reinterpret_cast<char*>(&label), sizeof(label));
+		for (int i1 = 0; i1 < cols; ++i1)
+		{
+			for (int i2 = 0; i2 < rows; ++i2)
+			{
+				unsigned char pixel;
+				in.read(reinterpret_cast<char*>(&pixel), sizeof(pixel));
+				mymat(i1, i2) = pixel;
+			}
+		}
+		samples.push_back(make_pair(label, mymat));
+	}
+
+    return true;
 }
 
 class Metr1
@@ -109,13 +127,8 @@ void explore_cover_tree()
 
 int main( int argc, char* argv[] )
 {
-  string exe  = argv[0];
-  string data = exe + "/../../../testdata/semeion/semeion.data";
-  if (!read_samples(data.c_str()))
-    return -1;
-
-  explore_cover_tree();
-
+	read_samples();
+	cout << "size: " << samples.size() << endl;
 
   int key=-1;
   for ( int frame =0; key != 27 && frame < int( samples.size() ); )
@@ -124,6 +137,7 @@ int main( int argc, char* argv[] )
     resize( samples[frame].second, matx, Size(), 16., 16., INTER_AREA ); // расширяем в 16 раз для удобного просмотра
 
     imshow( "sample", matx );
+	
     key = waitKey(50);
     switch (key)
     {
