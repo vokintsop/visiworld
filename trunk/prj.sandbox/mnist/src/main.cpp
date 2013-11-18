@@ -22,7 +22,8 @@
 using namespace std;
 using namespace cv;
 
-int SAMPLE_SIZE = 16;
+int SAMPLE_HEIGHT = 0;
+int SAMPLE_WIDTH = 0;
 
 
 // ..................... remake below ..................
@@ -33,11 +34,11 @@ vector< pair< int, cv::Mat > > samples;  //class_num image,
 inline unsigned long ntohl(unsigned long n) {
   return ((n & 0xFF) << 24) | ((n & 0xFF00) << 8) | ((n & 0xFF0000) >> 8) | ((n & 0xFF000000) >> 24);
 }
-bool read_samples()
+bool read_samples( string mnist_folder )
 {
 
-	string data = "C:/visiroad_3/visiworld/testdata/mnist/train-images.idx3-ubyte";
-	string data1 = "C:/visiroad_3/visiworld/testdata/mnist/train-labels.idx1-ubyte";
+	string data = mnist_folder + "/train-images.idx3-ubyte";
+	string data1 = mnist_folder + "/train-labels.idx1-ubyte";
 	
 	ifstream in(data.c_str(), ios::binary|ios::in);
 	ifstream in1(data1.c_str(), ios::binary|ios::in);
@@ -67,10 +68,12 @@ bool read_samples()
 	int rows;
 	in.read(reinterpret_cast<char*>(&rows), sizeof(rows));
 	rows = ntohl(rows);
+  SAMPLE_HEIGHT = rows;
 	
 	int cols;
 	in.read(reinterpret_cast<char*>(&cols), sizeof(cols));
 	cols = ntohl(cols);
+  SAMPLE_WIDTH = cols;
 
 	for (int i = 0; i < img_num; ++i)
 	{
@@ -89,7 +92,9 @@ bool read_samples()
 		samples.push_back(make_pair(label, mymat));
 	}
 
-    return true;
+  cout << samples.size() << " samples read from " << data << endl;;
+
+  return true;
 }
 
 class Metr1
@@ -100,9 +105,9 @@ public:
     double dst=0;
     Mat m1 = samples[i1].second;
     Mat m2 = samples[i2].second;
-    for ( int y=0; y<SAMPLE_SIZE; y++ )
+    for ( int y=0; y< SAMPLE_HEIGHT; y++ )
     {
-      for ( int x=0; x<SAMPLE_SIZE; x++ )
+      for ( int x=0; x< SAMPLE_WIDTH; x++ )
       {
         if (m1.at<uchar>( y, x ) != m2.at<uchar>( y, x ) )
           dst += 1;
@@ -127,8 +132,12 @@ void explore_cover_tree()
 
 int main( int argc, char* argv[] )
 {
-	read_samples();
-	cout << "size: " << samples.size() << endl;
+  string exe = argv[0];
+  string mnist_folder = exe + "/../../../testdata/mnist";
+	read_samples(mnist_folder);
+
+  explore_cover_tree();
+
 
   int key=-1;
   for ( int frame =0; key != 27 && frame < int( samples.size() ); )
