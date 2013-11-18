@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="9.00"
 	Name="semeion"
-	ProjectGUID="{62433097-0520-4C99-A42F-EB4498200FB1}"
+	ProjectGUID="{D07F04E4-776D-45D6-B3F3-7F53145D2A3B}"
 	Keyword="Win32Proj">
 	<Platforms>
 		<Platform
@@ -20,8 +20,7 @@
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalOptions=" /Zm1000"
-				AdditionalIncludeDirectories="D:\projects\visiworld\trunk\prj.core;D:\projects\visiworld\trunk\prj.sandbox;D:\projects\visiworld\trunk\prj.thirdparty;D:\projects\opencv\build\include;D:\projects\opencv\build\include\opencv;"
+				AdditionalIncludeDirectories="C:\visiroad_3\visiworld\trunk\prj.core;C:\visiroad_3\visiworld\trunk\prj.sandbox;C:\visiroad_3\visiworld\trunk\prj.thirdparty;C:\opencv\build\include;C:\opencv\build\include\opencv;"
 				BasicRuntimeChecks="3"
 				CompileAs="2"
 				DebugInformationFormat="3"
@@ -34,17 +33,17 @@
 				PreprocessorDefinitions="WIN32;_WINDOWS;_DEBUG;_CRT_SECURE_NO_WARNINGS;CMAKE_INTDIR=\&quot;Debug\&quot;"
 				AssemblerListingLocation="Debug"
 				ObjectFile="$(IntDir)\"
-				ProgramDataBaseFileName="D:\projects\visiworld\trunk\bin.win32.debug/semeion.pdb"
+				ProgramDataBaseFileName="C:\visiroad_3\visiworld\trunk\bin.win32.debug/semeion.pdb"
 />
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCResourceCompilerTool"
-				AdditionalIncludeDirectories="D:\projects\visiworld\trunk\prj.core;D:\projects\visiworld\trunk\prj.sandbox;D:\projects\visiworld\trunk\prj.thirdparty;D:\projects\opencv\build\include;D:\projects\opencv\build\include\opencv;"
+				AdditionalIncludeDirectories="C:\visiroad_3\visiworld\trunk\prj.core;C:\visiroad_3\visiworld\trunk\prj.sandbox;C:\visiroad_3\visiworld\trunk\prj.thirdparty;C:\opencv\build\include;C:\opencv\build\include\opencv;"
 				PreprocessorDefinitions="WIN32;_WINDOWS;_DEBUG;_CRT_SECURE_NO_WARNINGS;CMAKE_INTDIR=\&quot;Debug\&quot;"/>
 			<Tool
 				Name="VCMIDLTool"
-				AdditionalIncludeDirectories="D:\projects\visiworld\trunk\prj.core;D:\projects\visiworld\trunk\prj.sandbox;D:\projects\visiworld\trunk\prj.thirdparty;D:\projects\opencv\build\include;D:\projects\opencv\build\include\opencv;"
+				AdditionalIncludeDirectories="C:\visiroad_3\visiworld\trunk\prj.core;C:\visiroad_3\visiworld\trunk\prj.sandbox;C:\visiroad_3\visiworld\trunk\prj.thirdparty;C:\opencv\build\include;C:\opencv\build\include\opencv;"
 				MkTypLibCompatible="FALSE"
 				TargetEnvironment="1"
 				GenerateStublessProxies="TRUE"
@@ -58,22 +57,22 @@
 				Name="VCPreBuildEventTool"/>
 			<Tool
 				Name="VCPreLinkEventTool"
-CommandLine="&quot;C:\Program Files (x86)\CMake 2.8\bin\cmake.exe&quot; -E make_directory D:/projects/visiworld/trunk/lib/win32.vc/debug&#x0D;&#x0A;if errorlevel 1 goto :VCReportError"/>
+CommandLine="&quot;C:\Program Files (x86)\CMake 2.8\bin\cmake.exe&quot; -E make_directory C:/visiroad_3/visiworld/trunk/lib/win32.vc/debug&#x0D;&#x0A;if errorlevel 1 goto :VCReportError"/>
 			<Tool
 				Name="VCPostBuildEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
 				LinkLibraryDependencies="false"
-				AdditionalOptions=" /STACK:10000000 /machine:X86 /debug"
-				AdditionalDependencies="$(NOINHERIT) kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib  D:\projects\opencv\build\x86\vc9\lib\opencv_calib3d244d.lib D:\projects\opencv\build\x86\vc9\lib\opencv_contrib244d.lib D:\projects\opencv\build\x86\vc9\lib\opencv_core244d.lib D:\projects\opencv\build\x86\vc9\lib\opencv_features2d244d.lib D:\projects\opencv\build\x86\vc9\lib\opencv_flann244d.lib D:\projects\opencv\build\x86\vc9\lib\opencv_gpu244d.lib D:\projects\opencv\build\x86\vc9\lib\opencv_highgui244d.lib D:\projects\opencv\build\x86\vc9\lib\opencv_imgproc244d.lib D:\projects\opencv\build\x86\vc9\lib\opencv_legacy244d.lib D:\projects\opencv\build\x86\vc9\lib\opencv_ml244d.lib D:\projects\opencv\build\x86\vc9\lib\opencv_nonfree244d.lib D:\projects\opencv\build\x86\vc9\lib\opencv_objdetect244d.lib D:\projects\opencv\build\x86\vc9\lib\opencv_photo244d.lib D:\projects\opencv\build\x86\vc9\lib\opencv_stitching244d.lib D:\projects\opencv\build\x86\vc9\lib\opencv_ts244d.lib D:\projects\opencv\build\x86\vc9\lib\opencv_video244d.lib D:\projects\opencv\build\x86\vc9\lib\opencv_videostab244d.lib "
-				OutputFile="D:\projects\visiworld\trunk\bin.win32.debug\semeion.exe"
+				AdditionalOptions=" /machine:X86 /debug"
+				AdditionalDependencies="$(NOINHERIT) kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib C:\opencv\build\x86\vc9\lib\opencv_calib3d244d.lib C:\opencv\build\x86\vc9\lib\opencv_contrib244d.lib C:\opencv\build\x86\vc9\lib\opencv_core244d.lib C:\opencv\build\x86\vc9\lib\opencv_features2d244d.lib C:\opencv\build\x86\vc9\lib\opencv_flann244d.lib C:\opencv\build\x86\vc9\lib\opencv_gpu244d.lib C:\opencv\build\x86\vc9\lib\opencv_highgui244d.lib C:\opencv\build\x86\vc9\lib\opencv_imgproc244d.lib C:\opencv\build\x86\vc9\lib\opencv_legacy244d.lib C:\opencv\build\x86\vc9\lib\opencv_ml244d.lib C:\opencv\build\x86\vc9\lib\opencv_nonfree244d.lib C:\opencv\build\x86\vc9\lib\opencv_objdetect244d.lib C:\opencv\build\x86\vc9\lib\opencv_photo244d.lib C:\opencv\build\x86\vc9\lib\opencv_stitching244d.lib C:\opencv\build\x86\vc9\lib\opencv_ts244d.lib C:\opencv\build\x86\vc9\lib\opencv_video244d.lib C:\opencv\build\x86\vc9\lib\opencv_videostab244d.lib "
+				OutputFile="C:\visiroad_3\visiworld\trunk\bin.win32.debug\semeion.exe"
 				Version="0.0"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\..\lib\win32.vc\$(ConfigurationName)\$(OutDir),..\..\..\lib\win32.vc\$(ConfigurationName)"
-				ProgramDatabaseFile="D:\projects\visiworld\trunk\bin.win32.debug/semeion.pdb"
+				ProgramDatabaseFile="C:\visiroad_3\visiworld\trunk\bin.win32.debug/semeion.pdb"
 				GenerateDebugInformation="TRUE"
 				SubSystem="1"
-				ImportLibrary="D:\projects\visiworld\trunk\lib\win32.vc\debug\semeion.lib"/>
+				ImportLibrary="C:\visiroad_3\visiworld\trunk\lib\win32.vc\debug\semeion.lib"/>
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
@@ -85,8 +84,7 @@ CommandLine="&quot;C:\Program Files (x86)\CMake 2.8\bin\cmake.exe&quot; -E make_
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalOptions=" /Zm1000"
-				AdditionalIncludeDirectories="D:\projects\visiworld\trunk\prj.core;D:\projects\visiworld\trunk\prj.sandbox;D:\projects\visiworld\trunk\prj.thirdparty;D:\projects\opencv\build\include;D:\projects\opencv\build\include\opencv;"
+				AdditionalIncludeDirectories="C:\visiroad_3\visiworld\trunk\prj.core;C:\visiroad_3\visiworld\trunk\prj.sandbox;C:\visiroad_3\visiworld\trunk\prj.thirdparty;C:\opencv\build\include;C:\opencv\build\include\opencv;"
 				CompileAs="2"
 				ExceptionHandling="1"
 				InlineFunctionExpansion="2"
@@ -97,17 +95,17 @@ CommandLine="&quot;C:\Program Files (x86)\CMake 2.8\bin\cmake.exe&quot; -E make_
 				PreprocessorDefinitions="WIN32;_WINDOWS;NDEBUG;_CRT_SECURE_NO_WARNINGS;CMAKE_INTDIR=\&quot;Release\&quot;"
 				AssemblerListingLocation="Release"
 				ObjectFile="$(IntDir)\"
-				ProgramDataBaseFileName="D:\projects\visiworld\trunk\bin.win32.release/semeion.pdb"
+				ProgramDataBaseFileName="C:\visiroad_3\visiworld\trunk\bin.win32.release/semeion.pdb"
 />
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCResourceCompilerTool"
-				AdditionalIncludeDirectories="D:\projects\visiworld\trunk\prj.core;D:\projects\visiworld\trunk\prj.sandbox;D:\projects\visiworld\trunk\prj.thirdparty;D:\projects\opencv\build\include;D:\projects\opencv\build\include\opencv;"
+				AdditionalIncludeDirectories="C:\visiroad_3\visiworld\trunk\prj.core;C:\visiroad_3\visiworld\trunk\prj.sandbox;C:\visiroad_3\visiworld\trunk\prj.thirdparty;C:\opencv\build\include;C:\opencv\build\include\opencv;"
 				PreprocessorDefinitions="WIN32;_WINDOWS;NDEBUG;_CRT_SECURE_NO_WARNINGS;CMAKE_INTDIR=\&quot;Release\&quot;"/>
 			<Tool
 				Name="VCMIDLTool"
-				AdditionalIncludeDirectories="D:\projects\visiworld\trunk\prj.core;D:\projects\visiworld\trunk\prj.sandbox;D:\projects\visiworld\trunk\prj.thirdparty;D:\projects\opencv\build\include;D:\projects\opencv\build\include\opencv;"
+				AdditionalIncludeDirectories="C:\visiroad_3\visiworld\trunk\prj.core;C:\visiroad_3\visiworld\trunk\prj.sandbox;C:\visiroad_3\visiworld\trunk\prj.thirdparty;C:\opencv\build\include;C:\opencv\build\include\opencv;"
 				MkTypLibCompatible="FALSE"
 				TargetEnvironment="1"
 				GenerateStublessProxies="TRUE"
@@ -121,21 +119,21 @@ CommandLine="&quot;C:\Program Files (x86)\CMake 2.8\bin\cmake.exe&quot; -E make_
 				Name="VCPreBuildEventTool"/>
 			<Tool
 				Name="VCPreLinkEventTool"
-CommandLine="&quot;C:\Program Files (x86)\CMake 2.8\bin\cmake.exe&quot; -E make_directory D:/projects/visiworld/trunk/lib/win32.vc/release&#x0D;&#x0A;if errorlevel 1 goto :VCReportError"/>
+CommandLine="&quot;C:\Program Files (x86)\CMake 2.8\bin\cmake.exe&quot; -E make_directory C:/visiroad_3/visiworld/trunk/lib/win32.vc/release&#x0D;&#x0A;if errorlevel 1 goto :VCReportError"/>
 			<Tool
 				Name="VCPostBuildEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
 				LinkLibraryDependencies="false"
-				AdditionalOptions=" /STACK:10000000 /machine:X86"
-				AdditionalDependencies="$(NOINHERIT) kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib  D:\projects\opencv\build\x86\vc9\lib\opencv_calib3d244.lib D:\projects\opencv\build\x86\vc9\lib\opencv_contrib244.lib D:\projects\opencv\build\x86\vc9\lib\opencv_core244.lib D:\projects\opencv\build\x86\vc9\lib\opencv_features2d244.lib D:\projects\opencv\build\x86\vc9\lib\opencv_flann244.lib D:\projects\opencv\build\x86\vc9\lib\opencv_gpu244.lib D:\projects\opencv\build\x86\vc9\lib\opencv_highgui244.lib D:\projects\opencv\build\x86\vc9\lib\opencv_imgproc244.lib D:\projects\opencv\build\x86\vc9\lib\opencv_legacy244.lib D:\projects\opencv\build\x86\vc9\lib\opencv_ml244.lib D:\projects\opencv\build\x86\vc9\lib\opencv_nonfree244.lib D:\projects\opencv\build\x86\vc9\lib\opencv_objdetect244.lib D:\projects\opencv\build\x86\vc9\lib\opencv_photo244.lib D:\projects\opencv\build\x86\vc9\lib\opencv_stitching244.lib D:\projects\opencv\build\x86\vc9\lib\opencv_ts244.lib D:\projects\opencv\build\x86\vc9\lib\opencv_video244.lib D:\projects\opencv\build\x86\vc9\lib\opencv_videostab244.lib "
-				OutputFile="D:\projects\visiworld\trunk\bin.win32.release\semeion.exe"
+				AdditionalOptions=" /machine:X86"
+				AdditionalDependencies="$(NOINHERIT) kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib C:\opencv\build\x86\vc9\lib\opencv_calib3d244.lib C:\opencv\build\x86\vc9\lib\opencv_contrib244.lib C:\opencv\build\x86\vc9\lib\opencv_core244.lib C:\opencv\build\x86\vc9\lib\opencv_features2d244.lib C:\opencv\build\x86\vc9\lib\opencv_flann244.lib C:\opencv\build\x86\vc9\lib\opencv_gpu244.lib C:\opencv\build\x86\vc9\lib\opencv_highgui244.lib C:\opencv\build\x86\vc9\lib\opencv_imgproc244.lib C:\opencv\build\x86\vc9\lib\opencv_legacy244.lib C:\opencv\build\x86\vc9\lib\opencv_ml244.lib C:\opencv\build\x86\vc9\lib\opencv_nonfree244.lib C:\opencv\build\x86\vc9\lib\opencv_objdetect244.lib C:\opencv\build\x86\vc9\lib\opencv_photo244.lib C:\opencv\build\x86\vc9\lib\opencv_stitching244.lib C:\opencv\build\x86\vc9\lib\opencv_ts244.lib C:\opencv\build\x86\vc9\lib\opencv_video244.lib C:\opencv\build\x86\vc9\lib\opencv_videostab244.lib "
+				OutputFile="C:\visiroad_3\visiworld\trunk\bin.win32.release\semeion.exe"
 				Version="0.0"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\..\lib\win32.vc\$(ConfigurationName)\$(OutDir),..\..\..\lib\win32.vc\$(ConfigurationName)"
-				ProgramDatabaseFile="D:\projects\visiworld\trunk\bin.win32.release/semeion.pdb"
+				ProgramDatabaseFile="C:\visiroad_3\visiworld\trunk\bin.win32.release/semeion.pdb"
 				SubSystem="1"
-				ImportLibrary="D:\projects\visiworld\trunk\lib\win32.vc\release\semeion.lib"/>
+				ImportLibrary="C:\visiroad_3\visiworld\trunk\lib\win32.vc\release\semeion.lib"/>
 		</Configuration>
 		<Configuration
 			Name="MinSizeRel|Win32"
@@ -147,8 +145,7 @@ CommandLine="&quot;C:\Program Files (x86)\CMake 2.8\bin\cmake.exe&quot; -E make_
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalOptions=" /Zm1000"
-				AdditionalIncludeDirectories="D:\projects\visiworld\trunk\prj.core;D:\projects\visiworld\trunk\prj.sandbox;D:\projects\visiworld\trunk\prj.thirdparty;D:\projects\opencv\build\include;D:\projects\opencv\build\include\opencv;"
+				AdditionalIncludeDirectories="C:\visiroad_3\visiworld\trunk\prj.core;C:\visiroad_3\visiworld\trunk\prj.sandbox;C:\visiroad_3\visiworld\trunk\prj.thirdparty;C:\opencv\build\include;C:\opencv\build\include\opencv;"
 				CompileAs="2"
 				ExceptionHandling="1"
 				InlineFunctionExpansion="1"
@@ -159,17 +156,17 @@ CommandLine="&quot;C:\Program Files (x86)\CMake 2.8\bin\cmake.exe&quot; -E make_
 				PreprocessorDefinitions="WIN32;_WINDOWS;NDEBUG;_CRT_SECURE_NO_WARNINGS;CMAKE_INTDIR=\&quot;MinSizeRel\&quot;"
 				AssemblerListingLocation="MinSizeRel"
 				ObjectFile="$(IntDir)\"
-				ProgramDataBaseFileName="D:\projects\visiworld\trunk\bin.win32.release\MinSizeRel/semeion.pdb"
+				ProgramDataBaseFileName="C:\visiroad_3\visiworld\trunk\bin.win32.release\MinSizeRel/semeion.pdb"
 />
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCResourceCompilerTool"
-				AdditionalIncludeDirectories="D:\projects\visiworld\trunk\prj.core;D:\projects\visiworld\trunk\prj.sandbox;D:\projects\visiworld\trunk\prj.thirdparty;D:\projects\opencv\build\include;D:\projects\opencv\build\include\opencv;"
+				AdditionalIncludeDirectories="C:\visiroad_3\visiworld\trunk\prj.core;C:\visiroad_3\visiworld\trunk\prj.sandbox;C:\visiroad_3\visiworld\trunk\prj.thirdparty;C:\opencv\build\include;C:\opencv\build\include\opencv;"
 				PreprocessorDefinitions="WIN32;_WINDOWS;NDEBUG;_CRT_SECURE_NO_WARNINGS;CMAKE_INTDIR=\&quot;MinSizeRel\&quot;"/>
 			<Tool
 				Name="VCMIDLTool"
-				AdditionalIncludeDirectories="D:\projects\visiworld\trunk\prj.core;D:\projects\visiworld\trunk\prj.sandbox;D:\projects\visiworld\trunk\prj.thirdparty;D:\projects\opencv\build\include;D:\projects\opencv\build\include\opencv;"
+				AdditionalIncludeDirectories="C:\visiroad_3\visiworld\trunk\prj.core;C:\visiroad_3\visiworld\trunk\prj.sandbox;C:\visiroad_3\visiworld\trunk\prj.thirdparty;C:\opencv\build\include;C:\opencv\build\include\opencv;"
 				MkTypLibCompatible="FALSE"
 				TargetEnvironment="1"
 				GenerateStublessProxies="TRUE"
@@ -183,21 +180,21 @@ CommandLine="&quot;C:\Program Files (x86)\CMake 2.8\bin\cmake.exe&quot; -E make_
 				Name="VCPreBuildEventTool"/>
 			<Tool
 				Name="VCPreLinkEventTool"
-CommandLine="&quot;C:\Program Files (x86)\CMake 2.8\bin\cmake.exe&quot; -E make_directory D:/projects/visiworld/trunk/lib/win32.vc/release/MinSizeRel&#x0D;&#x0A;if errorlevel 1 goto :VCReportError"/>
+CommandLine="&quot;C:\Program Files (x86)\CMake 2.8\bin\cmake.exe&quot; -E make_directory C:/visiroad_3/visiworld/trunk/lib/win32.vc/release/MinSizeRel&#x0D;&#x0A;if errorlevel 1 goto :VCReportError"/>
 			<Tool
 				Name="VCPostBuildEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
 				LinkLibraryDependencies="false"
-				AdditionalOptions=" /STACK:10000000 /machine:X86"
-				AdditionalDependencies="$(NOINHERIT) kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib  D:\projects\opencv\build\x86\vc9\lib\opencv_calib3d244.lib D:\projects\opencv\build\x86\vc9\lib\opencv_contrib244.lib D:\projects\opencv\build\x86\vc9\lib\opencv_core244.lib D:\projects\opencv\build\x86\vc9\lib\opencv_features2d244.lib D:\projects\opencv\build\x86\vc9\lib\opencv_flann244.lib D:\projects\opencv\build\x86\vc9\lib\opencv_gpu244.lib D:\projects\opencv\build\x86\vc9\lib\opencv_highgui244.lib D:\projects\opencv\build\x86\vc9\lib\opencv_imgproc244.lib D:\projects\opencv\build\x86\vc9\lib\opencv_legacy244.lib D:\projects\opencv\build\x86\vc9\lib\opencv_ml244.lib D:\projects\opencv\build\x86\vc9\lib\opencv_nonfree244.lib D:\projects\opencv\build\x86\vc9\lib\opencv_objdetect244.lib D:\projects\opencv\build\x86\vc9\lib\opencv_photo244.lib D:\projects\opencv\build\x86\vc9\lib\opencv_stitching244.lib D:\projects\opencv\build\x86\vc9\lib\opencv_ts244.lib D:\projects\opencv\build\x86\vc9\lib\opencv_video244.lib D:\projects\opencv\build\x86\vc9\lib\opencv_videostab244.lib "
-				OutputFile="D:\projects\visiworld\trunk\bin.win32.release\MinSizeRel\semeion.exe"
+				AdditionalOptions=" /machine:X86"
+				AdditionalDependencies="$(NOINHERIT) kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib C:\opencv\build\x86\vc9\lib\opencv_calib3d244.lib C:\opencv\build\x86\vc9\lib\opencv_contrib244.lib C:\opencv\build\x86\vc9\lib\opencv_core244.lib C:\opencv\build\x86\vc9\lib\opencv_features2d244.lib C:\opencv\build\x86\vc9\lib\opencv_flann244.lib C:\opencv\build\x86\vc9\lib\opencv_gpu244.lib C:\opencv\build\x86\vc9\lib\opencv_highgui244.lib C:\opencv\build\x86\vc9\lib\opencv_imgproc244.lib C:\opencv\build\x86\vc9\lib\opencv_legacy244.lib C:\opencv\build\x86\vc9\lib\opencv_ml244.lib C:\opencv\build\x86\vc9\lib\opencv_nonfree244.lib C:\opencv\build\x86\vc9\lib\opencv_objdetect244.lib C:\opencv\build\x86\vc9\lib\opencv_photo244.lib C:\opencv\build\x86\vc9\lib\opencv_stitching244.lib C:\opencv\build\x86\vc9\lib\opencv_ts244.lib C:\opencv\build\x86\vc9\lib\opencv_video244.lib C:\opencv\build\x86\vc9\lib\opencv_videostab244.lib "
+				OutputFile="C:\visiroad_3\visiworld\trunk\bin.win32.release\MinSizeRel\semeion.exe"
 				Version="0.0"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\..\lib\win32.vc\$(ConfigurationName)\$(OutDir),..\..\..\lib\win32.vc\$(ConfigurationName)"
-				ProgramDatabaseFile="D:\projects\visiworld\trunk\bin.win32.release\MinSizeRel/semeion.pdb"
+				ProgramDatabaseFile="C:\visiroad_3\visiworld\trunk\bin.win32.release\MinSizeRel/semeion.pdb"
 				SubSystem="1"
-				ImportLibrary="D:\projects\visiworld\trunk\lib\win32.vc\release\MinSizeRel\semeion.lib"/>
+				ImportLibrary="C:\visiroad_3\visiworld\trunk\lib\win32.vc\release\MinSizeRel\semeion.lib"/>
 		</Configuration>
 		<Configuration
 			Name="RelWithDebInfo|Win32"
@@ -209,8 +206,7 @@ CommandLine="&quot;C:\Program Files (x86)\CMake 2.8\bin\cmake.exe&quot; -E make_
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalOptions=" /Zm1000"
-				AdditionalIncludeDirectories="D:\projects\visiworld\trunk\prj.core;D:\projects\visiworld\trunk\prj.sandbox;D:\projects\visiworld\trunk\prj.thirdparty;D:\projects\opencv\build\include;D:\projects\opencv\build\include\opencv;"
+				AdditionalIncludeDirectories="C:\visiroad_3\visiworld\trunk\prj.core;C:\visiroad_3\visiworld\trunk\prj.sandbox;C:\visiroad_3\visiworld\trunk\prj.thirdparty;C:\opencv\build\include;C:\opencv\build\include\opencv;"
 				CompileAs="2"
 				DebugInformationFormat="3"
 				ExceptionHandling="1"
@@ -222,17 +218,17 @@ CommandLine="&quot;C:\Program Files (x86)\CMake 2.8\bin\cmake.exe&quot; -E make_
 				PreprocessorDefinitions="WIN32;_WINDOWS;NDEBUG;_CRT_SECURE_NO_WARNINGS;CMAKE_INTDIR=\&quot;RelWithDebInfo\&quot;"
 				AssemblerListingLocation="RelWithDebInfo"
 				ObjectFile="$(IntDir)\"
-				ProgramDataBaseFileName="D:\projects\visiworld\trunk\bin.win32.release\RelWithDebInfo/semeion.pdb"
+				ProgramDataBaseFileName="C:\visiroad_3\visiworld\trunk\bin.win32.release\RelWithDebInfo/semeion.pdb"
 />
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCResourceCompilerTool"
-				AdditionalIncludeDirectories="D:\projects\visiworld\trunk\prj.core;D:\projects\visiworld\trunk\prj.sandbox;D:\projects\visiworld\trunk\prj.thirdparty;D:\projects\opencv\build\include;D:\projects\opencv\build\include\opencv;"
+				AdditionalIncludeDirectories="C:\visiroad_3\visiworld\trunk\prj.core;C:\visiroad_3\visiworld\trunk\prj.sandbox;C:\visiroad_3\visiworld\trunk\prj.thirdparty;C:\opencv\build\include;C:\opencv\build\include\opencv;"
 				PreprocessorDefinitions="WIN32;_WINDOWS;NDEBUG;_CRT_SECURE_NO_WARNINGS;CMAKE_INTDIR=\&quot;RelWithDebInfo\&quot;"/>
 			<Tool
 				Name="VCMIDLTool"
-				AdditionalIncludeDirectories="D:\projects\visiworld\trunk\prj.core;D:\projects\visiworld\trunk\prj.sandbox;D:\projects\visiworld\trunk\prj.thirdparty;D:\projects\opencv\build\include;D:\projects\opencv\build\include\opencv;"
+				AdditionalIncludeDirectories="C:\visiroad_3\visiworld\trunk\prj.core;C:\visiroad_3\visiworld\trunk\prj.sandbox;C:\visiroad_3\visiworld\trunk\prj.thirdparty;C:\opencv\build\include;C:\opencv\build\include\opencv;"
 				MkTypLibCompatible="FALSE"
 				TargetEnvironment="1"
 				GenerateStublessProxies="TRUE"
@@ -246,76 +242,76 @@ CommandLine="&quot;C:\Program Files (x86)\CMake 2.8\bin\cmake.exe&quot; -E make_
 				Name="VCPreBuildEventTool"/>
 			<Tool
 				Name="VCPreLinkEventTool"
-CommandLine="&quot;C:\Program Files (x86)\CMake 2.8\bin\cmake.exe&quot; -E make_directory D:/projects/visiworld/trunk/lib/win32.vc/release/RelWithDebInfo&#x0D;&#x0A;if errorlevel 1 goto :VCReportError"/>
+CommandLine="&quot;C:\Program Files (x86)\CMake 2.8\bin\cmake.exe&quot; -E make_directory C:/visiroad_3/visiworld/trunk/lib/win32.vc/release/RelWithDebInfo&#x0D;&#x0A;if errorlevel 1 goto :VCReportError"/>
 			<Tool
 				Name="VCPostBuildEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
 				LinkLibraryDependencies="false"
-				AdditionalOptions=" /STACK:10000000 /machine:X86 /debug"
-				AdditionalDependencies="$(NOINHERIT) kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib  D:\projects\opencv\build\x86\vc9\lib\opencv_calib3d244.lib D:\projects\opencv\build\x86\vc9\lib\opencv_contrib244.lib D:\projects\opencv\build\x86\vc9\lib\opencv_core244.lib D:\projects\opencv\build\x86\vc9\lib\opencv_features2d244.lib D:\projects\opencv\build\x86\vc9\lib\opencv_flann244.lib D:\projects\opencv\build\x86\vc9\lib\opencv_gpu244.lib D:\projects\opencv\build\x86\vc9\lib\opencv_highgui244.lib D:\projects\opencv\build\x86\vc9\lib\opencv_imgproc244.lib D:\projects\opencv\build\x86\vc9\lib\opencv_legacy244.lib D:\projects\opencv\build\x86\vc9\lib\opencv_ml244.lib D:\projects\opencv\build\x86\vc9\lib\opencv_nonfree244.lib D:\projects\opencv\build\x86\vc9\lib\opencv_objdetect244.lib D:\projects\opencv\build\x86\vc9\lib\opencv_photo244.lib D:\projects\opencv\build\x86\vc9\lib\opencv_stitching244.lib D:\projects\opencv\build\x86\vc9\lib\opencv_ts244.lib D:\projects\opencv\build\x86\vc9\lib\opencv_video244.lib D:\projects\opencv\build\x86\vc9\lib\opencv_videostab244.lib "
-				OutputFile="D:\projects\visiworld\trunk\bin.win32.release\RelWithDebInfo\semeion.exe"
+				AdditionalOptions=" /machine:X86 /debug"
+				AdditionalDependencies="$(NOINHERIT) kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib C:\opencv\build\x86\vc9\lib\opencv_calib3d244.lib C:\opencv\build\x86\vc9\lib\opencv_contrib244.lib C:\opencv\build\x86\vc9\lib\opencv_core244.lib C:\opencv\build\x86\vc9\lib\opencv_features2d244.lib C:\opencv\build\x86\vc9\lib\opencv_flann244.lib C:\opencv\build\x86\vc9\lib\opencv_gpu244.lib C:\opencv\build\x86\vc9\lib\opencv_highgui244.lib C:\opencv\build\x86\vc9\lib\opencv_imgproc244.lib C:\opencv\build\x86\vc9\lib\opencv_legacy244.lib C:\opencv\build\x86\vc9\lib\opencv_ml244.lib C:\opencv\build\x86\vc9\lib\opencv_nonfree244.lib C:\opencv\build\x86\vc9\lib\opencv_objdetect244.lib C:\opencv\build\x86\vc9\lib\opencv_photo244.lib C:\opencv\build\x86\vc9\lib\opencv_stitching244.lib C:\opencv\build\x86\vc9\lib\opencv_ts244.lib C:\opencv\build\x86\vc9\lib\opencv_video244.lib C:\opencv\build\x86\vc9\lib\opencv_videostab244.lib "
+				OutputFile="C:\visiroad_3\visiworld\trunk\bin.win32.release\RelWithDebInfo\semeion.exe"
 				Version="0.0"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\..\lib\win32.vc\$(ConfigurationName)\$(OutDir),..\..\..\lib\win32.vc\$(ConfigurationName)"
-				ProgramDatabaseFile="D:\projects\visiworld\trunk\bin.win32.release\RelWithDebInfo/semeion.pdb"
+				ProgramDatabaseFile="C:\visiroad_3\visiworld\trunk\bin.win32.release\RelWithDebInfo/semeion.pdb"
 				GenerateDebugInformation="TRUE"
 				SubSystem="1"
-				ImportLibrary="D:\projects\visiworld\trunk\lib\win32.vc\release\RelWithDebInfo\semeion.lib"/>
+				ImportLibrary="C:\visiroad_3\visiworld\trunk\lib\win32.vc\release\RelWithDebInfo\semeion.lib"/>
 		</Configuration>
 	</Configurations>
 	<Files>
 			<File
-				RelativePath="D:\projects\visiworld\trunk\prj.sandbox\semeion\CMakeLists.txt">
+				RelativePath="C:\visiroad_3\visiworld\trunk\prj.sandbox\semeion\CMakeLists.txt">
 				<FileConfiguration
 					Name="Debug|Win32">
 					<Tool
 					Name="VCCustomBuildTool"
-					Description="Building Custom Rule D:/projects/visiworld/trunk/prj.sandbox/semeion/CMakeLists.txt"
-					CommandLine="&quot;C:\Program Files (x86)\CMake 2.8\bin\cmake.exe&quot; -HD:/projects/visiworld/trunk -BD:/projects/visiworld/trunk/build --check-stamp-file D:\projects\visiworld\trunk\build\prj.sandbox\semeion\CMakeFiles\generate.stamp&#x0D;&#x0A;if errorlevel 1 goto :VCReportError"
-					AdditionalDependencies="D:\projects\visiworld\trunk\prj.sandbox\semeion\CMakeLists.txt;D:\projects\visiworld\trunk\prj.sandbox\semeion\CMakeLists.txt;"
-					Outputs="D:\projects\visiworld\trunk\build\prj.sandbox\semeion\CMakeFiles\generate.stamp"/>
+					Description="Building Custom Rule C:/visiroad_3/visiworld/trunk/prj.sandbox/semeion/CMakeLists.txt"
+					CommandLine="&quot;C:\Program Files (x86)\CMake 2.8\bin\cmake.exe&quot; -HC:/visiroad_3/visiworld/trunk -BC:/visiroad_3/visiworld/trunk/build --check-stamp-file C:\visiroad_3\visiworld\trunk\build\prj.sandbox\semeion\CMakeFiles\generate.stamp&#x0D;&#x0A;if errorlevel 1 goto :VCReportError"
+					AdditionalDependencies="C:\visiroad_3\visiworld\trunk\prj.sandbox\semeion\CMakeLists.txt;C:\visiroad_3\visiworld\trunk\prj.sandbox\semeion\CMakeLists.txt;"
+					Outputs="C:\visiroad_3\visiworld\trunk\build\prj.sandbox\semeion\CMakeFiles\generate.stamp"/>
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Release|Win32">
 					<Tool
 					Name="VCCustomBuildTool"
-					Description="Building Custom Rule D:/projects/visiworld/trunk/prj.sandbox/semeion/CMakeLists.txt"
-					CommandLine="&quot;C:\Program Files (x86)\CMake 2.8\bin\cmake.exe&quot; -HD:/projects/visiworld/trunk -BD:/projects/visiworld/trunk/build --check-stamp-file D:\projects\visiworld\trunk\build\prj.sandbox\semeion\CMakeFiles\generate.stamp&#x0D;&#x0A;if errorlevel 1 goto :VCReportError"
-					AdditionalDependencies="D:\projects\visiworld\trunk\prj.sandbox\semeion\CMakeLists.txt;D:\projects\visiworld\trunk\prj.sandbox\semeion\CMakeLists.txt;"
-					Outputs="D:\projects\visiworld\trunk\build\prj.sandbox\semeion\CMakeFiles\generate.stamp"/>
+					Description="Building Custom Rule C:/visiroad_3/visiworld/trunk/prj.sandbox/semeion/CMakeLists.txt"
+					CommandLine="&quot;C:\Program Files (x86)\CMake 2.8\bin\cmake.exe&quot; -HC:/visiroad_3/visiworld/trunk -BC:/visiroad_3/visiworld/trunk/build --check-stamp-file C:\visiroad_3\visiworld\trunk\build\prj.sandbox\semeion\CMakeFiles\generate.stamp&#x0D;&#x0A;if errorlevel 1 goto :VCReportError"
+					AdditionalDependencies="C:\visiroad_3\visiworld\trunk\prj.sandbox\semeion\CMakeLists.txt;C:\visiroad_3\visiworld\trunk\prj.sandbox\semeion\CMakeLists.txt;"
+					Outputs="C:\visiroad_3\visiworld\trunk\build\prj.sandbox\semeion\CMakeFiles\generate.stamp"/>
 				</FileConfiguration>
 				<FileConfiguration
 					Name="MinSizeRel|Win32">
 					<Tool
 					Name="VCCustomBuildTool"
-					Description="Building Custom Rule D:/projects/visiworld/trunk/prj.sandbox/semeion/CMakeLists.txt"
-					CommandLine="&quot;C:\Program Files (x86)\CMake 2.8\bin\cmake.exe&quot; -HD:/projects/visiworld/trunk -BD:/projects/visiworld/trunk/build --check-stamp-file D:\projects\visiworld\trunk\build\prj.sandbox\semeion\CMakeFiles\generate.stamp&#x0D;&#x0A;if errorlevel 1 goto :VCReportError"
-					AdditionalDependencies="D:\projects\visiworld\trunk\prj.sandbox\semeion\CMakeLists.txt;D:\projects\visiworld\trunk\prj.sandbox\semeion\CMakeLists.txt;"
-					Outputs="D:\projects\visiworld\trunk\build\prj.sandbox\semeion\CMakeFiles\generate.stamp"/>
+					Description="Building Custom Rule C:/visiroad_3/visiworld/trunk/prj.sandbox/semeion/CMakeLists.txt"
+					CommandLine="&quot;C:\Program Files (x86)\CMake 2.8\bin\cmake.exe&quot; -HC:/visiroad_3/visiworld/trunk -BC:/visiroad_3/visiworld/trunk/build --check-stamp-file C:\visiroad_3\visiworld\trunk\build\prj.sandbox\semeion\CMakeFiles\generate.stamp&#x0D;&#x0A;if errorlevel 1 goto :VCReportError"
+					AdditionalDependencies="C:\visiroad_3\visiworld\trunk\prj.sandbox\semeion\CMakeLists.txt;C:\visiroad_3\visiworld\trunk\prj.sandbox\semeion\CMakeLists.txt;"
+					Outputs="C:\visiroad_3\visiworld\trunk\build\prj.sandbox\semeion\CMakeFiles\generate.stamp"/>
 				</FileConfiguration>
 				<FileConfiguration
 					Name="RelWithDebInfo|Win32">
 					<Tool
 					Name="VCCustomBuildTool"
-					Description="Building Custom Rule D:/projects/visiworld/trunk/prj.sandbox/semeion/CMakeLists.txt"
-					CommandLine="&quot;C:\Program Files (x86)\CMake 2.8\bin\cmake.exe&quot; -HD:/projects/visiworld/trunk -BD:/projects/visiworld/trunk/build --check-stamp-file D:\projects\visiworld\trunk\build\prj.sandbox\semeion\CMakeFiles\generate.stamp&#x0D;&#x0A;if errorlevel 1 goto :VCReportError"
-					AdditionalDependencies="D:\projects\visiworld\trunk\prj.sandbox\semeion\CMakeLists.txt;D:\projects\visiworld\trunk\prj.sandbox\semeion\CMakeLists.txt;"
-					Outputs="D:\projects\visiworld\trunk\build\prj.sandbox\semeion\CMakeFiles\generate.stamp"/>
+					Description="Building Custom Rule C:/visiroad_3/visiworld/trunk/prj.sandbox/semeion/CMakeLists.txt"
+					CommandLine="&quot;C:\Program Files (x86)\CMake 2.8\bin\cmake.exe&quot; -HC:/visiroad_3/visiworld/trunk -BC:/visiroad_3/visiworld/trunk/build --check-stamp-file C:\visiroad_3\visiworld\trunk\build\prj.sandbox\semeion\CMakeFiles\generate.stamp&#x0D;&#x0A;if errorlevel 1 goto :VCReportError"
+					AdditionalDependencies="C:\visiroad_3\visiworld\trunk\prj.sandbox\semeion\CMakeLists.txt;C:\visiroad_3\visiworld\trunk\prj.sandbox\semeion\CMakeLists.txt;"
+					Outputs="C:\visiroad_3\visiworld\trunk\build\prj.sandbox\semeion\CMakeFiles\generate.stamp"/>
 				</FileConfiguration>
 			</File>
 		<Filter
 			Name="Source Files"
 			Filter="">
 			<File
-				RelativePath="D:\projects\visiworld\trunk\prj.sandbox\semeion\src\main.cpp">
+				RelativePath="C:\visiroad_3\visiworld\trunk\prj.sandbox\semeion\src\main.cpp">
 			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
 			Filter="">
 			<File
-				RelativePath="D:\projects\visiworld\trunk\prj.sandbox\semeion\src\cover_tree.h">
+				RelativePath="C:\visiroad_3\visiworld\trunk\prj.sandbox\semeion\src\cover_tree.h">
 			</File>
 		</Filter>
 	</Files>

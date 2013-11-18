@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="9.00"
 	Name="ZERO_CHECK"
-	ProjectGUID="{676309F1-2CFE-4830-AA6B-11FFFF330C8F}"
+	ProjectGUID="{C28DF0A5-E27F-497B-B38F-9F387C55D499}"
 	Keyword="Win32Proj">
 	<Platforms>
 		<Platform
@@ -20,7 +20,7 @@
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="D:\projects\visiworld\trunk\prj.core;D:\projects\visiworld\trunk\prj.sandbox;D:\projects\visiworld\trunk\prj.thirdparty;D:\projects\opencv\build\include;D:\projects\opencv\build\include\opencv;"
+				AdditionalIncludeDirectories="C:\visiroad_3\visiworld\trunk\prj.core;C:\visiroad_3\visiworld\trunk\prj.sandbox;C:\visiroad_3\visiworld\trunk\prj.thirdparty;C:\opencv\build\include;C:\opencv\build\include\opencv;"
 				ExceptionHandling="0"
 				PreprocessorDefinitions="_CRT_SECURE_NO_WARNINGS;CMAKE_INTDIR=\&quot;Debug\&quot;"
 				AssemblerListingLocation="Debug"
@@ -30,11 +30,11 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCResourceCompilerTool"
-				AdditionalIncludeDirectories="D:\projects\visiworld\trunk\prj.core;D:\projects\visiworld\trunk\prj.sandbox;D:\projects\visiworld\trunk\prj.thirdparty;D:\projects\opencv\build\include;D:\projects\opencv\build\include\opencv;"
+				AdditionalIncludeDirectories="C:\visiroad_3\visiworld\trunk\prj.core;C:\visiroad_3\visiworld\trunk\prj.sandbox;C:\visiroad_3\visiworld\trunk\prj.thirdparty;C:\opencv\build\include;C:\opencv\build\include\opencv;"
 				PreprocessorDefinitions="_CRT_SECURE_NO_WARNINGS;CMAKE_INTDIR=\&quot;Debug\&quot;"/>
 			<Tool
 				Name="VCMIDLTool"
-				AdditionalIncludeDirectories="D:\projects\visiworld\trunk\prj.core;D:\projects\visiworld\trunk\prj.sandbox;D:\projects\visiworld\trunk\prj.thirdparty;D:\projects\opencv\build\include;D:\projects\opencv\build\include\opencv;"
+				AdditionalIncludeDirectories="C:\visiroad_3\visiworld\trunk\prj.core;C:\visiroad_3\visiworld\trunk\prj.sandbox;C:\visiroad_3\visiworld\trunk\prj.thirdparty;C:\opencv\build\include;C:\opencv\build\include\opencv;"
 				MkTypLibCompatible="FALSE"
 				TargetEnvironment="1"
 				GenerateStublessProxies="TRUE"
@@ -61,7 +61,7 @@
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="D:\projects\visiworld\trunk\prj.core;D:\projects\visiworld\trunk\prj.sandbox;D:\projects\visiworld\trunk\prj.thirdparty;D:\projects\opencv\build\include;D:\projects\opencv\build\include\opencv;"
+				AdditionalIncludeDirectories="C:\visiroad_3\visiworld\trunk\prj.core;C:\visiroad_3\visiworld\trunk\prj.sandbox;C:\visiroad_3\visiworld\trunk\prj.thirdparty;C:\opencv\build\include;C:\opencv\build\include\opencv;"
 				ExceptionHandling="0"
 				PreprocessorDefinitions="_CRT_SECURE_NO_WARNINGS;CMAKE_INTDIR=\&quot;Release\&quot;"
 				AssemblerListingLocation="Release"
@@ -71,11 +71,11 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCResourceCompilerTool"
-				AdditionalIncludeDirectories="D:\projects\visiworld\trunk\prj.core;D:\projects\visiworld\trunk\prj.sandbox;D:\projects\visiworld\trunk\prj.thirdparty;D:\projects\opencv\build\include;D:\projects\opencv\build\include\opencv;"
+				AdditionalIncludeDirectories="C:\visiroad_3\visiworld\trunk\prj.core;C:\visiroad_3\visiworld\trunk\prj.sandbox;C:\visiroad_3\visiworld\trunk\prj.thirdparty;C:\opencv\build\include;C:\opencv\build\include\opencv;"
 				PreprocessorDefinitions="_CRT_SECURE_NO_WARNINGS;CMAKE_INTDIR=\&quot;Release\&quot;"/>
 			<Tool
 				Name="VCMIDLTool"
-				AdditionalIncludeDirectories="D:\projects\visiworld\trunk\prj.core;D:\projects\visiworld\trunk\prj.sandbox;D:\projects\visiworld\trunk\prj.thirdparty;D:\projects\opencv\build\include;D:\projects\opencv\build\include\opencv;"
+				AdditionalIncludeDirectories="C:\visiroad_3\visiworld\trunk\prj.core;C:\visiroad_3\visiworld\trunk\prj.sandbox;C:\visiroad_3\visiworld\trunk\prj.thirdparty;C:\opencv\build\include;C:\opencv\build\include\opencv;"
 				MkTypLibCompatible="FALSE"
 				TargetEnvironment="1"
 				GenerateStublessProxies="TRUE"
@@ -102,7 +102,7 @@
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="D:\projects\visiworld\trunk\prj.core;D:\projects\visiworld\trunk\prj.sandbox;D:\projects\visiworld\trunk\prj.thirdparty;D:\projects\opencv\build\include;D:\projects\opencv\build\include\opencv;"
+				AdditionalIncludeDirectories="C:\visiroad_3\visiworld\trunk\prj.core;C:\visiroad_3\visiworld\trunk\prj.sandbox;C:\visiroad_3\visiworld\trunk\prj.thirdparty;C:\opencv\build\include;C:\opencv\build\include\opencv;"
 				ExceptionHandling="0"
 				PreprocessorDefinitions="_CRT_SECURE_NO_WARNINGS;CMAKE_INTDIR=\&quot;MinSizeRel\&quot;"
 				AssemblerListingLocation="MinSizeRel"
@@ -112,11 +112,11 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCResourceCompilerTool"
-				AdditionalIncludeDirectories="D:\projects\visiworld\trunk\prj.core;D:\projects\visiworld\trunk\prj.sandbox;D:\projects\visiworld\trunk\prj.thirdparty;D:\projects\opencv\build\include;D:\projects\opencv\build\include\opencv;"
+				AdditionalIncludeDirectories="C:\visiroad_3\visiworld\trunk\prj.core;C:\visiroad_3\visiworld\trunk\prj.sandbox;C:\visiroad_3\visiworld\trunk\prj.thirdparty;C:\opencv\build\include;C:\opencv\build\include\opencv;"
 				PreprocessorDefinitions="_CRT_SECURE_NO_WARNINGS;CMAKE_INTDIR=\&quot;MinSizeRel\&quot;"/>
 			<Tool
 				Name="VCMIDLTool"
-				AdditionalIncludeDirectories="D:\projects\visiworld\trunk\prj.core;D:\projects\visiworld\trunk\prj.sandbox;D:\projects\visiworld\trunk\prj.thirdparty;D:\projects\opencv\build\include;D:\projects\opencv\build\include\opencv;"
+				AdditionalIncludeDirectories="C:\visiroad_3\visiworld\trunk\prj.core;C:\visiroad_3\visiworld\trunk\prj.sandbox;C:\visiroad_3\visiworld\trunk\prj.thirdparty;C:\opencv\build\include;C:\opencv\build\include\opencv;"
 				MkTypLibCompatible="FALSE"
 				TargetEnvironment="1"
 				GenerateStublessProxies="TRUE"
@@ -143,7 +143,7 @@
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="D:\projects\visiworld\trunk\prj.core;D:\projects\visiworld\trunk\prj.sandbox;D:\projects\visiworld\trunk\prj.thirdparty;D:\projects\opencv\build\include;D:\projects\opencv\build\include\opencv;"
+				AdditionalIncludeDirectories="C:\visiroad_3\visiworld\trunk\prj.core;C:\visiroad_3\visiworld\trunk\prj.sandbox;C:\visiroad_3\visiworld\trunk\prj.thirdparty;C:\opencv\build\include;C:\opencv\build\include\opencv;"
 				ExceptionHandling="0"
 				PreprocessorDefinitions="_CRT_SECURE_NO_WARNINGS;CMAKE_INTDIR=\&quot;RelWithDebInfo\&quot;"
 				AssemblerListingLocation="RelWithDebInfo"
@@ -153,11 +153,11 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCResourceCompilerTool"
-				AdditionalIncludeDirectories="D:\projects\visiworld\trunk\prj.core;D:\projects\visiworld\trunk\prj.sandbox;D:\projects\visiworld\trunk\prj.thirdparty;D:\projects\opencv\build\include;D:\projects\opencv\build\include\opencv;"
+				AdditionalIncludeDirectories="C:\visiroad_3\visiworld\trunk\prj.core;C:\visiroad_3\visiworld\trunk\prj.sandbox;C:\visiroad_3\visiworld\trunk\prj.thirdparty;C:\opencv\build\include;C:\opencv\build\include\opencv;"
 				PreprocessorDefinitions="_CRT_SECURE_NO_WARNINGS;CMAKE_INTDIR=\&quot;RelWithDebInfo\&quot;"/>
 			<Tool
 				Name="VCMIDLTool"
-				AdditionalIncludeDirectories="D:\projects\visiworld\trunk\prj.core;D:\projects\visiworld\trunk\prj.sandbox;D:\projects\visiworld\trunk\prj.thirdparty;D:\projects\opencv\build\include;D:\projects\opencv\build\include\opencv;"
+				AdditionalIncludeDirectories="C:\visiroad_3\visiworld\trunk\prj.core;C:\visiroad_3\visiworld\trunk\prj.sandbox;C:\visiroad_3\visiworld\trunk\prj.thirdparty;C:\opencv\build\include;C:\opencv\build\include\opencv;"
 				MkTypLibCompatible="FALSE"
 				TargetEnvironment="1"
 				GenerateStublessProxies="TRUE"
@@ -177,60 +177,60 @@
 	</Configurations>
 	<Files>
 			<File
-				RelativePath="D:\projects\visiworld\trunk\build\CMakeFiles\ZERO_CHECK">
+				RelativePath="C:\visiroad_3\visiworld\trunk\build\CMakeFiles\ZERO_CHECK">
 			</File>
 		<Filter
 			Name="CMake Rules"
 			Filter="">
 			<File
-				RelativePath="D:\projects\visiworld\trunk\build\CMakeFiles\generate.stamp.rule">
+				RelativePath="C:\visiroad_3\visiworld\trunk\build\CMakeFiles\generate.stamp.rule">
 				<FileConfiguration
 					Name="Debug|Win32">
 					<Tool
 					Name="VCCustomBuildTool"
 					Description="Checking Build System"
-					CommandLine="&quot;C:\Program Files (x86)\CMake 2.8\bin\cmake.exe&quot; -HD:/projects/visiworld/trunk -BD:/projects/visiworld/trunk/build --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file &quot;$(SolutionPath)&quot;&#x0D;&#x0A;if errorlevel 1 goto :VCReportError"
-					AdditionalDependencies="&quot;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\CMakeCInformation.cmake&quot;;&quot;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\CMakeCXXInformation.cmake&quot;;&quot;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\CMakeCommonLanguageInclude.cmake&quot;;&quot;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\CMakeGenericSystem.cmake&quot;;&quot;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\CMakeRCInformation.cmake&quot;;&quot;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\CMakeSystemSpecificInformation.cmake&quot;;&quot;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\Platform\Windows-cl.cmake&quot;;&quot;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\Platform\Windows.cmake&quot;;&quot;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\Platform\WindowsPaths.cmake&quot;;&quot;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\Platform\cl.cmake&quot;;D:\projects\opencv\build\OpenCVConfig-version.cmake;D:\projects\opencv\build\OpenCVConfig.cmake;D:\projects\opencv\build\x86\vc9\lib\OpenCVConfig.cmake;D:\projects\visiworld\trunk\CMakeLists.txt;D:\projects\visiworld\trunk\build\CMakeFiles\CMakeCCompiler.cmake;D:\projects\visiworld\trunk\build\CMakeFiles\CMakeCPlatform.cmake;D:\projects\visiworld\trunk\build\CMakeFiles\CMakeCXXCompiler.cmake;D:\projects\visiworld\trunk\build\CMakeFiles\CMakeCXXPlatform.cmake;D:\projects\visiworld\trunk\build\CMakeFiles\CMakeRCCompiler.cmake;D:\projects\visiworld\trunk\build\CMakeFiles\CMakeSystem.cmake;D:\projects\visiworld\trunk\prj.core\CMakeLists.txt;D:\projects\visiworld\trunk\prj.sandbox\CMakeLists.txt;D:\projects\visiworld\trunk\prj.sandbox\mnist\CMakeLists.txt;D:\projects\visiworld\trunk\prj.sandbox\overcom\CMakeLists.txt;D:\projects\visiworld\trunk\prj.sandbox\semeion\CMakeLists.txt;D:\projects\visiworld\trunk\prj.thirdparty\CMakeLists.txt;"
-					Outputs="D:\projects\visiworld\trunk\build\CMakeFiles\generate.stamp;D:\projects\visiworld\trunk\build\prj.core\CMakeFiles\generate.stamp;D:\projects\visiworld\trunk\build\prj.sandbox\CMakeFiles\generate.stamp;D:\projects\visiworld\trunk\build\prj.sandbox\mnist\CMakeFiles\generate.stamp;D:\projects\visiworld\trunk\build\prj.sandbox\overcom\CMakeFiles\generate.stamp;D:\projects\visiworld\trunk\build\prj.sandbox\semeion\CMakeFiles\generate.stamp;D:\projects\visiworld\trunk\build\prj.thirdparty\CMakeFiles\generate.stamp"/>
+					CommandLine="&quot;C:\Program Files (x86)\CMake 2.8\bin\cmake.exe&quot; -HC:/visiroad_3/visiworld/trunk -BC:/visiroad_3/visiworld/trunk/build --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file &quot;$(SolutionPath)&quot;&#x0D;&#x0A;if errorlevel 1 goto :VCReportError"
+					AdditionalDependencies="&quot;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\CMakeCInformation.cmake&quot;;&quot;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\CMakeCXXInformation.cmake&quot;;&quot;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\CMakeCommonLanguageInclude.cmake&quot;;&quot;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\CMakeGenericSystem.cmake&quot;;&quot;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\CMakeRCInformation.cmake&quot;;&quot;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\CMakeSystemSpecificInformation.cmake&quot;;&quot;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\Platform\Windows-MSVC-C.cmake&quot;;&quot;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\Platform\Windows-MSVC-CXX.cmake&quot;;&quot;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\Platform\Windows-MSVC.cmake&quot;;&quot;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\Platform\Windows.cmake&quot;;&quot;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\Platform\WindowsPaths.cmake&quot;;C:\opencv\build\OpenCVConfig-version.cmake;C:\opencv\build\OpenCVConfig.cmake;C:\opencv\build\x86\vc9\lib\OpenCVConfig.cmake;C:\visiroad_3\visiworld\trunk\CMakeLists.txt;C:\visiroad_3\visiworld\trunk\build\CMakeFiles\2.8.11.2\CMakeCCompiler.cmake;C:\visiroad_3\visiworld\trunk\build\CMakeFiles\2.8.11.2\CMakeCXXCompiler.cmake;C:\visiroad_3\visiworld\trunk\build\CMakeFiles\2.8.11.2\CMakeRCCompiler.cmake;C:\visiroad_3\visiworld\trunk\build\CMakeFiles\2.8.11.2\CMakeSystem.cmake;C:\visiroad_3\visiworld\trunk\prj.core\CMakeLists.txt;C:\visiroad_3\visiworld\trunk\prj.sandbox\CMakeLists.txt;C:\visiroad_3\visiworld\trunk\prj.sandbox\mnist\CMakeLists.txt;C:\visiroad_3\visiworld\trunk\prj.sandbox\overcom\CMakeLists.txt;C:\visiroad_3\visiworld\trunk\prj.sandbox\semeion\CMakeLists.txt;C:\visiroad_3\visiworld\trunk\prj.thirdparty\CMakeLists.txt;"
+					Outputs="C:\visiroad_3\visiworld\trunk\build\CMakeFiles\generate.stamp;C:\visiroad_3\visiworld\trunk\build\prj.core\CMakeFiles\generate.stamp;C:\visiroad_3\visiworld\trunk\build\prj.sandbox\CMakeFiles\generate.stamp;C:\visiroad_3\visiworld\trunk\build\prj.sandbox\mnist\CMakeFiles\generate.stamp;C:\visiroad_3\visiworld\trunk\build\prj.sandbox\overcom\CMakeFiles\generate.stamp;C:\visiroad_3\visiworld\trunk\build\prj.sandbox\semeion\CMakeFiles\generate.stamp;C:\visiroad_3\visiworld\trunk\build\prj.thirdparty\CMakeFiles\generate.stamp"/>
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Release|Win32">
 					<Tool
 					Name="VCCustomBuildTool"
 					Description="Checking Build System"
-					CommandLine="&quot;C:\Program Files (x86)\CMake 2.8\bin\cmake.exe&quot; -HD:/projects/visiworld/trunk -BD:/projects/visiworld/trunk/build --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file &quot;$(SolutionPath)&quot;&#x0D;&#x0A;if errorlevel 1 goto :VCReportError"
-					AdditionalDependencies="&quot;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\CMakeCInformation.cmake&quot;;&quot;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\CMakeCXXInformation.cmake&quot;;&quot;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\CMakeCommonLanguageInclude.cmake&quot;;&quot;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\CMakeGenericSystem.cmake&quot;;&quot;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\CMakeRCInformation.cmake&quot;;&quot;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\CMakeSystemSpecificInformation.cmake&quot;;&quot;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\Platform\Windows-cl.cmake&quot;;&quot;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\Platform\Windows.cmake&quot;;&quot;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\Platform\WindowsPaths.cmake&quot;;&quot;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\Platform\cl.cmake&quot;;D:\projects\opencv\build\OpenCVConfig-version.cmake;D:\projects\opencv\build\OpenCVConfig.cmake;D:\projects\opencv\build\x86\vc9\lib\OpenCVConfig.cmake;D:\projects\visiworld\trunk\CMakeLists.txt;D:\projects\visiworld\trunk\build\CMakeFiles\CMakeCCompiler.cmake;D:\projects\visiworld\trunk\build\CMakeFiles\CMakeCPlatform.cmake;D:\projects\visiworld\trunk\build\CMakeFiles\CMakeCXXCompiler.cmake;D:\projects\visiworld\trunk\build\CMakeFiles\CMakeCXXPlatform.cmake;D:\projects\visiworld\trunk\build\CMakeFiles\CMakeRCCompiler.cmake;D:\projects\visiworld\trunk\build\CMakeFiles\CMakeSystem.cmake;D:\projects\visiworld\trunk\prj.core\CMakeLists.txt;D:\projects\visiworld\trunk\prj.sandbox\CMakeLists.txt;D:\projects\visiworld\trunk\prj.sandbox\mnist\CMakeLists.txt;D:\projects\visiworld\trunk\prj.sandbox\overcom\CMakeLists.txt;D:\projects\visiworld\trunk\prj.sandbox\semeion\CMakeLists.txt;D:\projects\visiworld\trunk\prj.thirdparty\CMakeLists.txt;"
-					Outputs="D:\projects\visiworld\trunk\build\CMakeFiles\generate.stamp;D:\projects\visiworld\trunk\build\prj.core\CMakeFiles\generate.stamp;D:\projects\visiworld\trunk\build\prj.sandbox\CMakeFiles\generate.stamp;D:\projects\visiworld\trunk\build\prj.sandbox\mnist\CMakeFiles\generate.stamp;D:\projects\visiworld\trunk\build\prj.sandbox\overcom\CMakeFiles\generate.stamp;D:\projects\visiworld\trunk\build\prj.sandbox\semeion\CMakeFiles\generate.stamp;D:\projects\visiworld\trunk\build\prj.thirdparty\CMakeFiles\generate.stamp"/>
+					CommandLine="&quot;C:\Program Files (x86)\CMake 2.8\bin\cmake.exe&quot; -HC:/visiroad_3/visiworld/trunk -BC:/visiroad_3/visiworld/trunk/build --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file &quot;$(SolutionPath)&quot;&#x0D;&#x0A;if errorlevel 1 goto :VCReportError"
+					AdditionalDependencies="&quot;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\CMakeCInformation.cmake&quot;;&quot;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\CMakeCXXInformation.cmake&quot;;&quot;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\CMakeCommonLanguageInclude.cmake&quot;;&quot;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\CMakeGenericSystem.cmake&quot;;&quot;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\CMakeRCInformation.cmake&quot;;&quot;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\CMakeSystemSpecificInformation.cmake&quot;;&quot;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\Platform\Windows-MSVC-C.cmake&quot;;&quot;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\Platform\Windows-MSVC-CXX.cmake&quot;;&quot;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\Platform\Windows-MSVC.cmake&quot;;&quot;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\Platform\Windows.cmake&quot;;&quot;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\Platform\WindowsPaths.cmake&quot;;C:\opencv\build\OpenCVConfig-version.cmake;C:\opencv\build\OpenCVConfig.cmake;C:\opencv\build\x86\vc9\lib\OpenCVConfig.cmake;C:\visiroad_3\visiworld\trunk\CMakeLists.txt;C:\visiroad_3\visiworld\trunk\build\CMakeFiles\2.8.11.2\CMakeCCompiler.cmake;C:\visiroad_3\visiworld\trunk\build\CMakeFiles\2.8.11.2\CMakeCXXCompiler.cmake;C:\visiroad_3\visiworld\trunk\build\CMakeFiles\2.8.11.2\CMakeRCCompiler.cmake;C:\visiroad_3\visiworld\trunk\build\CMakeFiles\2.8.11.2\CMakeSystem.cmake;C:\visiroad_3\visiworld\trunk\prj.core\CMakeLists.txt;C:\visiroad_3\visiworld\trunk\prj.sandbox\CMakeLists.txt;C:\visiroad_3\visiworld\trunk\prj.sandbox\mnist\CMakeLists.txt;C:\visiroad_3\visiworld\trunk\prj.sandbox\overcom\CMakeLists.txt;C:\visiroad_3\visiworld\trunk\prj.sandbox\semeion\CMakeLists.txt;C:\visiroad_3\visiworld\trunk\prj.thirdparty\CMakeLists.txt;"
+					Outputs="C:\visiroad_3\visiworld\trunk\build\CMakeFiles\generate.stamp;C:\visiroad_3\visiworld\trunk\build\prj.core\CMakeFiles\generate.stamp;C:\visiroad_3\visiworld\trunk\build\prj.sandbox\CMakeFiles\generate.stamp;C:\visiroad_3\visiworld\trunk\build\prj.sandbox\mnist\CMakeFiles\generate.stamp;C:\visiroad_3\visiworld\trunk\build\prj.sandbox\overcom\CMakeFiles\generate.stamp;C:\visiroad_3\visiworld\trunk\build\prj.sandbox\semeion\CMakeFiles\generate.stamp;C:\visiroad_3\visiworld\trunk\build\prj.thirdparty\CMakeFiles\generate.stamp"/>
 				</FileConfiguration>
 				<FileConfiguration
 					Name="MinSizeRel|Win32">
 					<Tool
 					Name="VCCustomBuildTool"
 					Description="Checking Build System"
-					CommandLine="&quot;C:\Program Files (x86)\CMake 2.8\bin\cmake.exe&quot; -HD:/projects/visiworld/trunk -BD:/projects/visiworld/trunk/build --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file &quot;$(SolutionPath)&quot;&#x0D;&#x0A;if errorlevel 1 goto :VCReportError"
-					AdditionalDependencies="&quot;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\CMakeCInformation.cmake&quot;;&quot;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\CMakeCXXInformation.cmake&quot;;&quot;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\CMakeCommonLanguageInclude.cmake&quot;;&quot;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\CMakeGenericSystem.cmake&quot;;&quot;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\CMakeRCInformation.cmake&quot;;&quot;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\CMakeSystemSpecificInformation.cmake&quot;;&quot;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\Platform\Windows-cl.cmake&quot;;&quot;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\Platform\Windows.cmake&quot;;&quot;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\Platform\WindowsPaths.cmake&quot;;&quot;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\Platform\cl.cmake&quot;;D:\projects\opencv\build\OpenCVConfig-version.cmake;D:\projects\opencv\build\OpenCVConfig.cmake;D:\projects\opencv\build\x86\vc9\lib\OpenCVConfig.cmake;D:\projects\visiworld\trunk\CMakeLists.txt;D:\projects\visiworld\trunk\build\CMakeFiles\CMakeCCompiler.cmake;D:\projects\visiworld\trunk\build\CMakeFiles\CMakeCPlatform.cmake;D:\projects\visiworld\trunk\build\CMakeFiles\CMakeCXXCompiler.cmake;D:\projects\visiworld\trunk\build\CMakeFiles\CMakeCXXPlatform.cmake;D:\projects\visiworld\trunk\build\CMakeFiles\CMakeRCCompiler.cmake;D:\projects\visiworld\trunk\build\CMakeFiles\CMakeSystem.cmake;D:\projects\visiworld\trunk\prj.core\CMakeLists.txt;D:\projects\visiworld\trunk\prj.sandbox\CMakeLists.txt;D:\projects\visiworld\trunk\prj.sandbox\mnist\CMakeLists.txt;D:\projects\visiworld\trunk\prj.sandbox\overcom\CMakeLists.txt;D:\projects\visiworld\trunk\prj.sandbox\semeion\CMakeLists.txt;D:\projects\visiworld\trunk\prj.thirdparty\CMakeLists.txt;"
-					Outputs="D:\projects\visiworld\trunk\build\CMakeFiles\generate.stamp;D:\projects\visiworld\trunk\build\prj.core\CMakeFiles\generate.stamp;D:\projects\visiworld\trunk\build\prj.sandbox\CMakeFiles\generate.stamp;D:\projects\visiworld\trunk\build\prj.sandbox\mnist\CMakeFiles\generate.stamp;D:\projects\visiworld\trunk\build\prj.sandbox\overcom\CMakeFiles\generate.stamp;D:\projects\visiworld\trunk\build\prj.sandbox\semeion\CMakeFiles\generate.stamp;D:\projects\visiworld\trunk\build\prj.thirdparty\CMakeFiles\generate.stamp"/>
+					CommandLine="&quot;C:\Program Files (x86)\CMake 2.8\bin\cmake.exe&quot; -HC:/visiroad_3/visiworld/trunk -BC:/visiroad_3/visiworld/trunk/build --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file &quot;$(SolutionPath)&quot;&#x0D;&#x0A;if errorlevel 1 goto :VCReportError"
+					AdditionalDependencies="&quot;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\CMakeCInformation.cmake&quot;;&quot;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\CMakeCXXInformation.cmake&quot;;&quot;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\CMakeCommonLanguageInclude.cmake&quot;;&quot;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\CMakeGenericSystem.cmake&quot;;&quot;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\CMakeRCInformation.cmake&quot;;&quot;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\CMakeSystemSpecificInformation.cmake&quot;;&quot;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\Platform\Windows-MSVC-C.cmake&quot;;&quot;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\Platform\Windows-MSVC-CXX.cmake&quot;;&quot;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\Platform\Windows-MSVC.cmake&quot;;&quot;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\Platform\Windows.cmake&quot;;&quot;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\Platform\WindowsPaths.cmake&quot;;C:\opencv\build\OpenCVConfig-version.cmake;C:\opencv\build\OpenCVConfig.cmake;C:\opencv\build\x86\vc9\lib\OpenCVConfig.cmake;C:\visiroad_3\visiworld\trunk\CMakeLists.txt;C:\visiroad_3\visiworld\trunk\build\CMakeFiles\2.8.11.2\CMakeCCompiler.cmake;C:\visiroad_3\visiworld\trunk\build\CMakeFiles\2.8.11.2\CMakeCXXCompiler.cmake;C:\visiroad_3\visiworld\trunk\build\CMakeFiles\2.8.11.2\CMakeRCCompiler.cmake;C:\visiroad_3\visiworld\trunk\build\CMakeFiles\2.8.11.2\CMakeSystem.cmake;C:\visiroad_3\visiworld\trunk\prj.core\CMakeLists.txt;C:\visiroad_3\visiworld\trunk\prj.sandbox\CMakeLists.txt;C:\visiroad_3\visiworld\trunk\prj.sandbox\mnist\CMakeLists.txt;C:\visiroad_3\visiworld\trunk\prj.sandbox\overcom\CMakeLists.txt;C:\visiroad_3\visiworld\trunk\prj.sandbox\semeion\CMakeLists.txt;C:\visiroad_3\visiworld\trunk\prj.thirdparty\CMakeLists.txt;"
+					Outputs="C:\visiroad_3\visiworld\trunk\build\CMakeFiles\generate.stamp;C:\visiroad_3\visiworld\trunk\build\prj.core\CMakeFiles\generate.stamp;C:\visiroad_3\visiworld\trunk\build\prj.sandbox\CMakeFiles\generate.stamp;C:\visiroad_3\visiworld\trunk\build\prj.sandbox\mnist\CMakeFiles\generate.stamp;C:\visiroad_3\visiworld\trunk\build\prj.sandbox\overcom\CMakeFiles\generate.stamp;C:\visiroad_3\visiworld\trunk\build\prj.sandbox\semeion\CMakeFiles\generate.stamp;C:\visiroad_3\visiworld\trunk\build\prj.thirdparty\CMakeFiles\generate.stamp"/>
 				</FileConfiguration>
 				<FileConfiguration
 					Name="RelWithDebInfo|Win32">
 					<Tool
 					Name="VCCustomBuildTool"
 					Description="Checking Build System"
-					CommandLine="&quot;C:\Program Files (x86)\CMake 2.8\bin\cmake.exe&quot; -HD:/projects/visiworld/trunk -BD:/projects/visiworld/trunk/build --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file &quot;$(SolutionPath)&quot;&#x0D;&#x0A;if errorlevel 1 goto :VCReportError"
-					AdditionalDependencies="&quot;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\CMakeCInformation.cmake&quot;;&quot;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\CMakeCXXInformation.cmake&quot;;&quot;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\CMakeCommonLanguageInclude.cmake&quot;;&quot;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\CMakeGenericSystem.cmake&quot;;&quot;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\CMakeRCInformation.cmake&quot;;&quot;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\CMakeSystemSpecificInformation.cmake&quot;;&quot;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\Platform\Windows-cl.cmake&quot;;&quot;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\Platform\Windows.cmake&quot;;&quot;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\Platform\WindowsPaths.cmake&quot;;&quot;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\Platform\cl.cmake&quot;;D:\projects\opencv\build\OpenCVConfig-version.cmake;D:\projects\opencv\build\OpenCVConfig.cmake;D:\projects\opencv\build\x86\vc9\lib\OpenCVConfig.cmake;D:\projects\visiworld\trunk\CMakeLists.txt;D:\projects\visiworld\trunk\build\CMakeFiles\CMakeCCompiler.cmake;D:\projects\visiworld\trunk\build\CMakeFiles\CMakeCPlatform.cmake;D:\projects\visiworld\trunk\build\CMakeFiles\CMakeCXXCompiler.cmake;D:\projects\visiworld\trunk\build\CMakeFiles\CMakeCXXPlatform.cmake;D:\projects\visiworld\trunk\build\CMakeFiles\CMakeRCCompiler.cmake;D:\projects\visiworld\trunk\build\CMakeFiles\CMakeSystem.cmake;D:\projects\visiworld\trunk\prj.core\CMakeLists.txt;D:\projects\visiworld\trunk\prj.sandbox\CMakeLists.txt;D:\projects\visiworld\trunk\prj.sandbox\mnist\CMakeLists.txt;D:\projects\visiworld\trunk\prj.sandbox\overcom\CMakeLists.txt;D:\projects\visiworld\trunk\prj.sandbox\semeion\CMakeLists.txt;D:\projects\visiworld\trunk\prj.thirdparty\CMakeLists.txt;"
-					Outputs="D:\projects\visiworld\trunk\build\CMakeFiles\generate.stamp;D:\projects\visiworld\trunk\build\prj.core\CMakeFiles\generate.stamp;D:\projects\visiworld\trunk\build\prj.sandbox\CMakeFiles\generate.stamp;D:\projects\visiworld\trunk\build\prj.sandbox\mnist\CMakeFiles\generate.stamp;D:\projects\visiworld\trunk\build\prj.sandbox\overcom\CMakeFiles\generate.stamp;D:\projects\visiworld\trunk\build\prj.sandbox\semeion\CMakeFiles\generate.stamp;D:\projects\visiworld\trunk\build\prj.thirdparty\CMakeFiles\generate.stamp"/>
+					CommandLine="&quot;C:\Program Files (x86)\CMake 2.8\bin\cmake.exe&quot; -HC:/visiroad_3/visiworld/trunk -BC:/visiroad_3/visiworld/trunk/build --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file &quot;$(SolutionPath)&quot;&#x0D;&#x0A;if errorlevel 1 goto :VCReportError"
+					AdditionalDependencies="&quot;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\CMakeCInformation.cmake&quot;;&quot;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\CMakeCXXInformation.cmake&quot;;&quot;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\CMakeCommonLanguageInclude.cmake&quot;;&quot;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\CMakeGenericSystem.cmake&quot;;&quot;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\CMakeRCInformation.cmake&quot;;&quot;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\CMakeSystemSpecificInformation.cmake&quot;;&quot;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\Platform\Windows-MSVC-C.cmake&quot;;&quot;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\Platform\Windows-MSVC-CXX.cmake&quot;;&quot;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\Platform\Windows-MSVC.cmake&quot;;&quot;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\Platform\Windows.cmake&quot;;&quot;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\Platform\WindowsPaths.cmake&quot;;C:\opencv\build\OpenCVConfig-version.cmake;C:\opencv\build\OpenCVConfig.cmake;C:\opencv\build\x86\vc9\lib\OpenCVConfig.cmake;C:\visiroad_3\visiworld\trunk\CMakeLists.txt;C:\visiroad_3\visiworld\trunk\build\CMakeFiles\2.8.11.2\CMakeCCompiler.cmake;C:\visiroad_3\visiworld\trunk\build\CMakeFiles\2.8.11.2\CMakeCXXCompiler.cmake;C:\visiroad_3\visiworld\trunk\build\CMakeFiles\2.8.11.2\CMakeRCCompiler.cmake;C:\visiroad_3\visiworld\trunk\build\CMakeFiles\2.8.11.2\CMakeSystem.cmake;C:\visiroad_3\visiworld\trunk\prj.core\CMakeLists.txt;C:\visiroad_3\visiworld\trunk\prj.sandbox\CMakeLists.txt;C:\visiroad_3\visiworld\trunk\prj.sandbox\mnist\CMakeLists.txt;C:\visiroad_3\visiworld\trunk\prj.sandbox\overcom\CMakeLists.txt;C:\visiroad_3\visiworld\trunk\prj.sandbox\semeion\CMakeLists.txt;C:\visiroad_3\visiworld\trunk\prj.thirdparty\CMakeLists.txt;"
+					Outputs="C:\visiroad_3\visiworld\trunk\build\CMakeFiles\generate.stamp;C:\visiroad_3\visiworld\trunk\build\prj.core\CMakeFiles\generate.stamp;C:\visiroad_3\visiworld\trunk\build\prj.sandbox\CMakeFiles\generate.stamp;C:\visiroad_3\visiworld\trunk\build\prj.sandbox\mnist\CMakeFiles\generate.stamp;C:\visiroad_3\visiworld\trunk\build\prj.sandbox\overcom\CMakeFiles\generate.stamp;C:\visiroad_3\visiworld\trunk\build\prj.sandbox\semeion\CMakeFiles\generate.stamp;C:\visiroad_3\visiworld\trunk\build\prj.thirdparty\CMakeFiles\generate.stamp"/>
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="D:\projects\visiworld\trunk\build\CMakeFiles\ZERO_CHECK.rule">
+				RelativePath="C:\visiroad_3\visiworld\trunk\build\CMakeFiles\ZERO_CHECK.rule">
 				<FileConfiguration
 					Name="Debug|Win32">
 					<Tool
 					Name="VCCustomBuildTool"
 					Description=""
 					CommandLine=""
-					AdditionalDependencies="D:\projects\visiworld\trunk\build\CMakeFiles\ZERO_CHECK.rule"
-					Outputs="D:\projects\visiworld\trunk\build\CMakeFiles\ZERO_CHECK"/>
+					AdditionalDependencies="C:\visiroad_3\visiworld\trunk\build\CMakeFiles\ZERO_CHECK.rule"
+					Outputs="C:\visiroad_3\visiworld\trunk\build\CMakeFiles\ZERO_CHECK"/>
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Release|Win32">
@@ -238,8 +238,8 @@
 					Name="VCCustomBuildTool"
 					Description=""
 					CommandLine=""
-					AdditionalDependencies="D:\projects\visiworld\trunk\build\CMakeFiles\ZERO_CHECK.rule"
-					Outputs="D:\projects\visiworld\trunk\build\CMakeFiles\ZERO_CHECK"/>
+					AdditionalDependencies="C:\visiroad_3\visiworld\trunk\build\CMakeFiles\ZERO_CHECK.rule"
+					Outputs="C:\visiroad_3\visiworld\trunk\build\CMakeFiles\ZERO_CHECK"/>
 				</FileConfiguration>
 				<FileConfiguration
 					Name="MinSizeRel|Win32">
@@ -247,8 +247,8 @@
 					Name="VCCustomBuildTool"
 					Description=""
 					CommandLine=""
-					AdditionalDependencies="D:\projects\visiworld\trunk\build\CMakeFiles\ZERO_CHECK.rule"
-					Outputs="D:\projects\visiworld\trunk\build\CMakeFiles\ZERO_CHECK"/>
+					AdditionalDependencies="C:\visiroad_3\visiworld\trunk\build\CMakeFiles\ZERO_CHECK.rule"
+					Outputs="C:\visiroad_3\visiworld\trunk\build\CMakeFiles\ZERO_CHECK"/>
 				</FileConfiguration>
 				<FileConfiguration
 					Name="RelWithDebInfo|Win32">
@@ -256,8 +256,8 @@
 					Name="VCCustomBuildTool"
 					Description=""
 					CommandLine=""
-					AdditionalDependencies="D:\projects\visiworld\trunk\build\CMakeFiles\ZERO_CHECK.rule"
-					Outputs="D:\projects\visiworld\trunk\build\CMakeFiles\ZERO_CHECK"/>
+					AdditionalDependencies="C:\visiroad_3\visiworld\trunk\build\CMakeFiles\ZERO_CHECK.rule"
+					Outputs="C:\visiroad_3\visiworld\trunk\build\CMakeFiles\ZERO_CHECK"/>
 				</FileConfiguration>
 			</File>
 		</Filter>
