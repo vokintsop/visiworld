@@ -4,6 +4,7 @@
 #define __COVER_NET_H
 
 #include <vector>
+//#include <algorithm>
 
 #define COVER_NET_VERBOSE
 //#define COVER_NET_VERBOSE_DETAILED
@@ -16,8 +17,9 @@ struct CoverSphere
   int last_kid;  // указатель на последнего рожденного ребенка; 0 -- нет
 
   //... ?
-  double distance_to_parent; // расстояние до родительской вершины
-  std::vector< int > ancles; // вершины уровнем выше, которые покрывают данную // fat fat slow
+  double distance_to_parent; // расстояние до родительской вершины  // fat?
+  //std::vector< int > ancles; // вершины уровнем выше, которые покрывают данную // fat fat slow
+  int ancle; // индекс начала списка дядьев --> ancles[ancle](дядья в списке идут в порядке возрастания расстояния?)
   //.....
 
   PointType center;
@@ -34,6 +36,7 @@ struct CoverSphere
     level(level),
     prev_brother(0),
     last_kid(0),
+    ancle(-1),
     points(0)
   {
   } 
@@ -62,6 +65,8 @@ template < class PointType, class Metrics >
 class CoverNet
 {
   std::vector< CoverSphere< PointType > > spheres;
+  std::vector< std::pair< int, int > > ancles; // <ancle sphere, next> списки вершин уровнем выше, которые покрывают данную 
+
   Metrics* ruler;
   double rootRadius;  // при создании рута изначально указывается ожидаемое расстояние между наиболее удаленными точками
                       // если встречается точка, удаленная от рута на расстояние больше rootRadius дерево надстраивается вверх
