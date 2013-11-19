@@ -117,12 +117,18 @@ public:
 void explore_cover_tree()
 {
 
-  Metr1 ruler;
-  CoverNet< int, Metr1 > cvnet( &ruler, 256*256, 1 );
-  for (int i=0; i< int( samples.size() ); i+=16)
-    cvnet.insert( i );
-
-  cvnet.reportStatistics( 0, 3 ); 
+  for (int chr =0; chr<=9; chr++)
+  {
+    cout << "------ cvnet of class " << chr << endl;
+    Metr1 ruler;
+    CoverNet< int, Metr1 > cvnet( &ruler, 256*256, 1 );
+    for (int i=0; i< int( samples.size() ); i++)
+    {
+      if (samples[i].first == chr)
+        cvnet.insert( i );
+    }
+    cvnet.reportStatistics( 0, 3 ); 
+  }
 
 }
 
