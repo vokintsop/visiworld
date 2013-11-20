@@ -244,6 +244,8 @@ public:
     return count; 
   };
 
+#if 0 // ----------------------------------- not implemented yet 
+
   int // номер сферы, (-1 если за пределами радиуса стартовой), полученный выполн€€        
   branchSubTreeUsingFirstCover(   // пр€молинейный спуск по поддереву -- перва€ фаза branch&bounds
     const PointType& pt, // точка дл€ которой ищем сферу по схеме -- если накрывает -- сразу спускаемс€ 
@@ -271,6 +273,55 @@ public:
   //  /// .... todo ....
   //  return 0;
   //}
+
+  const PointType& 
+  findNearestPoint( // ближайший к указанной точке центр сферы из дерева
+    const PointType& pt, // точка дл€ которой ищем сферу с ближайшим центром
+    double* best_distance = NULL, // [in/out] рекорд рассто€ни€ -- оно же и отсечение (не искать дальше чем указано)
+//  , int iStartSphere = 0// с какой сферы начинать поиск, 0 - корень дерева 
+  )
+  {
+    if (*best_distance <0)
+      *best_distance = getRadius(0);
+    int iNearestSphere = findNearestSphere( pt, best_distance /*, ... */ );
+    return spheres[iNearestSphere].center;
+  }
+ 
+  int // номер сферы, (-1 если за пределами радиуса стартовой)
+  findNearestSphere(
+    const PointType& pt, // точка дл€ которой ищем сферу с ближайшим центром
+    double* best_distance // [in/out] рекорд рассто€ни€ -- оно же и отсечение (не искать дальше чем указано)
+//  , int iStartSphere = 0// с какой сферы начинать поиск, 0 - корень дерева 
+  )
+  {
+    int isp=0; // текуща€ сфера  // iStartSphere?
+    int lev=0; // текущий уровень
+    double  rad = getRadius(lev);// радиус текущей сферы (на данном уровне)
+    // branch and bound
+    // 1. спуск
+    double dist = computeDistance( isp, pt );
+
+
+
+
+
+    /// .... todo ....
+    return 0;
+  }
+
+  int // номер сферы
+  dropToNearestKid( // рекурсивное "проваливание" в ближайшую детскую сферу. 
+                    // на входе -- точка внутри или вне родительской сферы
+                    // на выходе -- номер найденной сферы нижнего уровн€ и рассто€ние до нее
+    int isphere, // проваливаемс€ в данную сферу
+    const PointType& pt, // точка дл€ которой ищем сферу с ближайшим центром
+    double* best_distance // [in/out] рекорд рассто€ни€ -- оно же и отсечение (не искать дальше чем указано)
+    )
+  {
+    // пока есть ребенок, в которого попадаем (из нескольких -- ближайший) -- проваливаемс€ в него
+    return 0; // todo
+  }
+#endif // ---------------------- not implemented yet
 
   void printNode( int node, int level )
   {

@@ -252,6 +252,38 @@ void explore_cover_tree()
     cvnet1.reportStatistics( 0, 3 ); 
     cout << "\nA vs dilate(B) + B vs dilate(A) metrics (L1):" << endl;
     cvnet2.reportStatistics( 0, 3 ); 
+
+    // test recognition
+    if (chr == 10)
+    {
+      ruler1.samples1 = &tst_samples;
+      ruler1.samples2 = &trn_samples;
+
+      double max_hit_distance = -1; 
+      double min_miss_distance = std::numeric_limits<double>::max(); 
+
+      //ruler2.samples1 = &tst_samples;    ruler2.samples1_dilated = &tst_samples_dilated;
+      //ruler2.samples2 = &trn_samples;    ruler2.samples2_dilated = &trn_samples_dilated;
+      int hit=0; int miss=0;
+      for (int i_tst=0; i_tst<int(tst_samples.size()); i_tst++)
+      {
+        double distance = SAMPLE_HEIGHT*SAMPLE_WIDTH*256; // а могли бы и отсечение указать?
+
+        int i_trn = 0; // cvnet1.findNearestPoint( i_tst, &distance );
+        if (tst_samples[i_tst].first == trn_samples[i_trn].first)
+        {
+          max_hit_distance = max( max_hit_distance, distance );
+          hit++;
+        }
+        else
+        {
+          min_miss_distance = min( min_miss_distance, distance );
+          miss++;
+        }
+      }
+      cout << "Hits = " << hit << " \tMisses = " << miss << endl;
+      cout << "Max hit dist = " << max_hit_distance << " Min miss dist = " << min_miss_distance << endl;
+    }
   }
 #if 0
   cout << "press any key to continue" << endl;
@@ -259,6 +291,7 @@ void explore_cover_tree()
 #endif
 
 }
+
 
 int main( int argc, char* argv[] )
 {
