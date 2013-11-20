@@ -197,17 +197,25 @@ private:
       double dist = computeDistance( kid, pt );
       if (dist < rlast_kid)
       {
-        insertPoint( pt, kid, iSphereLevel+1, dist );
-        return;
+        insertPoint( pt, kid, iSphereLevel+1, dist ); // провалились
+        return; // конец банкета
       }
       kid = spheres[kid].prev_brother;
     }
-
+    // нет детей, место свободно
     // создаем сферу
     int isp = makeSphere( pt, iSphere, iSphereLevel+1 );
     int bro = spheres[iSphere].last_kid;
     spheres[iSphere].last_kid = isp;
     spheres[isp].prev_brother = bro;
+#ifdef DONT_FORCE_DIRECT_SUCCESSORS
+    // порождаем прямых наследников
+    int lev = iSphereLevel+1;
+    while ( getRadius(iSphereLevel+1) > getMinRadius(iSphereLevel+1) )
+    {
+      int isp = makeSphere( pt, isp, lev++ );
+    }
+#endif
   }
 
   void attachPoint( const PointType& pt, int iSphere, int iSphereLevel, double dist )
