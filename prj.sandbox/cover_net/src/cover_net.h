@@ -322,11 +322,13 @@ public:
     for (int i=0; i<=maxLevel; i++)
     {
       std::cout 
-        << "level=" << i 
+        //<< fixed 
+        << setprecision(5)
+        << "tree level=" << i << "\t" 
         << "\tradius=" << getRadius(i) 
-        << "\tcount of spheres=" << spheresByLevel[i] 
-        << "\tpoints="  << pointsByLevel[i]  << "\taverage=" << double( pointsByLevel[i])/ spheresByLevel[i]
-        << "\tkids="    << kidsByLevel[i]    << "\taverage=" << double( kidsByLevel[i])/ spheresByLevel[i]
+        << "\tspheres=" << spheresByLevel[i] 
+        << "\tpoints="  << pointsByLevel[i]  << "\tave=" << double( pointsByLevel[i])/ spheresByLevel[i]
+        << "\tsum kids="    << kidsByLevel[i]    << "\tave=" << double( kidsByLevel[i])/ spheresByLevel[i]
         << std::endl;
     }
 
