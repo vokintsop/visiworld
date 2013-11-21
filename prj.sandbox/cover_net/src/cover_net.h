@@ -27,9 +27,10 @@ struct CoverSphere
   int level;    // уровень вершины в дереве // fat
 
   CoverSphere( 
-    int parent, 
+    int level,
     const PointType& center,
-    int level
+    int parent, 
+    double distance_to_parent
     ):
     parent(parent),
     center(center), 
@@ -37,7 +38,8 @@ struct CoverSphere
     prev_brother(0),
     last_kid(0),
     ancle(-1),
-    points(0)
+    points(0),
+    distance_to_parent(distance_to_parent)
   {
   } 
 
@@ -167,18 +169,44 @@ private:
     }
   }
 
-  int makeSphere( const PointType& pt, int parent, int iSphereLevel ) // создает сферу и возвращает ее номер
+//#define DONT_FORCE_DIRECT_SUCCESSORS
+  int makeSphere( // создает сферу, ее прямых наследников и возвращает ее номер
+    int iSphereLevel, // уровень создаваемой сферы
+    const PointType& pt, // центр сферы
+    int parent, // родительская сфера (гарантируется, что центр лежит внутри родительской и не покрыт братьями
+    double distance_to_parent // расстояние до центра родительской сферы
+    ) 
   {
-    spheres.push_back( CoverSphere<PointType>( parent, pt, iSphereLevel ) );
-    iLastSphere = spheres.size()-1;
-    iLastSphereLevel = iSphereLevel;
+    do {
+      spheres.push_back( CoverSphere<PointType>( iSphereLevel, pt, parent, distance_to_parent ) );
+      iLastSphere = spheres.size()-1;
+      iLastSphereLevel = iSphereLevel;
+      if (parent >=0) // not root
+      {
+        int bro = spheres[parent].last_kid; // поддержка списка детей упорядоченных по расстоянию от родителя???
+        spheres[parent].last_kid = iLastSphere;
+        spheres[iLastSphere].prev_brother = bro;
+      }
+#ifdef DONT_FORCE_DIRECT_SUCCESSORS
+      break;
+#endif
+      iSphereLevel++;
+      parent = iLastSphere;
+      distance_to_parent = 0;
+    } while ( getRadius(iSphereLevel) > getMinRadius(iSphereLevel) );
+
     notifyParents( pt, parent, iSphereLevel, SPHERE_CREATED );
     return iLastSphere;
   }
 
-  void makeRoot( const PointType& pt )  {   makeSphere( pt, -1, 0 );  }
+  void makeRoot( const PointType& pt )  {   makeSphere( 0, pt, -1, 0 );  }
 
-  void insertPoint( const PointType& pt, int iSphere, int iSphereLevel, double dist )
+  void insertPoint( 
+    const PointType& pt, // точка внутри сферы iSphere на уровне iSphereLevel
+    int iSphere, 
+    int iSphereLevel, 
+    double dist // расстояние до центра сферы iSphere (уже измерено)
+    )
   { // мы внутри сферы
     spheres[iSphere].points++;
 
@@ -202,20 +230,9 @@ private:
       }
       kid = spheres[kid].prev_brother;
     }
-    // нет детей, место свободно
-    // создаем сферу
-    int isp = makeSphere( pt, iSphere, iSphereLevel+1 );
-    int bro = spheres[iSphere].last_kid;
-    spheres[iSphere].last_kid = isp;
-    spheres[isp].prev_brother = bro;
-#ifdef DONT_FORCE_DIRECT_SUCCESSORS
-    // порождаем прямых наследников
-    int lev = iSphereLevel+1;
-    while ( getRadius(iSphereLevel+1) > getMinRadius(iSphereLevel+1) )
-    {
-      int isp = makeSphere( pt, isp, lev++ );
-    }
-#endif
+    // нет детей, место свободно, создаем сферу и, возможно, ее прямых наследников
+    makeSphere( iSphereLevel+1,  pt, iSphere, dist );
+
   }
 
   void attachPoint( const PointType& pt, int iSphere, int iSphereLevel, double dist )
