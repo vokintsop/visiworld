@@ -16,6 +16,7 @@
 
 
 #include "cover_net.h"
+#include "ticker.h"
 
 using namespace std;
 using namespace cv;
@@ -203,16 +204,18 @@ public:
         //  dst += 1;
         //if (m2.at<uchar>( y, x ) == 255 && m1ex.at<uchar>( y, x ) != 255 )
         //  dst += 1;
-#if 0 // -------- good --------
+#if 1 // -------- good --------
         if (m1.at<uchar>( y, x ) == 255 && m2ex.at<uchar>( y, x ) != 255 )
           dst += abs( m1.at<uchar>( y, x ) - m2ex.at<uchar>( y, x ) );
         if (m2.at<uchar>( y, x ) == 255 && m1ex.at<uchar>( y, x ) != 255 )
           dst += abs( m2.at<uchar>( y, x ) - m1ex.at<uchar>( y, x ) );
 #endif
+#if 0
         if (m1.at<uchar>( y, x ) > m2ex.at<uchar>( y, x ))
           dst += abs( m1.at<uchar>( y, x ) - m2ex.at<uchar>( y, x ) );
         if (m2.at<uchar>( y, x ) > m1ex.at<uchar>( y, x ))
           dst += abs( m2.at<uchar>( y, x ) - m1ex.at<uchar>( y, x ) );
+#endif
       }
     }
     return dst;
@@ -221,6 +224,9 @@ public:
 
 void explore_cover_tree()
 {
+  bool test_hamming=false;
+  bool test_smart = true;
+
   Metr1 ruler1;
   Metr2 ruler2;
   for (int chr =0; chr<=10; chr++)
@@ -234,24 +240,43 @@ void explore_cover_tree()
     ruler1.samples1 = &trn_samples;
     ruler1.samples2 = &trn_samples; // both from trn_samples
     CoverNet< int, Metr1 > cvnet1( &ruler1, SAMPLE_HEIGHT*SAMPLE_WIDTH*256, 1 );
-
     // both from trn_samples
     ruler2.samples1 = &trn_samples;    ruler2.samples1_dilated = &trn_samples_dilated;
     ruler2.samples2 = &trn_samples;    ruler2.samples2_dilated = &trn_samples_dilated;
 
     CoverNet< int, Metr2 > cvnet2( &ruler2, SAMPLE_HEIGHT*SAMPLE_WIDTH*256, 1 );
-    for (int i=0; i< int( trn_samples.size() ); i++)
+
+    if (test_hamming)
     {
-      if (chr == 10 || trn_samples[i].first == chr)
+      Ticker t;
+      for (int i=0; i< int( trn_samples.size() ); i++)
       {
-        cvnet1.insert( i );
-        cvnet2.insert( i );
+        if (chr == 10 || trn_samples[i].first == chr)
+        {
+          cvnet1.insert( i );
+        }
       }
+      double ms = t.msecs();
+      cout << "\nHamming metrics (simple L1):" << endl;
+      cvnet1.reportStatistics( 0, 3 ); 
+      cout << "Build time = " << ms/1000 << " seconds" << endl;
     }
-    cout << "\nHamming metrics (simple L1):" << endl;
-    cvnet1.reportStatistics( 0, 3 ); 
-    cout << "\nA vs dilate(B) + B vs dilate(A) metrics (L1):" << endl;
-    cvnet2.reportStatistics( 0, 3 ); 
+
+    if (test_smart)
+    {
+      Ticker t;
+      for (int i=0; i< int( trn_samples.size() ); i++)
+      {
+        if (chr == 10 || trn_samples[i].first == chr)
+        {
+          cvnet2.insert( i );
+        }
+      }
+      double ms = t.msecs();
+      cout << "\nA vs dilate(B) + B vs dilate(A) metrics (L1):" << endl;
+      cvnet2.reportStatistics( 0, 3 ); 
+      cout << "Build time = " << ms/1000 << " seconds" << endl;
+    }
 
     // test recognition
     if (chr == 10)
