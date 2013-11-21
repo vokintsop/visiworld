@@ -3,6 +3,7 @@ IF( MSVC )
   
   SET( SOURCES
     src/cover_net.h
+    src/ticker.h
     src/main.cpp 
     )
 
