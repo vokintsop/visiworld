@@ -183,9 +183,24 @@ private:
       iLastSphereLevel = iSphereLevel;
       if (parent >=0) // not root
       {
+#ifdef DONT_FORCE_DIRECT_SUCCESSORS 
         int bro = spheres[parent].last_kid; // поддержка списка детей упор€доченных по рассто€нию от родител€???
         spheres[parent].last_kid = iLastSphere;
         spheres[iLastSphere].prev_brother = bro;
+#else
+		int bro = spheres[parent].last_kid;//последний ребенок
+		if (bro == 0) // bro нету
+		{
+			spheres[parent].last_kid = iLastSphere;//тогда iLastSphere -- первый ребенок
+			spheres[iLastSphere].prev_brother = bro;// = 0;
+		}
+		else
+		{
+			int prev_bro = spheres[bro].prev_brother;//предпоследний ребенок
+			spheres[bro].prev_brother = iLastSphere;// предпоследний теперь новый
+			spheres[iLastSphere].prev_brother = prev_bro;//перед новым стоит prev_bro
+		}
+#endif
       }
 #ifdef DONT_FORCE_DIRECT_SUCCESSORS
       break;
