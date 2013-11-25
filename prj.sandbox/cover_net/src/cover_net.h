@@ -326,12 +326,12 @@ public:
   {
     
     int iNearestSphere = findNearestSphere( pt, best_distance, iStartSphere);
-	if (iNearestSphere == -1)
-	{
-		cerr << "error: distance to root is more then maximal radius" << endl;
-	}
+	  if (iNearestSphere == -1)
+	  {
+		  cerr << "error: distance to root is more then maximal radius" << endl;
+	  }
 
-	return spheres[iNearestSphere].center;
+	  return spheres[iNearestSphere].center;
   }
  
   int // номер сферы, (-1 если за пределами радиуса стартовой)
@@ -342,31 +342,31 @@ public:
   )
   {
     int isp=iStartSphere; // текущая сфера
-	int lev = spheres[isp].level; // текущий уровень
+	  int lev = spheres[isp].level; // текущий уровень
     double  rad = getRadius(lev);// радиус текущей сферы (на данном уровне)
     double dist = computeDistance( isp, pt );
 	
-	if (isp == 0 && dist > rad)// если за пределами стартовой
-		return -1;
+	  if (isp == 0 && dist > rad)// если за пределами стартовой
+		  return -1;
 
-	int ans = -1;
-	double min_dist = max(0.0, dist - rad);// расстояние от pt до сферы  
-	if (min_dist > best_distance)// если минимальное расстояние больше оптимального
-		return -1;
-	if (dist < best_distance)// если можно улучшить ответ
-	{
-		ans = isp;
-		best_distance = dist;
-	}
+	  int ans = -1;
+	  double min_dist = max(0.0, dist - rad);// расстояние от pt до сферы  
+	  if (min_dist > best_distance)// если минимальное расстояние больше оптимального
+		  return -1;
+	  if (dist < best_distance)// если можно улучшить ответ
+	  {
+		  ans = isp;
+		  best_distance = dist;
+	  }
 
-	for (int kid = spheres[isp].last_kid; kid > 0; kid = spheres[kid].prev_brother)// идем по всем детям
-	{
-		int kid_ans = findNearestSphere(pt, best_distance, kid);
-		if (kid_ans != -1)// если результат улучшился 
-			ans = kid_ans;
-	}
+	  for (int kid = spheres[isp].last_kid; kid > 0; kid = spheres[kid].prev_brother)// идем по всем детям
+	  {
+		  int kid_ans = findNearestSphere(pt, best_distance, kid);
+		  if (kid_ans != -1)// если результат улучшился 
+			  ans = kid_ans;
+	  }
 
-	return ans;
+	  return ans;
   }
 
   public:
