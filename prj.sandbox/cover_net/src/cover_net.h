@@ -195,6 +195,10 @@ private:
 		{
 			spheres[parent].last_kid = iLastSphere;//тогда iLastSphere -- первый ребенок
 			spheres[iLastSphere].prev_brother = bro;// = 0;
+			/*if (spheres[iLastSphere].center != spheres[parent].center)
+				cout << "O_O" << endl;
+			else
+				cout << "+" << endl;*/
 		}
 		else
 		{
@@ -325,7 +329,7 @@ public:
   )
   {
     
-    int iNearestSphere = findNearestSphere( pt, best_distance, iStartSphere);
+      int iNearestSphere = findNearestSphere(pt, best_distance, -1, iStartSphere);
 	  if (iNearestSphere == -1)
 	  {
 		  cerr << "error: distance to root is more then maximal radius" << endl;
@@ -335,7 +339,7 @@ public:
   }
  
   int // номер сферы, (-1 если за пределами радиуса стартовой)
-  findNearestSphere(
+  findNearestSphere1(
     const PointType& pt, // точка для которой ищем сферу с ближайшим центром
     double& best_distance // [in/out] рекорд расстояния -- оно же и отсечение (не искать дальше чем указано)
   ,  int iStartSphere = 0// с какой сферы начинать поиск, 0 - корень дерева 
@@ -368,6 +372,62 @@ public:
 
 	  return ans;
   }
+
+  int // номер сферы, (-1 если за пределами радиуса стартовой)
+  findNearestSphere(
+    const PointType& pt, // точка для которой ищем сферу с ближайшим центром
+    double& best_distance,// [in/out] рекорд расстояния -- оно же и отсечение (не искать дальше чем указано)
+	double distanceToPt = -1, // расстояние до точки, maxRadius -- если не посчитано
+    int iStartSphere = 0// с какой сферы начинать поиск, 0 - корень дерева 
+  )
+  {
+    int isp=iStartSphere; // текущая сфера
+	int lev = spheres[isp].level; // текущий уровень
+    double  rad = getRadius(lev);// радиус текущей сферы (на данном уровне)
+    double dist = distanceToPt;
+
+	if (dist == -1)
+		dist = computeDistance(isp, pt);
+	
+	if (isp == 0 && dist >= rad)// если за пределами стартовой
+		return -1;
+
+	  int ans = -1;
+	  double min_dist = max(0.0, dist - rad);// расстояние от pt до сферы  
+	  if (min_dist > best_distance)// если минимальное расстояние больше оптимального
+		  return -1;
+	  if (dist < best_distance)// если можно улучшить ответ
+	  {
+		  ans = isp;
+		  best_distance = dist;
+	  }
+
+	  vector <pair<double, int> > kids;
+
+	  if (spheres[isp].last_kid == 0) // лист
+		  return ans;
+
+	  int kid = spheres[isp].last_kid;
+	  if (spheres[kid].center == spheres[isp].center)
+	  {
+		kids.push_back(make_pair(dist, kid));
+		kid = spheres[kid].prev_brother;
+	  }
+
+	  for (; kid > 0; kid = spheres[kid].prev_brother)// идем по всем детям
+		  kids.push_back(make_pair(computeDistance(kid, pt), kid));
+	  
+	  sort(kids.begin(), kids.end());
+	  for (int i = 0; i < kids.size(); ++i)
+	  {
+		  int new_ans = findNearestSphere(pt, best_distance, kids[i].first, kids[i].second);
+		  if (new_ans != -1)
+			  ans = new_ans;
+	  }
+
+	  return ans;
+  }
+
 
   public:
   int // номер сферы

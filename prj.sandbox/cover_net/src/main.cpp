@@ -318,6 +318,11 @@ void explore_cover_tree()
         else if (test_smart)
           i_trn = cvnet2.findNearestPoint(i_tst, distance);// надо добавить поиск ближайшей точки от какого-то образца i_tst до trn_samples 
 
+		/*imshow("test_mat", tst_samples[i_tst].second);
+		imshow("best_vertex", trn_samples[i_trn].second);
+		cerr << "Result:  tst_value = " << tst_samples[i_tst].first << " trn_value = " << trn_samples[i_trn].first << " dist = " << distance << endl;
+		cvWaitKey(0);*/
+
   		  if (tst_samples[i_tst].first == trn_samples[i_trn].first)
         {
           max_hit_distance = max( max_hit_distance, distance );
@@ -325,10 +330,6 @@ void explore_cover_tree()
         }
         else
         {
-		      //imshow("test_mat", tst_samples[i_tst].second);
-		      //imshow("best_vertex", trn_samples[i_trn].second);
-		      //cerr << "Result:  tst_value = " << tst_samples[i_tst].first << " trn_value = " << trn_samples[i_trn].first << " dist = " << distance << endl;
-		      //cvWaitKey(0);
           min_miss_distance = min( min_miss_distance, distance );
           miss++;
         }
