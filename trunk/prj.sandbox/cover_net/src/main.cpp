@@ -160,8 +160,10 @@ void dilate_samples()
 class Metr1
 {
 public:
+  long long counter;
+
   vector< pair< int, cv::Mat > > *samples1, *samples2;
-  Metr1() : samples1(0),samples2(0) {};
+  Metr1() : samples1(0),samples2(0), counter(0) {};
 
   double computeDistance( const int& i1,  const int& i2 )  // индексы к samples[]
   {
@@ -179,6 +181,7 @@ public:
         dst += abs(d1-d2);
       }
     }
+    counter++;
     return dst;
   }
 };
@@ -186,46 +189,49 @@ public:
 class Metr2 // A intersect dilated(B) + B intersect dilated(A)
 {
 public:
+  long long counter;
+
   vector< pair< int, cv::Mat > > *samples1, *samples2;
   vector< pair< int, cv::Mat > > *samples1_dilated, *samples2_dilated;
 
-  Metr2():  samples1(0), samples2(0), samples1_dilated(0), samples2_dilated(0){}
+  Metr2():  samples1(0), samples2(0), samples1_dilated(0), samples2_dilated(0), counter(0){}
 
   double computeDistance( const int& i1,  const int& i2 )  // индексы к samples[]
   {
     double dst=0;
     Mat m1 = (*samples1)[i1].second;    Mat m1ex = (*samples1_dilated)[i1].second; 
     Mat m2 = (*samples2)[i2].second;    Mat m2ex = (*samples2_dilated)[i2].second; 
-    for ( int y=0; y<16; y++ )
+    for ( int y=0; y<SAMPLE_HEIGHT; y++ )
     {
-      for ( int x=0; x<16; x++ )
+      for ( int x=0; x<SAMPLE_WIDTH; x++ )
       {
         //if (m1.at<uchar>( y, x ) == 255 && m2ex.at<uchar>( y, x ) != 255 )
         //  dst += 1;
         //if (m2.at<uchar>( y, x ) == 255 && m1ex.at<uchar>( y, x ) != 255 )
         //  dst += 1;
-#if 1 // -------- good --------
+#if 0 // -------- good --------
         if (m1.at<uchar>( y, x ) == 255 && m2ex.at<uchar>( y, x ) != 255 )
           dst += abs( m1.at<uchar>( y, x ) - m2ex.at<uchar>( y, x ) );
         if (m2.at<uchar>( y, x ) == 255 && m1ex.at<uchar>( y, x ) != 255 )
           dst += abs( m2.at<uchar>( y, x ) - m1ex.at<uchar>( y, x ) );
 #endif
-#if 0
-        if (m1.at<uchar>( y, x ) > m2ex.at<uchar>( y, x ))
-          dst += abs( m1.at<uchar>( y, x ) - m2ex.at<uchar>( y, x ) );
-        if (m2.at<uchar>( y, x ) > m1ex.at<uchar>( y, x ))
-          dst += abs( m2.at<uchar>( y, x ) - m1ex.at<uchar>( y, x ) );
+#if 1
+        if (m1.at<uchar>( y, x ) > m2ex.at<uchar>( y, x ) + 128)
+          dst ++; ///= abs( m1.at<uchar>( y, x ) - m2ex.at<uchar>( y, x ) );
+        if (m2.at<uchar>( y, x ) > m1ex.at<uchar>( y, x ) + 128)
+          dst ++; ///= abs( m2.at<uchar>( y, x ) - m1ex.at<uchar>( y, x ) );
 #endif
       }
     }
+    counter++;
     return dst;
   }
 };
 
 void explore_cover_tree()
 {
-  bool test_hamming= true;
-  bool test_smart = false;
+  bool test_hamming= false; //true;
+  bool test_smart = true; //false;
 
   Metr1 ruler1;
   Metr2 ruler2;
@@ -281,14 +287,15 @@ void explore_cover_tree()
     // test recognition
     if (chr == 10)
     {
+      Ticker t;
       ruler1.samples1 = &trn_samples;
       ruler1.samples2 = &tst_samples;
 
-	  ruler2.samples1 = &trn_samples;
+	    ruler2.samples1 = &trn_samples;
       ruler2.samples2 = &tst_samples;
 
-	  ruler2.samples1_dilated = &trn_samples_dilated;
-	  ruler2.samples2_dilated = &tst_samples_dilated;
+	    ruler2.samples1_dilated = &trn_samples_dilated;
+	    ruler2.samples2_dilated = &tst_samples_dilated;
 
       double max_hit_distance = -1; 
       double min_miss_distance = std::numeric_limits<double>::max(); 
@@ -299,32 +306,41 @@ void explore_cover_tree()
 
 	  // 
 
-	  cout << "begin test " << endl;
+	    cout << "begin test " << endl;
+      ruler1.counter=0;
+      ruler2.counter=0;
       for (int i_tst=0; i_tst<int(tst_samples.size()); i_tst++)
       {
         double distance = SAMPLE_HEIGHT*SAMPLE_WIDTH*256; // а могли бы и отсечение указать?
-        int i_trn = cvnet1.findNearestPoint(i_tst, distance);// надо добавить поиск ближайшей точки от какого-то образца i_tst до trn_samples 
-/// my check
+        int i_trn = 0;
+        if (test_hamming)
+          i_trn = cvnet1.findNearestPoint(i_tst, distance);// надо добавить поиск ближайшей точки от какого-то образца i_tst до trn_samples 
+        else if (test_smart)
+          i_trn = cvnet2.findNearestPoint(i_tst, distance);// надо добавить поиск ближайшей точки от какого-то образца i_tst до trn_samples 
 
-		imshow("test_mat", tst_samples[i_tst].second);
-		imshow("best_vertex", trn_samples[i_trn].second);
-		cerr << "Result:  tst_value = " << tst_samples[i_tst].first << " trn_value = " << trn_samples[i_trn].first << " dist = " << distance << endl;
-		cvWaitKey(500);
-
-/////
-		if (tst_samples[i_tst].first == trn_samples[i_trn].first)
+  		  if (tst_samples[i_tst].first == trn_samples[i_trn].first)
         {
           max_hit_distance = max( max_hit_distance, distance );
           hit++;
         }
         else
         {
+		      //imshow("test_mat", tst_samples[i_tst].second);
+		      //imshow("best_vertex", trn_samples[i_trn].second);
+		      //cerr << "Result:  tst_value = " << tst_samples[i_tst].first << " trn_value = " << trn_samples[i_trn].first << " dist = " << distance << endl;
+		      //cvWaitKey(0);
           min_miss_distance = min( min_miss_distance, distance );
           miss++;
         }
       }
       cout << "Hits = " << hit << " \tMisses = " << miss << endl;
       cout << "Max hit dist = " << max_hit_distance << " Min miss dist = " << min_miss_distance << endl;
+      cout << 10000.0 / t.dsecs() << "symbols per second" << endl;
+      if (test_hamming)
+        cout << ruler1.counter/10000.0 << "distance calculations per point" << endl;
+      else if (test_smart)
+        cout << ruler2.counter/10000.0 << "distance calculations per point" << endl;
+
     }
   }
 #if 0
