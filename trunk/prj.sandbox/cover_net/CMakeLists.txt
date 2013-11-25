@@ -5,7 +5,7 @@ IF( MSVC )
     src/cover_net.h
     src/ticker.h
     src/main.cpp 
- 
+    src/test.h
     )
 
   ADD_EXECUTABLE( cover_net ${SOURCES} )

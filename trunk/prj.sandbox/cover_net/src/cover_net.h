@@ -4,7 +4,7 @@
 #define __COVER_NET_H
 
 #include <vector>
-//#include <algorithm>
+#include <algorithm>
 
 #define COVER_NET_VERBOSE
 //#define COVER_NET_VERBOSE_DETAILED
@@ -402,23 +402,25 @@ public:
 		  best_distance = dist;
 	  }
 
-	  vector <pair<double, int> > kids;
+	  const int MAX_KIDS_SIZE = 256;
+	  pair<double, int> kids[MAX_KIDS_SIZE];
 
 	  if (spheres[isp].last_kid == 0) // лист
 		  return ans;
 
 	  int kid = spheres[isp].last_kid;
+	  int kids_size = 0;
 	  if (spheres[kid].center == spheres[isp].center)
 	  {
-		kids.push_back(make_pair(dist, kid));
+		kids[kids_size++] = make_pair(dist, kid);
 		kid = spheres[kid].prev_brother;
 	  }
 
 	  for (; kid > 0; kid = spheres[kid].prev_brother)// идем по всем детям
-		  kids.push_back(make_pair(computeDistance(kid, pt), kid));
+		  kids[kids_size++] = make_pair(computeDistance(kid, pt), kid);
 	  
-	  sort(kids.begin(), kids.end());
-	  for (int i = 0; i < kids.size(); ++i)
+	  sort(kids + 0, kids + kids_size);
+	  for (int i = 0; i < kids_size; ++i)
 	  {
 		  int new_ans = findNearestSphere(pt, best_distance, kids[i].first, kids[i].second);
 		  if (new_ans != -1)
