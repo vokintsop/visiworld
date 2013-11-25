@@ -17,12 +17,15 @@
 
 #include "cover_net.h"
 #include "ticker.h"
+#include "test.h"
 
 using namespace std;
 using namespace cv;
 
 int SAMPLE_HEIGHT = 0;
 int SAMPLE_WIDTH = 0;
+
+//#define simple_tester
 
 // train:
 vector< pair< int, cv::Mat > > trn_samples;  // image, class_num
@@ -323,7 +326,7 @@ void explore_cover_tree()
 		cerr << "Result:  tst_value = " << tst_samples[i_tst].first << " trn_value = " << trn_samples[i_trn].first << " dist = " << distance << endl;
 		cvWaitKey(0);*/
 
-  		  if (tst_samples[i_tst].first == trn_samples[i_trn].first)
+  		if (tst_samples[i_tst].first == trn_samples[i_trn].first)
         {
           max_hit_distance = max( max_hit_distance, distance );
           hit++;
@@ -354,6 +357,9 @@ void explore_cover_tree()
 
 int main( int argc, char* argv[] )
 {
+#ifdef simple_tester
+	test_cover_net();
+#else
   string exe = argv[0];
   string mnist_folder = exe + "/../../../testdata/mnist";
 	read_samples(mnist_folder);
@@ -383,6 +389,6 @@ int main( int argc, char* argv[] )
     }
   }
 
-
+#endif
 	return 0;
 }
