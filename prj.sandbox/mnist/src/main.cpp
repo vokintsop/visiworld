@@ -47,7 +47,7 @@ bool read_samples( string mnist_folder )
 	{
 		cout << "no file" << endl;
 		return false;
-	}
+	} 
  	
 	int magic_number;
     in.read(reinterpret_cast<char*>(&magic_number), sizeof(magic_number));

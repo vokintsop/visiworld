@@ -32,7 +32,7 @@ vector< pair< int, cv::Mat > > trn_samples_dilated;  // image, class_num
 vector< pair< int, cv::Mat > > tst_samples;  // image, class_num
 vector< pair< int, cv::Mat > > tst_samples_dilated;  // image, class_num
 
-//only for intel O_O
+//only for intel
 inline unsigned long ntohl(unsigned long n) {
   return ((n & 0xFF) << 24) | ((n & 0xFF00) << 8) | ((n & 0xFF0000) >> 8) | ((n & 0xFF000000) >> 24);
 }
@@ -224,8 +224,8 @@ public:
 
 void explore_cover_tree()
 {
-  bool test_hamming=false;
-  bool test_smart = true;
+  bool test_hamming= true;
+  bool test_smart = false;
 
   Metr1 ruler1;
   Metr2 ruler2;
@@ -281,8 +281,14 @@ void explore_cover_tree()
     // test recognition
     if (chr == 10)
     {
-      ruler1.samples1 = &tst_samples;
-      ruler1.samples2 = &trn_samples;
+      ruler1.samples1 = &trn_samples;
+      ruler1.samples2 = &tst_samples;
+
+	  ruler2.samples1 = &trn_samples;
+      ruler2.samples2 = &tst_samples;
+
+	  ruler2.samples1_dilated = &trn_samples_dilated;
+	  ruler2.samples2_dilated = &tst_samples_dilated;
 
       double max_hit_distance = -1; 
       double min_miss_distance = std::numeric_limits<double>::max(); 
@@ -290,12 +296,23 @@ void explore_cover_tree()
       //ruler2.samples1 = &tst_samples;    ruler2.samples1_dilated = &tst_samples_dilated;
       //ruler2.samples2 = &trn_samples;    ruler2.samples2_dilated = &trn_samples_dilated;
       int hit=0; int miss=0;
+
+	  // 
+
+	  cout << "begin test " << endl;
       for (int i_tst=0; i_tst<int(tst_samples.size()); i_tst++)
       {
         double distance = SAMPLE_HEIGHT*SAMPLE_WIDTH*256; // а могли бы и отсечение указать?
+        int i_trn = cvnet1.findNearestPoint(i_tst, distance);// надо добавить поиск ближайшей точки от какого-то образца i_tst до trn_samples 
+/// my check
 
-        int i_trn = 0; // cvnet1.findNearestPoint( i_tst, &distance );
-        if (tst_samples[i_tst].first == trn_samples[i_trn].first)
+		imshow("test_mat", tst_samples[i_tst].second);
+		imshow("best_vertex", trn_samples[i_trn].second);
+		cerr << "Result:  tst_value = " << tst_samples[i_tst].first << " trn_value = " << trn_samples[i_trn].first << " dist = " << distance << endl;
+		cvWaitKey(500);
+
+/////
+		if (tst_samples[i_tst].first == trn_samples[i_trn].first)
         {
           max_hit_distance = max( max_hit_distance, distance );
           hit++;
