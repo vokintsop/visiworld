@@ -158,6 +158,8 @@ public:
     return true;
   }
 
+
+
 private:
   enum { SPHERE_CREATED, POINT_ATTACHED };
   void  notifyParents( const PointType& pt, int iSphere, int iSphereLevel, int eventToNote  )
@@ -284,7 +286,7 @@ public:
     return count; 
   };
 
-#if 0 // ----------------------------------- not implemented yet 
+#if 1 // ----------------------------------- not implemented yet 
 
   int // номер сферы, (-1 если за пределами радиуса стартовой), полученный выполняя        
   branchSubTreeUsingFirstCover(   // прямолинейный спуск по поддереву -- первая фаза branch&bounds
@@ -314,41 +316,60 @@ public:
   //  return 0;
   //}
 
+  public:
   const PointType& 
   findNearestPoint( // ближайший к указанной точке центр сферы из дерева
     const PointType& pt, // точка для которой ищем сферу с ближайшим центром
-    double* best_distance = NULL, // [in/out] рекорд расстояния -- оно же и отсечение (не искать дальше чем указано)
-//  , int iStartSphere = 0// с какой сферы начинать поиск, 0 - корень дерева 
+    double &best_distance// [in/out] рекорд расстояния -- оно же и отсечение (не искать дальше чем указано)
+  , int iStartSphere = 0// с какой сферы начинать поиск, 0 - корень дерева 
   )
   {
-    if (*best_distance <0)
-      *best_distance = getRadius(0);
-    int iNearestSphere = findNearestSphere( pt, best_distance /*, ... */ );
-    return spheres[iNearestSphere].center;
+    
+    int iNearestSphere = findNearestSphere( pt, best_distance, iStartSphere);
+	if (iNearestSphere == -1)
+	{
+		cerr << "error: distance to root is more then maximal radius" << endl;
+	}
+
+	return spheres[iNearestSphere].center;
   }
  
   int // номер сферы, (-1 если за пределами радиуса стартовой)
   findNearestSphere(
     const PointType& pt, // точка для которой ищем сферу с ближайшим центром
-    double* best_distance // [in/out] рекорд расстояния -- оно же и отсечение (не искать дальше чем указано)
-//  , int iStartSphere = 0// с какой сферы начинать поиск, 0 - корень дерева 
+    double& best_distance // [in/out] рекорд расстояния -- оно же и отсечение (не искать дальше чем указано)
+  ,  int iStartSphere = 0// с какой сферы начинать поиск, 0 - корень дерева 
   )
   {
-    int isp=0; // текущая сфера  // iStartSphere?
-    int lev=0; // текущий уровень
+    int isp=iStartSphere; // текущая сфера
+	int lev = spheres[isp].level; // текущий уровень
     double  rad = getRadius(lev);// радиус текущей сферы (на данном уровне)
-    // branch and bound
-    // 1. спуск
     double dist = computeDistance( isp, pt );
+	
+	if (isp == 0 && dist > rad)// если за пределами стартовой
+		return -1;
 
+	int ans = -1;
+	double min_dist = max(0.0, dist - rad);// расстояние от pt до сферы  
+	if (min_dist > best_distance)// если минимальное расстояние больше оптимального
+		return -1;
+	if (dist < best_distance)// если можно улучшить ответ
+	{
+		ans = isp;
+		best_distance = dist;
+	}
 
+	for (int kid = spheres[isp].last_kid; kid > 0; kid = spheres[kid].prev_brother)// идем по всем детям
+	{
+		int kid_ans = findNearestSphere(pt, best_distance, kid);
+		if (kid_ans != -1)// если результат улучшился 
+			ans = kid_ans;
+	}
 
-
-
-    /// .... todo ....
-    return 0;
+	return ans;
   }
 
+  public:
   int // номер сферы
   dropToNearestKid( // рекурсивное "проваливание" в ближайшую детскую сферу. 
                     // на входе -- точка внутри или вне родительской сферы
