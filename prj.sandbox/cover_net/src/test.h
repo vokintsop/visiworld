@@ -29,20 +29,21 @@ void test_cover_net ()
 	 vector<int> points;
 	
 	 cout << "BEGIN test" << endl;
-	 const int NET_SIZE = 1000000;
+	 const int NET_SIZE = 500;
 	 int srand_const = cv::getTickCount();  
-	 srand(-1019611072); // error 
+	// srand(-1019611072); // error 
+   srand(srand_const);
+   srand(-23655176);
 	 for (int i = 0; i < NET_SIZE; ++i)
 	 {
 		 int a = rand();
-		 if (a > 18000 && a < 18100)
-			cout << "a = " << a << endl;
 		 if (i != 0)
 		 {
 			 double distance = 1e100;
 			 int b = cvnet.findNearestPoint(a, distance);
 			 int myans = 100000;
 			 int anspoint = 0;
+       cvnet.checkCoverNet();
 
 			 for (int i1 = 0; i1 < points.size(); ++i1)
 			 {
@@ -54,6 +55,7 @@ void test_cover_net ()
 			 }
 			 if (myans != distance)
 			 {
+         cerr << " Error on " << i << "step" << endl;
 				 cout << "Wrong distance-- from point" << a << "  to tree" << endl;
 				 cout << "returns point: " << b << "with distance: " << distance << endl;
 				 cout << "correct point: " << anspoint << "with distance: " << myans << endl;
@@ -63,7 +65,7 @@ void test_cover_net ()
 			 }
 		 }
 
-		// cout << "ADD: " << a << endl;
+		 cout << "ADD: " << a << endl;
 		 cvnet.insert(a);
 		 points.push_back(a);
 	 }
