@@ -256,6 +256,7 @@ private:
 
   }
 
+
   void attachPoint( const PointType& pt, int iSphere, int iSphereLevel, double dist )
     // лепим непосредственно к данной сфере, не пытаясь свалиться вниз
   {
@@ -338,41 +339,72 @@ public:
 	  return spheres[iNearestSphere].center;
   }
  
-  int // номер сферы, (-1 если за пределами радиуса стартовой)
-  findNearestSphere1(
-    const PointType& pt, // точка для которой ищем сферу с ближайшим центром
-    double& best_distance // [in/out] рекорд расстояния -- оно же и отсечение (не искать дальше чем указано)
-  ,  int iStartSphere = 0// с какой сферы начинать поиск, 0 - корень дерева 
-  )
-  {
-    int isp=iStartSphere; // текущая сфера
-	  int lev = spheres[isp].level; // текущий уровень
-    double  rad = getRadius(lev);// радиус текущей сферы (на данном уровне)
-    double dist = computeDistance( isp, pt );
+  //int // номер сферы, (-1 если за пределами радиуса стартовой)
+  //findNearestSphere1(
+  //  const PointType& pt, // точка для которой ищем сферу с ближайшим центром
+  //  double& best_distance // [in/out] рекорд расстояния -- оно же и отсечение (не искать дальше чем указано)
+  //,  int iStartSphere = 0// с какой сферы начинать поиск, 0 - корень дерева 
+  //)
+  //{
+  //  int isp=iStartSphere; // текущая сфера
+	 // int lev = spheres[isp].level; // текущий уровень
+  //  double  rad = getRadius(lev);// радиус текущей сферы (на данном уровне)
+  //  double dist = computeDistance( isp, pt );
 	
-	  if (isp == 0 && dist > rad)// если за пределами стартовой
-		  return -1;
+	 // if (isp == 0 && dist > rad)// если за пределами стартовой
+		//  return -1;
 
-	  int ans = -1;
-	  double min_dist = max(0.0, dist - rad);// расстояние от pt до сферы  
-	  if (min_dist > best_distance)// если минимальное расстояние больше оптимального
-		  return -1;
-	  if (dist < best_distance)// если можно улучшить ответ
-	  {
-		  ans = isp;
-		  best_distance = dist;
-	  }
+	 // int ans = -1;
+	 // double min_dist = max(0.0, dist - rad);// расстояние от pt до сферы  
+	 // if (min_dist > best_distance)// если минимальное расстояние больше оптимального
+		//  return -1;
+	 // if (dist < best_distance)// если можно улучшить ответ
+	 // {
+		//  ans = isp;
+		//  best_distance = dist;
+	 // }
 
-	  for (int kid = spheres[isp].last_kid; kid > 0; kid = spheres[kid].prev_brother)// идем по всем детям
-	  {
-		  int kid_ans = findNearestSphere(pt, best_distance, kid);
-		  if (kid_ans != -1)// если результат улучшился 
-			  ans = kid_ans;
-	  }
+	 // for (int kid = spheres[isp].last_kid; kid > 0; kid = spheres[kid].prev_brother)// идем по всем детям
+	 // {
+		//  int kid_ans = findNearestSphere(pt, best_distance, kid);
+		//  if (kid_ans != -1)// если результат улучшился 
+		//	  ans = kid_ans;
+	 // }
 
-	  return ans;
+	 // return ans;
+  //}
+
+  public: bool checkCoverNetSphere(int iSphere, int iKidSphere) // функция, проверяющая корректность построения дерева -- на данный момент тот факт, что все потомки внутри данной сферы
+  { 
+      int isp=iSphere; // текущая сфера
+	    int lev = spheres[isp].level; // текущий уровень
+      double  rad = getRadius(lev);
+      double dist = computeDistance(isp, spheres[iKidSphere].center);
+      if (dist > rad)// если расстояние до потомка больше радиуса
+      {
+         cout << "build tree error" << endl;
+         cout << "incorrect distance from sphere N = " << iSphere << " with center in " << spheres[isp].center << " and R = " << rad << " to kid N = " << iKidSphere << " with center in " << spheres[iKidSphere].center << endl;
+         system ("pause");
+         return false;
+      }
+      for (int kid = spheres[iKidSphere].last_kid; kid > 0; kid = spheres[kid].prev_brother)// идем по всем детям
+	    {
+		    int kid_ans = checkCoverNetSphere(iSphere, kid);
+        if (!kid_ans)
+          return false;
+      }
+
+      return true;    
   }
-
+  public: bool checkCoverNet()
+  {
+     for (int i = 0; i < spheres.size(); ++i)
+     {
+         if (!checkCoverNetSphere(i, i))
+           return false;
+     }
+     return true;
+  }
   int // номер сферы, (-1 если за пределами радиуса стартовой)
   findNearestSphere(
     const PointType& pt, // точка для которой ищем сферу с ближайшим центром
@@ -422,6 +454,8 @@ public:
 	  sort(kids + 0, kids + kids_size);
 	  for (int i = 0; i < kids_size; ++i)
 	  {
+     // if (best_distance < spheres[kids[i].second].distance_to_parent + dist)
+     //   continue;
 		  int new_ans = findNearestSphere(pt, best_distance, kids[i].first, kids[i].second);
 		  if (new_ans != -1)
 			  ans = new_ans;
