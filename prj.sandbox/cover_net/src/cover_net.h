@@ -138,23 +138,23 @@ public:
       return false; // игнорируем слишком далекую точку
     }
 
-#define NO_SEQUENTAL_PROXIMITY_ASSUMPTION
-#ifndef NO_SEQUENTAL_PROXIMITY_ASSUMPTION  // если регистрируем пиксели подряд, то соседи вероятно близки
-    if (iLastSphere != -1)
-    {
-      double dist = computeDistance( iLastSphere, pt );
-      double rad = getRadius(iLastSphereLevel);
-      assert( spheres[iLastSphere].level == iLastSphereLevel );
-      if ( dist < rad )
-      {
-        int start=iLastSphere;
-        insertPoint( pt, iLastSphere, iLastSphereLevel, dist ); // изменяет iLastSphere & iLastSphereLevel
-        for (int isp = spheres[start].parent; isp >=0; isp = spheres[isp].parent)
-          spheres[isp].points++;
-        return true;
-      }
-    }
-#endif
+////////#define NO_SEQUENTAL_PROXIMITY_ASSUMPTION
+//////#ifndef NO_SEQUENTAL_PROXIMITY_ASSUMPTION  // если регистрируем пиксели подряд, то соседи вероятно близки
+//////    if (iLastSphere != -1)
+//////    {
+//////      double dist = computeDistance( iLastSphere, pt );
+//////      double rad = getRadius(iLastSphereLevel);
+//////      assert( spheres[iLastSphere].level == iLastSphereLevel );
+//////      if ( dist < rad ) // <<<<<<<<<<<<<<< MUST CHECK PARENT, GRANDPARENT and so on !!!!!
+//////      {
+//////        int start=iLastSphere;
+//////        insertPoint( pt, iLastSphere, iLastSphereLevel, dist ); // изменяет iLastSphere & iLastSphereLevel
+//////        for (int isp = spheres[start].parent; isp >=0; isp = spheres[isp].parent)
+//////          spheres[isp].points++;
+//////        return true;
+//////      }
+//////    }
+//////#endif
 
     insertPoint( pt, 0, 0, dist_root ); // добавляем спускаясь с рута
 

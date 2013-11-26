@@ -285,6 +285,12 @@ void explore_cover_tree()
       cout << "\nA vs dilate(B) + B vs dilate(A) metrics (L1):" << endl;
       cvnet2.reportStatistics( 0, 3 ); 
       cout << "Build time = " << ms/1000 << " seconds" << endl;
+
+      cout << "Test Cover Net...";
+      if (cvnet2.checkCoverNet())
+        cout << "ok" << endl;
+      else
+        cout << "failed" << endl;
     }
 
     // test recognition
@@ -309,11 +315,15 @@ void explore_cover_tree()
 
 	  // 
 
-	    cout << "begin test " << endl;
+
+	    cout << "Test 1-NN recognition " << endl;
       ruler1.counter=0;
       ruler2.counter=0;
       for (int i_tst=0; i_tst<int(tst_samples.size()); i_tst++)
       {
+        if (i_tst%500 == 0)
+          cout << ".";
+
         double distance = SAMPLE_HEIGHT*SAMPLE_WIDTH*256; // а могли бы и отсечение указать?
         int i_trn = 0;
         if (test_hamming)
@@ -337,7 +347,7 @@ void explore_cover_tree()
           miss++;
         }
       }
-      cout << "Hits = " << hit << " \tMisses = " << miss << endl;
+      cout << "\nHits = " << hit << " \tMisses = " << miss << endl;
       cout << "Max hit dist = " << max_hit_distance << " Min miss dist = " << min_miss_distance << endl;
       cout << 10000.0 / t.dsecs() << "symbols per second" << endl;
       if (test_hamming)
