@@ -5,6 +5,7 @@
 
 #include <vector>
 #include <algorithm>
+#include <cassert>
 
 #define COVER_NET_VERBOSE
 //#define COVER_NET_VERBOSE_DETAILED
@@ -137,11 +138,13 @@ public:
       return false; // игнорируем слишком далекую точку
     }
 
+#define NO_SEQUENTAL_PROXIMITY_ASSUMPTION
 #ifndef NO_SEQUENTAL_PROXIMITY_ASSUMPTION  // если регистрируем пиксели подряд, то соседи вероятно близки
     if (iLastSphere != -1)
     {
       double dist = computeDistance( iLastSphere, pt );
       double rad = getRadius(iLastSphereLevel);
+      assert( spheres[iLastSphere].level == iLastSphereLevel );
       if ( dist < rad )
       {
         int start=iLastSphere;
@@ -179,6 +182,12 @@ private:
     double distance_to_parent // расстояние до центра родительской сферы
     ) 
   {
+    assert(distance_to_parent == ( (parent >= 0) ? computeDistance( parent, pt ) : distance_to_parent ) );
+
+    if (iSphereLevel > 0) // not root
+      assert( computeDistance( parent, pt ) <= getRadius(iSphereLevel-1) + 0.0000001 );
+
+
     do {
       spheres.push_back( CoverSphere<PointType>( iSphereLevel, pt, parent, distance_to_parent ) );
       iLastSphere = spheres.size()-1;
@@ -190,22 +199,22 @@ private:
         spheres[parent].last_kid = iLastSphere;
         spheres[iLastSphere].prev_brother = bro;
 #else
-		int bro = spheres[parent].last_kid;//последний ребенок
-		if (bro == 0) // bro нету
-		{
-			spheres[parent].last_kid = iLastSphere;//тогда iLastSphere -- первый ребенок
-			spheres[iLastSphere].prev_brother = bro;// = 0;
-			/*if (spheres[iLastSphere].center != spheres[parent].center)
-				cout << "O_O" << endl;
-			else
-				cout << "+" << endl;*/
-		}
-		else
-		{
-			int prev_bro = spheres[bro].prev_brother;//предпоследний ребенок
-			spheres[bro].prev_brother = iLastSphere;// предпоследний теперь новый
-			spheres[iLastSphere].prev_brother = prev_bro;//перед новым стоит prev_bro
-		}
+		    int bro = spheres[parent].last_kid;//последний ребенок
+        if (bro == 0) // bro нету
+        {
+          spheres[parent].last_kid = iLastSphere;//тогда iLastSphere -- первый ребенок
+          spheres[iLastSphere].prev_brother = bro;// = 0;
+          /*if (spheres[iLastSphere].center != spheres[parent].center)
+            cout << "O_O" << endl;
+          else
+            cout << "+" << endl;*/
+        }
+        else
+        {
+          int prev_bro = spheres[bro].prev_brother;//предпоследний ребенок
+          spheres[bro].prev_brother = iLastSphere;// предпоследний теперь новый
+          spheres[iLastSphere].prev_brother = prev_bro;//перед новым стоит prev_bro
+        }
 #endif
       }
 #ifdef DONT_FORCE_DIRECT_SUCCESSORS
@@ -228,7 +237,9 @@ private:
     int iSphereLevel, 
     double dist // расстояние до центра сферы iSphere (уже измерено)
     )
-  { // мы внутри сферы
+  { 
+    // мы внутри сферы
+    assert( computeDistance( iSphere, pt ) <= getRadius(iSphereLevel) + 0.0000001 );
     spheres[iSphere].points++;
 
     double minrad = getMinRadius(iSphereLevel);
@@ -243,10 +254,10 @@ private:
     double rlast_kid = getRadius(iSphereLevel+1);
     while (kid > 0)
     {
-      double dist = computeDistance( kid, pt );
-      if (dist < rlast_kid)
+      double dist_kid = computeDistance( kid, pt );
+      if (dist_kid < rlast_kid)
       {
-        insertPoint( pt, kid, iSphereLevel+1, dist ); // провалились
+        insertPoint( pt, kid, iSphereLevel+1, dist_kid ); // провалились
         return; // конец банкета
       }
       kid = spheres[kid].prev_brother;
@@ -383,7 +394,9 @@ public:
       if (dist > rad)// если расстояние до потомка больше радиуса
       {
          cout << "build tree error" << endl;
-         cout << "incorrect distance from sphere N = " << iSphere << " with center in " << spheres[isp].center << " and R = " << rad << " to kid N = " << iKidSphere << " with center in " << spheres[iKidSphere].center << endl;
+         cout << "incorrect distance " << dist << " from sphere N = " << iSphere 
+           << " with center in " << spheres[isp].center << " and R = " << rad << " to kid N = " << iKidSphere 
+           << " with center in " << spheres[iKidSphere].center << endl;
          system ("pause");
          return false;
       }

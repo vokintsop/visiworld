@@ -25,7 +25,7 @@ using namespace cv;
 int SAMPLE_HEIGHT = 0;
 int SAMPLE_WIDTH = 0;
 
-#define simple_tester
+//#define simple_tester
 
 // train:
 vector< pair< int, cv::Mat > > trn_samples;  // image, class_num
