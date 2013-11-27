@@ -1,4 +1,5 @@
 // test cover_net on word lists
+#include <conio.h>
 #include <string>
 #include <vector>
 #include <iostream>
@@ -91,6 +92,30 @@ void test_Metr1Str( int start =0, int step = 1 )
   //else
   //  cout << "failed" << endl;
 
+  vector< string > samples_distorted;
+  for (int i=start; i< int( samples.size() ); i+= step)
+  {
+    string ss = samples[i];
+    ss[ rand() % ss.length() ] = '?';
+    samples_distorted.push_back(ss);
+  }
+
+  ruler1.samples2 = &samples_distorted;
+  int cc = 0;
+  for (int i=start; i< int( samples.size() ); i+= step)
+  {
+    ruler1.counter = 0;
+    //if (i%100)
+    //  cout << ".";
+    double distance = cvnet1.getRadius(0)*2;
+    int ix = cvnet1.findNearestPoint( i, distance ); 
+    cout << samples[i] << endl << samples_distorted[i] << endl << samples[ix] << endl << ruler1.counter << endl << endl;
+    cc = (cc==32) ? cc : _getch();
+    if (cc == 27)
+      break;
+  }
+  //cout << "Average distance calculations per word = " << double( ruler1.counter ) / samples.size() << endl;
+
 }
 
 int explore_words( int argc, char* argv[] )
@@ -99,11 +124,10 @@ int explore_words( int argc, char* argv[] )
   string data = exe + "/../../../testdata/wordlists/corncob_lowercase.txt";
 	if (!read_samples(data))
     return -1;
-
+#if 0
   cout << "======== Ordered list of words:" << endl;
   test_Metr1Str(0,1);
-
-
+#endif
   cout << "======== Shuffled list of words:" << endl;
   std::random_shuffle(samples.begin(), samples.end());
   test_Metr1Str(0,1);
