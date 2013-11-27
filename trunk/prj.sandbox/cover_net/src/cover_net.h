@@ -419,7 +419,7 @@ public:
        }
 	  }
 
-	  const int MAX_KIDS_SIZE = 256;
+	  const int MAX_KIDS_SIZE = 10000;
 	  pair<double, int> kids[MAX_KIDS_SIZE];
 
 	  if (spheres[isp].last_kid == 0) // лист
