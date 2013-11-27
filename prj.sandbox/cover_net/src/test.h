@@ -7,6 +7,7 @@
 
 #include <vector>
 #include <iostream>
+#include <queue>
 
 #include "cover_net.h"
 
@@ -27,45 +28,83 @@ void test_cover_net ()
 
 	 CoverNet<int, simpleMetr > cvnet(&rule, 1e5, 1);
 	 vector<int> points;
+
+   int k = 3; // количество ближайших, которое ищем
 	
 	 cout << "BEGIN test" << endl;
-	 const int NET_SIZE = 500;
+	 const int NET_SIZE = 1000;
 	 int srand_const = cv::getTickCount();  
 	// srand(-1019611072); // error 
    srand(srand_const);
-   srand(-23655176);
+   //srand(118227059);
+   set<int> S;
+
 	 for (int i = 0; i < NET_SIZE; ++i)
 	 {
 		 int a = rand();
+     if (S.find(a)!= S.end())
+       continue;
+     S.insert(a);
 		 if (i != 0)
 		 {
 			 double distance = 1e100;
-			 int b = cvnet.findNearestPoint(a, distance);
-			 int myans = 100000;
+			 vector<pair<int, double> > b = cvnet.findNearestPoints(a, k, distance);
 			 int anspoint = 0;
        cvnet.checkCoverNet();
 
+       priority_queue<pair<double, int> > Q; // совсем ленивая проверка
+
 			 for (int i1 = 0; i1 < points.size(); ++i1)
 			 {
-				 if (rule.computeDistance(points[i1], a) < myans)
-				 {
-					 myans = rule.computeDistance(points[i1], a);
-					 anspoint = points[i1];
-				 }
+         Q.push(make_pair(rule.computeDistance(points[i1], a) * (-1), points[i1]));
 			 }
-			 if (myans != distance)
-			 {
-         cerr << " Error on " << i << "step" << endl;
-				 cout << "Wrong distance-- from point" << a << "  to tree" << endl;
-				 cout << "returns point: " << b << "with distance: " << distance << endl;
-				 cout << "correct point: " << anspoint << "with distance: " << myans << endl;
 
+       vector<pair<int, double> > myans;
+       while (true)
+       {
+         if (myans.size() == k || Q.empty())
+           break;
+         pair<double, int> pt = Q.top();
+         Q.pop();
+         myans.push_back(make_pair(pt.second, pt.first * (-1)));
+         //cout << pt.second << endl;
+       }
+
+       bool check = true;
+       if (b.size() != myans.size())
+         check = false;
+       else
+       {
+         for (int i = 0; i < b.size();++i)
+         {
+           if (myans[i].second != b[i].second)
+             check = false;
+         }
+       }
+
+			 if (!check)
+			 {
+         cout << " Error on " << i << "step" << endl;
+  
+         cout << "count points :" << endl;
+         for (int i1 = 0; i1 < b.size(); ++i1)
+         {
+           cout << "(" << b[i1].first << ", " << b[i1].second << ") "; 
+         }
+         cout << endl;
+
+         cout << "correct points :" << endl;
+         for (int i1 = 0; i1 < myans.size(); ++i1)
+         {
+           cout << "(" << myans[i1].first << ", " << myans[i1].second << ") "; 
+         }
+         cout << endl;
 				 cout << "srand_const = " << srand_const << endl;
 				 system ("pause");
 			 }
 		 }
 
-		 cout << "ADD: " << a << endl;
+		// cout << "ADD: " << a << endl;
 		 cvnet.insert(a);
 		 points.push_back(a);
 	 }
