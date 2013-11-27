@@ -27,7 +27,7 @@ using namespace cv;
 int SAMPLE_HEIGHT = 0;
 int SAMPLE_WIDTH = 0;
 
-//#define simple_tester
+#define simple_tester
 
 // train:
 vector< pair< int, cv::Mat > > trn_samples;  // image, class_num
@@ -288,11 +288,11 @@ void explore_cover_tree()
       cvnet2.reportStatistics( 0, 3 ); 
       cout << "Build time = " << ms/1000 << " seconds" << endl;
 
-      cout << "Test Cover Net...";
+      /*cout << "Test Cover Net...";
       if (cvnet2.checkCoverNet())
         cout << "ok" << endl;
       else
-        cout << "failed" << endl;
+        cout << "failed" << endl;*/
     }
 
     // test recognition
