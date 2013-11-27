@@ -516,7 +516,7 @@ public:
 		  best_distance = dist;
 	  }
 
-	  const int MAX_KIDS_SIZE = 256;
+	  const int MAX_KIDS_SIZE = 10000;  // <<<<<<<< TODO --- CHECK!!!
 	  pair<double, int> kids[MAX_KIDS_SIZE];
 
 	  if (spheres[isp].last_kid == 0) // лист
@@ -531,7 +531,7 @@ public:
 	  }
 
 	  for (; kid > 0; kid = spheres[kid].prev_brother)// идем по всем детям
-		  kids[kids_size++] = make_pair(computeDistance(kid, pt), kid);
+		  kids[kids_size++] = make_pair(computeDistance(kid, pt), kid);  // <<<<<<<<<< CHECK kids_size++
 	  
 	  sort(kids + 0, kids + kids_size);
 	  for (int i = 0; i < kids_size; ++i)
