@@ -5,6 +5,8 @@ IF( MSVC )
     src/cover_net.h
     src/ticker.h
     src/main.cpp 
+    src/mnist.cpp 
+    src/words.cpp 
     src/test.h
     )
 
