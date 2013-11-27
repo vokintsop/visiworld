@@ -42,12 +42,12 @@ inline unsigned long ntohl(unsigned long n) {
   return ((n & 0xFF) << 24) | ((n & 0xFF00) << 8) | ((n & 0xFF0000) >> 8) | ((n & 0xFF000000) >> 24);
 }
 
-bool _read_samples( string data, // images
+static bool _read_samples( string data, // images
                     string data2, // labels
                     vector< pair< int, cv::Mat > >& samples // result vector
                     );
 
-bool read_samples( string mnist_folder )
+static bool read_samples( string mnist_folder )
 {
 	string trndata = mnist_folder + "/train-images.idx3-ubyte";
 	string trndata1 = mnist_folder + "/train-labels.idx1-ubyte";
