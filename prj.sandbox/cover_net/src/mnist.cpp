@@ -367,7 +367,7 @@ void explore_cover_tree()
 }
 
 
-int mnist( int argc, char* argv[] )
+int explore_mnist( int argc, char* argv[] )
 {
 #ifdef simple_tester
 	test_cover_net();
