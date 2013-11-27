@@ -380,8 +380,7 @@ int explore_mnist( int argc, char* argv[] )
 
   explore_cover_tree();
 
-  cout << "\n\n ======= Press any key to finish... ========" << endl;
-  _getch();
+
   //return 1;
 
   int key=-1;
