@@ -3,6 +3,7 @@
 #include <vector>
 #include <iostream>
 #include <fstream>
+#include <algorithm>
 
 #include <opencv/cv.h>
 #include <opencv/highgui.h>
@@ -67,6 +68,31 @@ public:
   }
 };
 
+void test_Metr1Str( int start =0, int step = 1 )
+{
+  Ticker t;
+  Metr1Str ruler1;
+  ruler1.samples1 = &samples;
+  ruler1.samples2 = &samples;
+  CoverNet< int, Metr1Str > cvnet1( &ruler1, 300, 1 );
+
+  for (int i=start; i< int( samples.size() ); i+= step)
+    cvnet1.insert( i );
+
+  double sec = t.dsecs();
+
+
+  cvnet1.reportStatistics( 0, 3 ); 
+  cout << "Build time = " << sec << " seconds" << endl;
+
+  //cout << "Test Cover Net...";
+  //if (cvnet1.checkCoverNet())
+  //  cout << "ok" << endl;
+  //else
+  //  cout << "failed" << endl;
+
+}
+
 int explore_words( int argc, char* argv[] )
 {
   string exe = argv[0];
@@ -74,28 +100,18 @@ int explore_words( int argc, char* argv[] )
 	if (!read_samples(data))
     return -1;
 
-  {
-    Ticker t;
-    Metr1Str ruler1;
-    ruler1.samples1 = &samples;
-    ruler1.samples2 = &samples;
-    CoverNet< int, Metr1Str > cvnet1( &ruler1, 300, 1 );
-
-    for (int i=0; i< int( samples.size() ); i++)
-      cvnet1.insert( i );
-
-    double ms = t.msecs();
+  cout << "======== Ordered list of words:" << endl;
+  test_Metr1Str(0,1);
 
 
-    cvnet1.reportStatistics( 0, 3 ); 
+  cout << "======== Shuffled list of words:" << endl;
+  std::random_shuffle(samples.begin(), samples.end());
+  test_Metr1Str(0,1);
+  cout << "======== Odd half list of words:" << endl;
+  test_Metr1Str(1,2);
+  cout << "======== Even half list of words:" << endl;
+  test_Metr1Str(0,2);
 
-    //cout << "Test Cover Net...";
-    //if (cvnet1.checkCoverNet())
-    //  cout << "ok" << endl;
-    //else
-    //  cout << "failed" << endl;
-
-  }
 
   return 0;
 }
