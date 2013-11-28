@@ -183,10 +183,9 @@ private:
     double distance_to_parent // расстояние до центра родительской сферы
     ) 
   {
-    assert(distance_to_parent == ( (parent >= 0) ? computeDistance( parent, pt ) : distance_to_parent ) );
-
-    if (iSphereLevel > 0) // not root
-      assert( computeDistance( parent, pt ) <= getRadius(iSphereLevel-1) + 0.0000001 );
+    //assert(distance_to_parent == ( (parent >= 0) ? computeDistance( parent, pt ) : distance_to_parent ) );
+    //if (iSphereLevel > 0) // not root
+    //  assert( computeDistance( parent, pt ) <= getRadius(iSphereLevel-1) + 0.0000001 );
 
 
     do {
@@ -240,7 +239,7 @@ private:
     )
   { 
     // мы внутри сферы
-    assert( computeDistance( iSphere, pt ) <= getRadius(iSphereLevel) + 0.0000001 );
+    //assert( computeDistance( iSphere, pt ) <= getRadius(iSphereLevel) + 0.0000001 );
     spheres[iSphere].points++;
 
     double minrad = getMinRadius(iSphereLevel);
@@ -303,47 +302,22 @@ public:
     return count; 
   };
 
-#if 1 // ----------------------------------- not implemented yet 
-
-  int // номер сферы, (-1 если за пределами радиуса стартовой), полученный выполняя        
-  branchSubTreeUsingFirstCover(   // прямолинейный спуск по поддереву -- первая фаза branch&bounds
-    const PointType& pt, // точка для которой ищем сферу по схеме -- если накрывает -- сразу спускаемся 
-                         // т.е. без попытки поиска более близкой на том же уровне 
-    int iStartSphere = 0,// с какой сферы начинать поиск, 0 - корень дерева 
-    int iStartLevel = 0 // уровень стартовой сферы, 0 - уровень кореня дерева 
-//    ,CoverRecord& record // регистрируем рекорд расстояния?
-    ) 
-  {
-    double dist = computeDistance( iStartSphere, pt );
-//  record.update( dist, iStartSphere, iStartLevel );
-    if (!(dist < getRadius( iStartLevel )))
-      return -1;
-    // находимся в покрытом пространстве
-
-    /// .... todo ....
-    return 0;
-  }
-
-
-  public:
+public:
   const PointType& 
   findNearestPoint( // ближайший к указанной точке центр сферы из дерева
     const PointType& pt, // точка для которой ищем сферу с ближайшим центром
-    double &best_distance// [in/out] рекорд расстояния -- оно же и отсечение (не искать дальше чем указано)
-  , int iStartSphere = 0// с какой сферы начинать поиск, 0 - корень дерева 
+    double &best_distance,// [in/out] рекорд расстояния -- оно же и отсечение (не искать дальше чем указано)
+    int iStartSphere = 0// с какой сферы начинать поиск, 0 - корень дерева 
   )
   {
-    
-      int iNearestSphere = findNearestSphere(pt, best_distance, -1, iStartSphere);
+    int iNearestSphere = findNearestSphere(pt, best_distance, -1, iStartSphere);
 	  if (iNearestSphere == -1)
-	  {
 		  cerr << "error: distance to root is more then maximal radius" << endl;
-	  }
-
 	  return spheres[iNearestSphere].center;
   }
  
-  public: bool checkCoverNetSphere(int iSphere, int iKidSphere) // функция, проверяющая корректность построения дерева -- на данный момент тот факт, что все потомки внутри данной сферы
+public:
+  bool checkCoverNetSphere(int iSphere, int iKidSphere) // функция, проверяющая корректность построения дерева -- на данный момент тот факт, что все потомки внутри данной сферы
   { 
       int isp=iSphere; // текущая сфера
 	    int lev = spheres[isp].level; // текущий уровень
@@ -367,17 +341,17 @@ public:
 
       return true;    
   }
-  public: bool checkCoverNet()
+
+  bool checkCoverNet()
   {
      for (int i = 0; i < spheres.size(); ++i)
-     {
          if (!checkCoverNetSphere(i, i))
            return false;
-     }
      return true;
   }
+
   void// результат в best_spheres - если best_spheres.size() < k, то нету сфер лучше, чем k
-  findNearestSpheres(
+  findKNearestSpheres(
     const PointType& pt, // точка для которой ищем сферы с ближайшими центрами
     int k,// количество сфер, которые мы хотим найти
     std::priority_queue<std::pair<double, int> > &best_spheres,// куча лучштх сфер (пара - расстояние, радиус), начиная с максимально удаленной
@@ -413,13 +387,13 @@ public:
 	  if (dist < best_kth_distance && !is_copy)// если можно улучшить ответ (хотя бы самую плохую сферу)
 	  {
 		   best_spheres.push(make_pair(dist, isp)); // добавляем новое расстояние
-       if (best_spheres.size() > k) // если сфер больше чем k
+       if (int( best_spheres.size()) > k) // если сфер больше чем k
        {
           best_spheres.pop();
        }
 	  }
 
-	  const int MAX_KIDS_SIZE = 10000;
+	  const int MAX_KIDS_SIZE = 1000;
 	  pair<double, int> kids[MAX_KIDS_SIZE];
 
 	  if (spheres[isp].last_kid == 0) // лист
@@ -451,15 +425,15 @@ public:
      // if (best_distance < spheres[kids[i].second].distance_to_parent + dist)
      //   continue;
       if (num == kids[i].second)
-        findNearestSpheres(pt, k, best_spheres, kids[i].first, kids[i].second, true);
+        findKNearestSpheres(pt, k, best_spheres, kids[i].first, kids[i].second, true);
       else
-		    findNearestSpheres(pt, k, best_spheres, kids[i].first, kids[i].second, false);
+		    findKNearestSpheres(pt, k, best_spheres, kids[i].first, kids[i].second, false);
     }
   }
 
   public:
     std::vector<std::pair<PointType, double> >  // а надо ли возвращать расстояния? -- возвращаем пары точка, расстояния -- отсортированы по возрастанию расстояния
-  findNearestPoints( // ближайшие к указанной точке центры сфер из дерева
+  findKNearestPoints( // ближайшие к указанной точке центры сфер из дерева
     const PointType& pt,// точка для которой ищем сферу с ближайшим центром
     int k, // количество вершин
     double &best_distance// [in/out] рекорд расстояния -- оно же и отсечение (не искать дальше чем указано)
@@ -470,7 +444,7 @@ public:
     for (int i = 0; i < k; ++i)
       best_dist.push(make_pair(best_distance, -1)); // добавляем фиктивные вершины с расстоянием best_distance
     
-    findNearestSpheres(pt, k, best_dist, -1, iStartSphere); // найдем сферы;
+    findKNearestSpheres(pt, k, best_dist, -1, iStartSphere); // найдем сферы;
     
     vector<pair<PointType, double> > result;
     while (!best_dist.empty())
@@ -546,20 +520,6 @@ public:
 	  return ans;
   }
 
-  public:
-  int // номер сферы
-  dropToNearestKid( // рекурсивное "проваливание" в ближайшую детскую сферу. 
-                    // на входе -- точка внутри или вне родительской сферы
-                    // на выходе -- номер найденной сферы нижнего уровня и расстояние до нее
-    int isphere, // проваливаемся в данную сферу
-    const PointType& pt, // точка для которой ищем сферу с ближайшим центром
-    double* best_distance // [in/out] рекорд расстояния -- оно же и отсечение (не искать дальше чем указано)
-    )
-  {
-    // пока есть ребенок, в которого попадаем (из нескольких -- ближайший) -- проваливаемся в него
-    return 0; // todo
-  }
-#endif // ---------------------- not implemented yet
 
   void printNode( int node, int level )
   {

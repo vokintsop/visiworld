@@ -108,7 +108,7 @@ void test_Metr1Str( int start =0, int step = 1 )
     //if (i%100)
     //  cout << ".";
     double distance = cvnet1.getRadius(0)*2;
-    vector< pair< int, double > > nearestWords = cvnet1.findNearestPoints( i, 20, distance ); 
+    vector< pair< int, double > > nearestWords = cvnet1.findKNearestPoints( i, 20, distance ); 
 
     cout << endl << samples[i] << endl << samples_distorted[i] << endl;
     for (int j=0; j< int(nearestWords.size()); j++)
