@@ -317,12 +317,19 @@ void explore_cover_tree()
 
 #define ONLY_ONE
 #ifdef ONLY_ONE
-      int kNeighbours = 1;
+      int kNeighbours = 1; ///  ==> 2.81% error rate, ??> 159 символов в сек <?? 782 расстояния
 #else
-      int kNeighbours = 8;
+      //int kNeighbours = 2; // ==> 2.72% error rate, 351 символ в сек, 861 расстояние на точку
+      //int kNeighbours = 4; // ==> 2.34% error rate, 301 символ в сек
+      //int kNeighbours = 6; // ==> 2.29% error rate, 272 символ в сек, 1041 расстояние на точку
+      //int kNeighbours = 7; // ==> 2.28% error rate, 260 символ в сек, 1175 расстояние на точку
+      //int kNeighbours = 8; // ==> 2.22% error rate, 250 символ в сек, 1105 расстояние на точку
+      //int kNeighbours = 9; // ==> 2.24% error rate, 240 символ в сек, 1135 расстояние на точку
+      //int kNeighbours = 10; // ==> 2.24% error rate, 232 символ в сек, 1162 расстояние на точку
+      //int kNeighbours = 16; // ==> 2.44% error rate, 198 символ в сек, 1302 расстояние на точку
 #endif
 
-	    cout << "Test 1-NN recognition " << endl;
+	    cout << "Test " << kNeighbours << "-NN recognition " << endl;
 
       ruler1.counter=0;
       ruler2.counter=0;
@@ -356,7 +363,7 @@ void explore_cover_tree()
 
         int winner = -1;
         if (kNeighbours == 1)
-          winner = tst_samples[i_tst].first;
+          winner = trn_samples[i_trn].first;
         else
         {
           vector< pair< double, int > > votes(10);
