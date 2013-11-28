@@ -33,7 +33,7 @@ void test_cover_net ()
 	
 	 cout << "BEGIN test" << endl;
 	 const int NET_SIZE = 1000;
-	 int srand_const = cv::getTickCount();  
+	 long long srand_const = cv::getTickCount();  
 	// srand(-1019611072); // error 
    srand(srand_const);
    //srand(118227059);
@@ -48,13 +48,13 @@ void test_cover_net ()
 		 if (i != 0)
 		 {
 			 double distance = 1e100;
-			 vector<pair<int, double> > b = cvnet.findNearestPoints(a, k, distance);
+			 vector<pair<int, double> > b = cvnet.findKNearestPoints(a, k, distance);
 			 int anspoint = 0;
        cvnet.checkCoverNet();
 
        priority_queue<pair<double, int> > Q; // совсем ленивая проверка
 
-			 for (int i1 = 0; i1 < points.size(); ++i1)
+			 for (int i1 = 0; i1 < int( points.size() ); ++i1)
 			 {
          Q.push(make_pair(rule.computeDistance(points[i1], a) * (-1), points[i1]));
 			 }
@@ -75,7 +75,7 @@ void test_cover_net ()
          check = false;
        else
        {
-         for (int i = 0; i < b.size();++i)
+         for (int i = 0; i < int( b.size() );++i)
          {
            if (myans[i].second != b[i].second)
              check = false;
@@ -87,14 +87,14 @@ void test_cover_net ()
          cout << " Error on " << i << "step" << endl;
   
          cout << "count points :" << endl;
-         for (int i1 = 0; i1 < b.size(); ++i1)
+         for (int i1 = 0; i1 < int( b.size() ); ++i1)
          {
            cout << "(" << b[i1].first << ", " << b[i1].second << ") "; 
          }
          cout << endl;
 
          cout << "correct points :" << endl;
-         for (int i1 = 0; i1 < myans.size(); ++i1)
+         for (int i1 = 0; i1 < int( myans.size() ); ++i1)
          {
            cout << "(" << myans[i1].first << ", " << myans[i1].second << ") "; 
          }

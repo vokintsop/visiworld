@@ -27,7 +27,7 @@ using namespace cv;
 int SAMPLE_HEIGHT = 0;
 int SAMPLE_WIDTH = 0;
 
-#define simple_tester
+//#define simple_tester
 
 // train:
 vector< pair< int, cv::Mat > > trn_samples;  // image, class_num
@@ -315,10 +315,15 @@ void explore_cover_tree()
       //ruler2.samples2 = &trn_samples;    ruler2.samples2_dilated = &trn_samples_dilated;
       int hit=0; int miss=0;
 
-	  // 
-
+#define ONLY_ONE
+#ifdef ONLY_ONE
+      int kNeighbours = 1;
+#else
+      int kNeighbours = 8;
+#endif
 
 	    cout << "Test 1-NN recognition " << endl;
+
       ruler1.counter=0;
       ruler2.counter=0;
       for (int i_tst=0; i_tst<int(tst_samples.size()); i_tst++)
@@ -327,18 +332,53 @@ void explore_cover_tree()
           cout << ".";
 
         double distance = SAMPLE_HEIGHT*SAMPLE_WIDTH*256; // а могли бы и отсечение указать?
+        vector< pair< int, double > > nearest; 
         int i_trn = 0;
-        if (test_hamming)
-          i_trn = cvnet1.findNearestPoint(i_tst, distance);// надо добавить поиск ближайшей точки от какого-то образца i_tst до trn_samples 
-        else if (test_smart)
-          i_trn = cvnet2.findNearestPoint(i_tst, distance);// надо добавить поиск ближайшей точки от какого-то образца i_tst до trn_samples 
+        if (kNeighbours == 1)
+        {
+          if (test_hamming)
+            i_trn = cvnet1.findNearestPoint(i_tst, distance);
+          else if (test_smart)
+            i_trn = cvnet2.findNearestPoint(i_tst, distance);
+        }
+        else
+        {
+          if (test_hamming)
+            nearest = cvnet1.findKNearestPoints(i_tst, kNeighbours, distance);
+          else if (test_smart)
+            nearest = cvnet2.findKNearestPoints(i_tst, kNeighbours, distance);
+        }
 
-		/*imshow("test_mat", tst_samples[i_tst].second);
-		imshow("best_vertex", trn_samples[i_trn].second);
-		cerr << "Result:  tst_value = " << tst_samples[i_tst].first << " trn_value = " << trn_samples[i_trn].first << " dist = " << distance << endl;
-		cvWaitKey(0);*/
+		    /*imshow("test_mat", tst_samples[i_tst].second);
+		    imshow("best_vertex", trn_samples[i_trn].second);
+		    cerr << "Result:  tst_value = " << tst_samples[i_tst].first << " trn_value = " << trn_samples[i_trn].first << " dist = " << distance << endl;
+		    cvWaitKey(0);*/
 
-  		if (tst_samples[i_tst].first == trn_samples[i_trn].first)
+        int winner = -1;
+        if (kNeighbours == 1)
+          winner = tst_samples[i_tst].first;
+        else
+        {
+          vector< pair< double, int > > votes(10);
+          for (int i=0;i < int(votes.size()); i++ )
+          {
+            votes[i].first = 0;
+            votes[i].second = i;
+          }
+
+          for (int i=0; i < int(nearest.size()); i++ )
+          {
+            int trn_class = trn_samples[nearest[i].first].first;
+            double trn_distance = nearest[i].second;
+            votes[ trn_class ].first += 1. / (1. + trn_distance);
+          }
+          sort( votes.rbegin(), votes.rend() );
+          winner = votes[0].second;
+        }
+
+
+  		  //if (tst_samples[i_tst].first == trn_samples[i_trn].first)
+  		  if (winner == tst_samples[i_tst].first)
         {
           max_hit_distance = max( max_hit_distance, distance );
           hit++;
@@ -381,8 +421,8 @@ int explore_mnist( int argc, char* argv[] )
   explore_cover_tree();
 
 
-  //return 1;
-
+  return 1;
+///////////////////////////////////////////////////////////
   int key=-1;
   for ( int frame =0; key != 27 && frame < int( tst_samples.size() ); )
   {
