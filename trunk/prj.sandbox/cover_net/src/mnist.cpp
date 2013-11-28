@@ -319,6 +319,7 @@ void explore_cover_tree()
 #ifdef ONLY_ONE
       int kNeighbours = 1; ///  ==> 2.81% error rate, ??> 159 символов в сек <?? 782 расстояния
 #else
+      int kNeighbours = 1; // ==> 2.81% error rate, 387 символ в сек, 782 расстояние на точку
       //int kNeighbours = 2; // ==> 2.72% error rate, 351 символ в сек, 861 расстояние на точку
       //int kNeighbours = 4; // ==> 2.34% error rate, 301 символ в сек
       //int kNeighbours = 6; // ==> 2.29% error rate, 272 символ в сек, 1041 расстояние на точку
@@ -341,7 +342,7 @@ void explore_cover_tree()
         double distance = SAMPLE_HEIGHT*SAMPLE_WIDTH*256; // а могли бы и отсечение указать?
         vector< pair< int, double > > nearest; 
         int i_trn = 0;
-        if (kNeighbours == 1)
+        if (0) //kNeighbours == 1)
         {
           if (test_hamming)
             i_trn = cvnet1.findNearestPoint(i_tst, distance);
@@ -362,7 +363,7 @@ void explore_cover_tree()
 		    cvWaitKey(0);*/
 
         int winner = -1;
-        if (kNeighbours == 1)
+        if (0) //kNeighbours == 1)
           winner = trn_samples[i_trn].first;
         else
         {
