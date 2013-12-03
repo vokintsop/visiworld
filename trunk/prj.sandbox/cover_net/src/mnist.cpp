@@ -319,12 +319,12 @@ void explore_cover_tree()
 #ifdef ONLY_ONE
       int kNeighbours = 1; ///  ==> 2.81% error rate, ??> 159 символов в сек <?? 782 расстояния
 #else
-      int kNeighbours = 1; // ==> 2.81% error rate, 387 символ в сек, 782 расстояние на точку
+      //int kNeighbours = 1; // ==> 2.81% error rate, 387 символ в сек, 782 расстояние на точку
       //int kNeighbours = 2; // ==> 2.72% error rate, 351 символ в сек, 861 расстояние на точку
       //int kNeighbours = 4; // ==> 2.34% error rate, 301 символ в сек
       //int kNeighbours = 6; // ==> 2.29% error rate, 272 символ в сек, 1041 расстояние на точку
       //int kNeighbours = 7; // ==> 2.28% error rate, 260 символ в сек, 1175 расстояние на точку
-      //int kNeighbours = 8; // ==> 2.22% error rate, 250 символ в сек, 1105 расстояние на точку
+      int kNeighbours = 8; // ==> 2.22% error rate, 250 символ в сек, 1105 расстояние на точку
       //int kNeighbours = 9; // ==> 2.24% error rate, 240 символ в сек, 1135 расстояние на точку
       //int kNeighbours = 10; // ==> 2.24% error rate, 232 символ в сек, 1162 расстояние на точку
       //int kNeighbours = 16; // ==> 2.44% error rate, 198 символ в сек, 1302 расстояние на точку
@@ -402,7 +402,21 @@ void explore_cover_tree()
         {
           min_miss_distance = min( min_miss_distance, distance );
           miss++;
+
+          imshow("tst", tst_samples[i_tst].second);
+          Mat near_mats(trn_samples[nearest[0].first].second.rows, trn_samples[nearest[0].first].second.cols * nearest.size(), trn_samples[0].second.type());
+          for (int i1 = 0; i1 < nearest.size(); ++i1)
+          {
+            Mat Roi(near_mats, Rect(i1 * trn_samples[nearest[i1].first].second.cols, 0,trn_samples[nearest[i1].first].second.cols, trn_samples[nearest[i1].first].second.rows));
+            trn_samples[nearest[i1].first].second.copyTo(Roi);
+            //imshow("nya", trn_samples[nearest[i1].second].second);
+          }
+          imshow("nearest", near_mats);
+          cvWaitKey(0);
+
         }
+        
+
       }
       cout << "\nHits = " << hit << " \tMisses = " << miss << endl;
       cout << "Max hit dist = " << max_hit_distance << " Min miss dist = " << min_miss_distance << endl;
