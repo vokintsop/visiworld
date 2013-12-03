@@ -411,19 +411,15 @@ public:
 
 	  for (; kid > 0; kid = spheres[kid].prev_brother)// идем по всем детям
     {
-      if (spheres[kid].center == spheres[isp].center)
-	    {
-        cout << "O_O" << endl;
-        system ("pause");
-      }
-		  kids[kids_size++] = make_pair(computeDistance(kid, pt), kid);
+      if (fabs(spheres[kid].distance_to_parent - dist) < best_kth_distance + getRadius(lev + 1)) 
+		    kids[kids_size++] = make_pair(computeDistance(kid, pt), kid);
     }
 	  
 	  sort(kids + 0, kids + kids_size);
 	  for (int i = 0; i < kids_size; ++i)
 	  {
-     // if (best_distance < spheres[kids[i].second].distance_to_parent + dist)
-     //   continue;
+      if (best_kth_distance + getRadius(lev + 1) <= fabs(spheres[kids[i].second].distance_to_parent - dist))// если по неравенству треугольника, нельзя улучшить ответ
+       continue;
       if (num == kids[i].second)
         findKNearestSpheres(pt, k, best_spheres, kids[i].first, kids[i].second, true);
       else
@@ -436,7 +432,7 @@ public:
   findKNearestPoints( // ближайшие к указанной точке центры сфер из дерева
     const PointType& pt,// точка для которой ищем сферу с ближайшим центром
     int k, // количество вершин
-    double &best_distance// [in/out] рекорд расстояния -- оно же и отсечение (не искать дальше чем указано)
+    double best_distance// [in/out] рекорд расстояния -- оно же и отсечение (не искать дальше чем указано)
   , int iStartSphere = 0// с какой сферы начинать поиск, 0 - корень дерева 
   )
   {
@@ -468,7 +464,7 @@ public:
 	double distanceToPt = -1, // расстояние до точки, -1 -- если не посчитано
     int iStartSphere = 0// с какой сферы начинать поиск, 0 - корень дерева 
   )
-  {//  улучшить отсечения!!
+  {
     int isp=iStartSphere; // текущая сфера
 	int lev = spheres[isp].level; // текущий уровень
     double  rad = getRadius(lev);// радиус текущей сферы (на данном уровне)
@@ -490,7 +486,7 @@ public:
 		  best_distance = dist;
 	  }
 
-	  const int MAX_KIDS_SIZE = 10000;  // <<<<<<<< TODO --- CHECK!!!
+	  const int MAX_KIDS_SIZE = 1000;  // <<<<<<<< TODO --- CHECK!!!
 	  pair<double, int> kids[MAX_KIDS_SIZE];
 
 	  if (spheres[isp].last_kid == 0) // лист
@@ -500,18 +496,21 @@ public:
 	  int kids_size = 0;
 	  if (spheres[kid].center == spheres[isp].center)
 	  {
-		kids[kids_size++] = make_pair(dist, kid);
-		kid = spheres[kid].prev_brother;
+		  kids[kids_size++] = make_pair(dist, kid);
+		  kid = spheres[kid].prev_brother;
 	  }
 
 	  for (; kid > 0; kid = spheres[kid].prev_brother)// идем по всем детям
-		  kids[kids_size++] = make_pair(computeDistance(kid, pt), kid);  // <<<<<<<<<< CHECK kids_size++
+    {
+      if (fabs(spheres[kid].distance_to_parent - dist) < best_distance + getRadius(lev + 1)) // если по неравенству треугольника, можно улучшить ответ
+		   kids[kids_size++] = make_pair(computeDistance(kid, pt), kid);  // <<<<<<<<<< CHECK kids_size++
+    }
 	  
 	  sort(kids + 0, kids + kids_size);
 	  for (int i = 0; i < kids_size; ++i)
 	  {
-     // if (best_distance < spheres[kids[i].second].distance_to_parent + dist)
-     //   continue;
+      if (best_distance + getRadius(lev + 1) <= fabs(spheres[kids[i].second].distance_to_parent - dist))// если по неравенству треугольника, нельзя улучшить ответ
+       continue;
 		  int new_ans = findNearestSphere(pt, best_distance, kids[i].first, kids[i].second);
 		  if (new_ans != -1)
 			  ans = new_ans;

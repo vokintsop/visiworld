@@ -315,7 +315,7 @@ void explore_cover_tree()
       //ruler2.samples2 = &trn_samples;    ruler2.samples2_dilated = &trn_samples_dilated;
       int hit=0; int miss=0;
 
-#define ONLY_ONE
+//#define ONLY_ONE
 #ifdef ONLY_ONE
       int kNeighbours = 1; ///  ==> 2.81% error rate, ??> 159 символов в сек <?? 782 расстояния
 #else
@@ -342,7 +342,7 @@ void explore_cover_tree()
         double distance = SAMPLE_HEIGHT*SAMPLE_WIDTH*256; // а могли бы и отсечение указать?
         vector< pair< int, double > > nearest; 
         int i_trn = 0;
-        if (0) //kNeighbours == 1)
+        if (0)
         {
           if (test_hamming)
             i_trn = cvnet1.findNearestPoint(i_tst, distance);
@@ -354,7 +354,14 @@ void explore_cover_tree()
           if (test_hamming)
             nearest = cvnet1.findKNearestPoints(i_tst, kNeighbours, distance);
           else if (test_smart)
-            nearest = cvnet2.findKNearestPoints(i_tst, kNeighbours, distance);
+          {
+            #ifdef ONLY_ONE
+              int best_pt = cvnet2.findNearestPoint(i_tst, distance); 
+              nearest.push_back(make_pair(best_pt, distance));
+            #else
+               nearest = cvnet2.findKNearestPoints(i_tst, kNeighbours, distance);
+            #endif
+          }
         }
 
 		    /*imshow("test_mat", tst_samples[i_tst].second);
