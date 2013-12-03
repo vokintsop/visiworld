@@ -315,7 +315,7 @@ void explore_cover_tree()
       //ruler2.samples2 = &trn_samples;    ruler2.samples2_dilated = &trn_samples_dilated;
       int hit=0; int miss=0;
 
-//#define ONLY_ONE
+#define ONLY_ONE
 #ifdef ONLY_ONE
       int kNeighbours = 1; ///  ==> 2.81% error rate, ??> 159 символов в сек <?? 782 расстояния
 #else
