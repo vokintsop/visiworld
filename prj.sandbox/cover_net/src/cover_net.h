@@ -350,8 +350,8 @@ public:
      return true;
   }
 
-  void// результат в best_spheres - если best_spheres.size() < k, то нету сфер лучше, чем k
-  findKNearestSpheres(
+  double// возвращает худшее из k расстояний в best_spheres
+  findKNearestSpheres(// результат в best_spheres - если best_spheres.size() < k, то нету сфер лучше, чем k
     const PointType& pt, // точка для которой ищем сферы с ближайшими центрами
     int k,// количество сфер, которые мы хотим найти
     std::priority_queue<std::pair<double, int> > &best_spheres,// куча лучштх сфер (пара - расстояние, радиус), начиная с максимально удаленной
@@ -367,13 +367,14 @@ public:
 
 	  if (dist == -1) // если расстояние еще не посичтано
 		  dist = computeDistance(isp, pt);
-	
+	 
+    const double INF = 1e100; //бесконечность
 	  if (isp == 0 && dist >= rad)// если за пределами стартовой
-		  return;
+		  return INF;
 
 	  double min_dist = max(0.0, dist - rad);// расстояние от pt до сферы
     
-    const double INF = 1e100; //бесконечность
+   
     double best_kth_distance = INF;
     if (best_spheres.size() == k)
     {
@@ -383,7 +384,7 @@ public:
 
 
 	  if (min_dist > best_kth_distance)// если минимальное расстояние больше оптимального
-		  return;
+		  return best_kth_distance;
 	  if (dist < best_kth_distance && !is_copy)// если можно улучшить ответ (хотя бы самую плохую сферу)
 	  {
 		   best_spheres.push(make_pair(dist, isp)); // добавляем новое расстояние
@@ -397,7 +398,7 @@ public:
 	  pair<double, int> kids[MAX_KIDS_SIZE];
 
 	  if (spheres[isp].last_kid == 0) // лист
-		  return;
+		  return best_kth_distance;
 
     int num = -1;
 	  int kid = spheres[isp].last_kid;
@@ -421,10 +422,11 @@ public:
       if (best_kth_distance + getRadius(lev + 1) <= fabs(spheres[kids[i].second].distance_to_parent - dist))// если по неравенству треугольника, нельзя улучшить ответ
        continue;
       if (num == kids[i].second)
-        findKNearestSpheres(pt, k, best_spheres, kids[i].first, kids[i].second, true);
+        best_kth_distance = min(best_kth_distance, findKNearestSpheres(pt, k, best_spheres, kids[i].first, kids[i].second, true));
       else
-		    findKNearestSpheres(pt, k, best_spheres, kids[i].first, kids[i].second, false);
+		    best_kth_distance = min(best_kth_distance, findKNearestSpheres(pt, k, best_spheres, kids[i].first, kids[i].second, false));
     }
+    return best_kth_distance;
   }
 
   public:
