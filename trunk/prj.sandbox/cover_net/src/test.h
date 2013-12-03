@@ -36,7 +36,7 @@ void test_cover_net ()
 	 long long srand_const = cv::getTickCount();  
 	// srand(-1019611072); // error 
    srand(srand_const);
-   //srand(118227059);
+   srand(118227059);
    set<int> S;
 
 	 for (int i = 0; i < NET_SIZE; ++i)
