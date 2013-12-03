@@ -392,6 +392,7 @@ public:
        {
           best_spheres.pop();
        }
+       best_kth_distance = dist;
 	  }
 
 	  const int MAX_KIDS_SIZE = 1000;
