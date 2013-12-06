@@ -252,18 +252,28 @@ private:
     // поищем нет ли ребенка
     int kid = spheres[iSphere].last_kid;
     double rlast_kid = getRadius(iSphereLevel+1);
+
+    int best_kid = -1;
+    double best_dist = rlast_kid;
+
     while (kid > 0)
     {
       double dist_kid = computeDistance( kid, pt );
-      if (dist_kid < rlast_kid)
+      if (dist_kid < best_dist)
       {
-        insertPoint( pt, kid, iSphereLevel+1, dist_kid ); // провалились
-        return; // конец банкета
+        best_kid = kid;
+        best_dist = dist_kid;
+        //
+        //return; // конец банкета
       }
       kid = spheres[kid].prev_brother;
     }
-    // нет детей, место свободно, создаем сферу и, возможно, ее прямых наследников
-    makeSphere( iSphereLevel+1,  pt, iSphere, dist );
+
+
+    if (best_kid != -1)
+       insertPoint( pt, best_kid, iSphereLevel+1, best_dist ); // провалились
+    else // нет детей, место свободно, создаем сферу и, возможно, ее прямых наследников
+      makeSphere( iSphereLevel+1,  pt, iSphere, dist );
 
   }
 
