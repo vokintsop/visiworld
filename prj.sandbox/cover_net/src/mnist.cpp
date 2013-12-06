@@ -403,7 +403,7 @@ void explore_cover_tree()
           min_miss_distance = min( min_miss_distance, distance );
           miss++;
 
-          imshow("tst", tst_samples[i_tst].second);
+          /*imshow("tst", tst_samples[i_tst].second);
           Mat near_mats(trn_samples[nearest[0].first].second.rows, trn_samples[nearest[0].first].second.cols * nearest.size(), trn_samples[0].second.type());
           for (int i1 = 0; i1 < nearest.size(); ++i1)
           {
@@ -412,7 +412,7 @@ void explore_cover_tree()
             //imshow("nya", trn_samples[nearest[i1].second].second);
           }
           imshow("nearest", near_mats);
-          cvWaitKey(0);
+          cvWaitKey(0);*/
 
         }
         
