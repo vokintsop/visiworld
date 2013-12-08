@@ -60,6 +60,69 @@ static bool read_samples( string mnist_folder )
   return ok1 && ok2;
 }
 
+Mat rotateImage(const Mat& source, double angle)
+{
+    Point2f src_center(source.cols/2.0F, source.rows/2.0F);
+    Mat rot_mat = getRotationMatrix2D(src_center, angle, 1.0);
+    Mat dst;
+    warpAffine(source, dst, rot_mat, source.size());
+    return dst;
+}
+
+Mat1b pca( Mat1b& m ) // возвращает Mat повернутый главной осью вверх
+{
+  double sum_f=0;
+  double sum_fx=0;
+  double sum_fy=0;
+  double sum_fxx=0;
+  double sum_fxy=0;
+  double sum_fyy=0;
+  for (int y=0; y<m.cols; y++)
+  {
+    for (int x=0; x<m.rows; x++)
+    {
+      double f = m[y][x];
+      sum_f += f;
+      sum_fx += f*x; 
+      sum_fy += f*y;
+      sum_fxx += f * x * x;  
+      sum_fxy += f * x * y;
+      sum_fyy += f * y * y;
+    }
+  }
+  
+  double xc = sum_fx / sum_f;
+  double yc = sum_fy / sum_f;
+  // sum_fxx_ == sum( f * (x-xc) * (x-xc) ) == sum( f*x*x - 2*f*x*xc + f*xc*xc ) ==
+  // == sum_fxx - 2*sum_fx * xc  + sum_f * xc * xc
+  double sum_fxx_ = sum_fxx - 2*sum_fx * xc  + sum_f * xc * xc;
+  double sum_fyy_ = sum_fyy - 2*sum_fy * yc  + sum_f * yc * yc;
+
+  // fxy_ == sum( f * (x-xc) * (y-yc) ) == sum( f*x*x - f*x*yc - f*y*xc + f*xc*yc ) ==
+  // == sum_fxy - sum_fy * xc - sum_fx * yc + sum_f * xc * yc
+  double sum_fxy_ = sum_fxy - sum_fy * xc - sum_fx * yc + sum_f * xc * yc;
+
+  double ds = sum_fxx_ - sum_fyy_;
+  double phi_rad =  ( abs( ds ) <= 0.000001 ) ? 0. 
+    : 0.5 * atan( 2*sum_fxy_ / ds );
+    //: 0.5 * atan2( 2*sum_fxy_ , ds );
+
+  double I1 = 0.5*( sum_fxx_ + sum_fyy_  + sqrt( ds*ds + 4* sum_fxy_*sum_fxy_ ));
+  double I2 = 0.5*( sum_fxx_ + sum_fyy_  - sqrt( ds*ds + 4* sum_fxy_*sum_fxy_ ));
+
+  double phi_degree = phi_rad * 360./ (CV_PI*2);
+  Mat1b mm = rotateImage( m, phi_degree );
+#if 0
+  cout << phi_degree << " grad\t" << I1 << '\t'<< I2 << endl;
+  imshow( "img", m );
+  imshow( "img-rot", mm );
+  waitKey(0);
+#endif
+  return mm;
+
+
+}
+
 bool _read_samples( string patterns, // images
                     string labels, // labels
                     vector< pair< int, cv::Mat > >& samples // result vector
@@ -123,13 +186,35 @@ bool _read_samples( string patterns, // images
 				mymat(i1, i2) = pixel;
 			}
 		}
-		samples.push_back(make_pair(label, mymat));
-	}
+#define  DONT_RESIZE // сильно ухудшает
+#ifndef DONT_RESIZE
+    if (SAMPLE_HEIGHT == 28 && SAMPLE_WIDTH == 28)
+    {
+      Mat1b mymat2;
+      resize( mymat, mymat2, Size(16,16) ); 
+      mymat = mymat2;
+    }
+#endif
 
+    Mat1b mm = pca( mymat );
+
+		samples.push_back(make_pair(label, mm));
+		//samples.push_back(make_pair(label, mymat));
+	}
   cout << endl << samples.size() << " samples read from " << patterns << endl;
 
+#ifndef DONT_RESIZE
+    if (SAMPLE_HEIGHT == 28 && SAMPLE_WIDTH == 28)
+    {
+      cout << "Samples resized to 16x16" << endl;
+      SAMPLE_HEIGHT = 16;
+      SAMPLE_HEIGHT = 16;
+    }
+#endif
   return true;
 }
+
+
 
 void _dilate_samples(
   vector< pair< int, cv::Mat > >& samples, // result vector
@@ -240,7 +325,7 @@ void explore_cover_tree()
 
   Metr1 ruler1;
   Metr2 ruler2;
-  for (int chr =0; chr<=10; chr++)
+  for (int chr =10; chr<=10; chr++)
   {
     if (chr < 10)
       cout << "------ cvnet report of class " << chr << endl;
@@ -255,7 +340,10 @@ void explore_cover_tree()
     ruler2.samples1 = &trn_samples;    ruler2.samples1_dilated = &trn_samples_dilated;
     ruler2.samples2 = &trn_samples;    ruler2.samples2_dilated = &trn_samples_dilated;
 
-    CoverNet< int, Metr2 > cvnet2( &ruler2, SAMPLE_HEIGHT*SAMPLE_WIDTH*256, 1 );
+    //CoverNet< int, Metr2 > cvnet2( &ruler2, SAMPLE_HEIGHT*SAMPLE_WIDTH*256, 1 ); // << 8-NN => 2.22
+    CoverNet< int, Metr2 > cvnet2( &ruler2, SAMPLE_HEIGHT*SAMPLE_WIDTH*256, 8 );  // << 8-NN => 2.18, best
+    //CoverNet< int, Metr2 > cvnet2( &ruler2, SAMPLE_HEIGHT*SAMPLE_WIDTH*256, 4 );  // << 8-NN => 2.24
+
 
     if (test_hamming)
     {
@@ -385,7 +473,10 @@ void explore_cover_tree()
           {
             int trn_class = trn_samples[nearest[i].first].first;
             double trn_distance = nearest[i].second;
-            votes[ trn_class ].first += 1. / (1. + trn_distance);
+            double vote = 1. / (1. + trn_distance);
+            //vote = sqrt(vote); // 2.22 => 2.25
+            vote = vote*vote; // 2.22 => 2.17 !
+            votes[ trn_class ].first += vote;
           }
           sort( votes.rbegin(), votes.rend() );
           winner = votes[0].second;
@@ -402,7 +493,8 @@ void explore_cover_tree()
         {
           min_miss_distance = min( min_miss_distance, distance );
           miss++;
-
+//#ifdef ___SHOW___
+#ifdef ___SHOW___
           /*imshow("tst", tst_samples[i_tst].second);
           Mat near_mats(trn_samples[nearest[0].first].second.rows, trn_samples[nearest[0].first].second.cols * nearest.size(), trn_samples[0].second.type());
           for (int i1 = 0; i1 < nearest.size(); ++i1)
@@ -413,7 +505,7 @@ void explore_cover_tree()
           }
           imshow("nearest", near_mats);
           cvWaitKey(0);*/
-
+#endif
         }
         
 
