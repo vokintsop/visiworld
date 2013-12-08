@@ -25,7 +25,6 @@ using namespace cv;
 Mat make_labels( const cv::Mat &bw, int& label_index )
 {
   Ticker t;  
-
   Mat labels;
   bw.convertTo(labels, CV_32SC1);
   label_index = 2; 
@@ -45,7 +44,7 @@ Mat make_labels( const cv::Mat &bw, int& label_index )
   return labels;
 }
 
-
+/*
 
 void comps( Mat1b& src )
 {
@@ -76,6 +75,7 @@ void comps( Mat1b& src )
   imshow( "Components", dst );
   waitKey(0);
 }
+*/
 
 class CCData
 {
@@ -86,7 +86,7 @@ public:
   double sum_fx,sum_fy;
   double sum_fxx, sum_fxy, sum_fyy;
   CCData():
-    minx( INT_MIN ), miny( INT_MIN ), maxx( INT_MAX ), maxy(INT_MAX),
+    minx( INT_MAX ), miny( INT_MAX ), maxx( INT_MIN ), maxy(INT_MIN ),
     sum_f(0.), sum_fx(0.), sum_fy(0.), sum_fxx(0.), sum_fxy(0.), sum_fyy(0.)
   {}
   void add( int x, int y, double f = 1. )
@@ -130,23 +130,20 @@ public:
 int bukvoed( int argc, char* argv[] )
 {
 	int res = 0;
-  //Mat1b src = imread( "/images/1.png", IMREAD_GRAYSCALE );
-  Mat1b src = imread( "/images/3.png", IMREAD_GRAYSCALE );
+  Mat1b src = imread( "/images/1.png", IMREAD_GRAYSCALE );
+  //Mat1b src = imread( "/images/3.png", IMREAD_GRAYSCALE );
 #if 0
   imshow( "input", src );
   waitKey(0);
 #endif
 
-  int label_index=0;
   //src = src < 128;
-  threshold( src, src, 128., 1., THRESH_BINARY_INV );
+  Mat1b thr; // 0-background, 1-foreground
+  threshold( src, thr, 128., 1., THRESH_BINARY_INV );
 
-#if 0
-  imshow( "input-0-1", src );
-  waitKey(0);
-#endif
 
-  Mat1i labels = make_labels( src, label_index );
+  int label_index=0;
+  Mat1i labels = make_labels( thr, label_index );
 
   vector< CCData > cc( label_index );
   for(int y=0; y < labels.rows; y++)
@@ -160,11 +157,15 @@ int bukvoed( int argc, char* argv[] )
     }
   }
   for (int i=2; i< int(cc.size()); i++ )
-    cc[i].fix();
+  {
+    CCData& ccd = cc[i];
+    ccd.fix();
+    rectangle( src, Point( ccd.minx, ccd.miny ), Point( ccd.maxx, ccd.maxy ), Scalar( 128, 0, 0 ) );
+  }
+  imshow( "comps", src );
+  waitKey(0);
 
-
-  cout << labels;
-
+  //cout << labels;
 
   return res;
 }
