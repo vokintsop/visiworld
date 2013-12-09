@@ -44,38 +44,6 @@ Mat make_labels( const cv::Mat &bw, int& label_index )
   return labels;
 }
 
-/*
-
-void comps( Mat1b& src )
-{
-  src = src < 128;
-
-  vector< vector<Point> > contours;
-  vector< Vec4i > hierarchy;
-  { 
-    Ticker t;  
-    findContours( src, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0) );
-    cout << "findContours()..." << t.msecs() << " milliseconds" << endl;
-  }
-
-
-  // iterate through all the top-level contours,
-  // draw each connected component with its own random color
-
-  Mat dst = Mat::zeros(src.rows, src.cols, CV_8UC3);
-
-  int idx = 0;
-  for( ; idx >= 0; idx = hierarchy[idx][0] )
-  {
-      Scalar color( rand()&255, rand()&255, rand()&255 );
-      drawContours( dst, contours, idx, color, CV_FILLED, 8, hierarchy );
-  }
-
-  namedWindow( "Components", 1 );
-  imshow( "Components", dst );
-  waitKey(0);
-}
-*/
 
 class CCData
 {
@@ -127,11 +95,85 @@ public:
   }
 };
 
+Mat1b src; // входное изображение, ч-б, 0-черное (сигнал), 255-белое (фон)
+Mat1b src_dilated; // размазанное входное
+Mat1i labels; // карта компонент связности, [2...labels.size()-1] ==> cc[]
+vector< CCData > cc; // информация о компонентах
+
+void dilate1( Mat& in, Mat& ou, bool inverted = false )
+{
+  int an = 1;
+  int element_shape = MORPH_CROSS; // MORPH_RECT;
+  Mat element = getStructuringElement(element_shape, Size(an*2+1, an*2+1), Point(an, an) );
+  if (!inverted)
+    dilate( in, ou, element, Point( 1, 1 ) );
+  else
+    erode( in, ou, element, Point( 1, 1 ) );
+
+  imshow( "before_dilation", in );
+  imshow( "after_dilation", ou );
+  waitKey(0);
+
+}
+
+
+inline bool more_128( int x, int y, Mat1b& m )
+{
+  return x < m.cols && x>=0 && y < m.rows && y >= 0 && m[y][x] > 128;
+}
+class MetrСС // A intersect dilated(B) + B intersect dilated(A)
+{
+public:
+  long long counter; // 
+  MetrСС(): counter(0){}
+
+  double computeDistance( const int& i1,  const int& i2 )  // индексы к сс[]
+  {
+    double dst=0;
+    CCData& ccd1 = cc[i1];
+    CCData& ccd2 = cc[i2];
+    int dx = cvRound( ccd2.xc - ccd1.xc );
+    int dy = cvRound( ccd2.yc - ccd1.yc );
+    for ( int y=ccd1.miny; y<ccd1.maxy; y++ )
+    {
+      for ( int x=ccd1.minx; x<ccd1.maxx; x++ )
+      {
+        if (labels[y][x] == i1) // сигнал
+        {
+          int qqq = src[y][x];
+          assert( src[y][x] < 128 );
+          if (more_128( x+dx, y+dy, src_dilated ))
+            dst++;
+        }
+      }
+    }
+
+    for ( int y=ccd2.miny; y<ccd2.maxy; y++ )
+    {
+      for ( int x=ccd2.minx; x<ccd2.maxx; x++ )
+      {
+        if (labels[y][x] == i2) // сигнал
+        {
+          assert( src[y][x] < 128 );
+          if (more_128( x-dx, y-dy, src_dilated ))
+            dst++;
+        }
+      }
+    }
+
+    counter++;
+    return dst;
+  }
+};
+
 int bukvoed( int argc, char* argv[] )
 {
 	int res = 0;
-  Mat1b src = imread( "/images/1.png", IMREAD_GRAYSCALE );
-  //Mat1b src = imread( "/images/3.png", IMREAD_GRAYSCALE );
+  //Mat1b 
+  src = imread( "/images/1.png", IMREAD_GRAYSCALE );
+  //src = imread( "/images/3.png", IMREAD_GRAYSCALE );
+  dilate1( src, src_dilated, true );
+
 #if 0
   imshow( "input", src );
   waitKey(0);
@@ -143,9 +185,10 @@ int bukvoed( int argc, char* argv[] )
 
 
   int label_index=0;
-  Mat1i labels = make_labels( thr, label_index );
+  labels = make_labels( thr, label_index );
 
-  vector< CCData > cc( label_index );
+  cc.clear(); 
+  cc.resize( label_index );
   for(int y=0; y < labels.rows; y++)
   {
     int *row = (int*)labels.ptr(y);
@@ -156,16 +199,67 @@ int bukvoed( int argc, char* argv[] )
       cc[ row[x] ].add( x, y );
     }
   }
-  for (int i=2; i< int(cc.size()); i++ )
+  for (int i=3; i< int(cc.size()); i++ ) // <<<<<<<<<<< 2 comp -> gpf
   {
     CCData& ccd = cc[i];
     ccd.fix();
+#if 0 // draw rects
     rectangle( src, Point( ccd.minx, ccd.miny ), Point( ccd.maxx, ccd.maxy ), Scalar( 128, 0, 0 ) );
+#endif
   }
-  imshow( "comps", src );
-  waitKey(0);
+  //imshow( "comps", src );
+  //waitKey(0);
 
   //cout << labels;
 
+  {
+    Ticker t;
+    MetrСС ruler;
+    CoverNet< int, MetrСС > cvnet( &ruler, 10000, 1 );
+    for (int i=3; i<int(cc.size()); i++) // <<<<<<<<<<< 2 comp -> gpf
+    {
+      cvnet.insert(i);
+    }
+    double ms = t.msecs();
+    cout << "\MetrCC metrics (simple L1):" << endl;
+    cvnet.reportStatistics( 0, 3 ); 
+    cout << "Build time = " << ms/1000 << " seconds" << endl;
+  }
+
   return res;
 }
+
+////////////////////////////////////////////////////
+
+/*
+
+void comps( Mat1b& src )
+{
+  src = src < 128;
+
+  vector< vector<Point> > contours;
+  vector< Vec4i > hierarchy;
+  { 
+    Ticker t;  
+    findContours( src, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0) );
+    cout << "findContours()..." << t.msecs() << " milliseconds" << endl;
+  }
+
+
+  // iterate through all the top-level contours,
+  // draw each connected component with its own random color
+
+  Mat dst = Mat::zeros(src.rows, src.cols, CV_8UC3);
+
+  int idx = 0;
+  for( ; idx >= 0; idx = hierarchy[idx][0] )
+  {
+      Scalar color( rand()&255, rand()&255, rand()&255 );
+      drawContours( dst, contours, idx, color, CV_FILLED, 8, hierarchy );
+  }
+
+  namedWindow( "Components", 1 );
+  imshow( "Components", dst );
+  waitKey(0);
+}
+*/
