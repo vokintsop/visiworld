@@ -3,6 +3,7 @@ IF( MSVC )
   
   SET( SOURCES
     src/main.cpp 
+    src/procframe.cpp 
     )
 
   ADD_EXECUTABLE( track_points ${SOURCES} )

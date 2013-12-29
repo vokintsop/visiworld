@@ -9,23 +9,24 @@
 using namespace std;
 using namespace cv;
 
-void procframe( Mat& img, int iframe )
-{
-}
 
-void procframe( const char* path, int iframe )
+int // 0-continue, <0 failed or user breaks
+procframe( Mat& img, int iframe, double fps );
+
+int // 0-continue, <0 failed or user breaks
+procframe( const char* path, int iframe, double fps=0 )
 {
   Mat img;
   try { 
     img = imread( path ); }
   catch (...) {
-    return; }
+    return -1; }
   if (img.empty())
-    return;
+    return -1;
 
   cout << path << endl;
 
-  procframe( img, iframe );
+  return procframe( img, iframe, fps );
 }
 
 
@@ -38,14 +39,16 @@ int main( int argc, char* argv[] )
   string data = "/testdata/akenori/input/REC.0716/AKN00014.avi";
 
   cv::VideoCapture cap( data );
+  double fps = cap.get( CV_CAP_PROP_FPS );
   Mat frame;
   int index=0;
   while (cap.read( frame ))
   {
-    imshow("..", frame);
-    if (27==waitKey(1))
+    //imshow("..", frame);
+    //if (27==waitKey(1))
+    //  break;
+    if (0>procframe( frame, index++, fps ))
       break;
-    procframe( frame, index++ );
   }
 
   return 0;
