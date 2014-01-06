@@ -8,10 +8,16 @@
 #include <vector>
 #include <iostream>
 #include <queue>
+#include <cmath>
 
-#include "cover_net.h"
+#include "cover_net2.h"
 
 using namespace std;
+
+struct pt
+{
+  double x, y;
+};
 
 class simpleMetr
 {
@@ -22,7 +28,17 @@ public:
   }  
 };
 
-void test_cover_net ()
+class simpleMetr2d
+{
+public:
+  double computeDistance( const pt  i1,  pt i2 ) 
+  {
+      return sqrt((i1.x - i2.x) * (i1.x - i2.x) + (i1.y - i2.y) * (i1.y - i2.y));
+  }  
+};
+
+
+/*void test_cover_net ()
 { 
 	 simpleMetr rule;
 
@@ -35,7 +51,7 @@ void test_cover_net ()
 	 const int NET_SIZE = 1000;
 	 long long srand_const = cv::getTickCount();  
 	// srand(-1019611072); // error 
-   srand(srand_const);
+   srand((unsigned int)srand_const);
    srand(118227059);
    set<int> S;
 
@@ -110,4 +126,66 @@ void test_cover_net ()
 	 }
 
 	 cout << "END test" << endl;
+}
+*/
+void checkGraph(CoverNet<pt, simpleMetr2d > &cvnet)
+{
+  vector<vector<int> > M(cvnet.spheres.size(), vector<int>(cvnet.spheres.size(), 0)); // матрица смежности графа
+  for (int i = 0; i < (int)cvnet.spheres.size(); ++i)
+  {
+    for (int i1 = 0; i1 < (int)cvnet.spheres.size(); ++i1)
+    {
+      if (cvnet.computeDistance(i, cvnet.spheres[i1].center) != 0 && cvnet.spheres[i].level == cvnet.spheres[i1].level && cvnet.computeDistance(i, cvnet.spheres[i1].center) <= cvnet.getRadius(cvnet.spheres[i].level) * 2.0)
+        M[i][i1] = 1;
+      //cout << M[i][i1];
+    }
+    //cout << endl;
+  }
+  for (int i = 0; i < (int)cvnet.graphes.size(); ++i)
+  {
+    for (int i1 = 0; i1 < (int)cvnet.graphes[i].vertex.size(); ++i1)
+    {
+      for (int v = cvnet.graphes[i].vertex[i1]; v != -1; v = cvnet.graphes[i].elems[v].next)
+      {
+        --M[i1][cvnet.graphes[i].elems[v].vert_num];
+        //cout << "^_^" << endl;
+      }
+    }
+  }
+  for (int i = 0; i < (int)cvnet.spheres.size(); ++i)
+  {
+    for (int i1 = 0; i1 < (int)cvnet.spheres.size(); ++i1)
+    {
+      if (M[i][i1] != 0)
+      {
+        cout << "Error at edge " << i << " " << i1 << endl; //либо есть ребро, где его быть не должно, лиюо, наоборот, не хватает ребра
+        if (M[i][i1] < 0)
+          cout << "+" << endl;// думает, что есть несуществующие ребра
+        else
+          cout << "-" << endl;// надо чтобы оно было, а его нету
+      }
+    }
+  }
+}
+
+void testGraph()
+{  
+	 simpleMetr2d rule;
+
+	 CoverNet<pt, simpleMetr2d > cvnet(&rule, 1e5, 1);
+	 vector<pt> points;
+
+   cout << "BEGIN test" << endl;
+	 const int NET_SIZE = 100;
+
+   for (int i = 0; i < NET_SIZE; ++i)
+	 {
+		  pt a;
+      a.x = rand() % 1000;
+      a.y = rand() % 1000;
+      cvnet.insert(a);
+   }
+   
+   cout << "end building graph" << endl;
+   checkGraph(cvnet);
 }
