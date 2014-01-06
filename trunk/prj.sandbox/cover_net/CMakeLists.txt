@@ -8,6 +8,9 @@ IF( MSVC )
     src/mnist.cpp 
     src/words.cpp 
     src/test.h
+
+    src/cover_net2.h
+    src/graph.h
     )
 
   ADD_EXECUTABLE( cover_net ${SOURCES} )
