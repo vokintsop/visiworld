@@ -13,10 +13,13 @@
 #include <opencv2/highgui/highgui.hpp>
 
 #include "cover_net.h"
+#include "cover_net2.h"
 #include "ticker.h"
 
 using namespace std;
 using namespace cv;
+
+
 vector< string > samples;
 
 static bool read_samples( string data )

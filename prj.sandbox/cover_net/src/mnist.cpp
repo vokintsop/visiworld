@@ -16,7 +16,7 @@
 
 #include <cassert>
 
-
+#include "cover_net.h"
 #include "cover_net2.h"
 #include "ticker.h"
 #include "test.h"

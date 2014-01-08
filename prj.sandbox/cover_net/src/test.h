@@ -11,6 +11,8 @@
 #include <cmath>
 
 #include "cover_net2.h"
+#include "cover_net.h"
+
 
 using namespace std;
 
@@ -128,6 +130,7 @@ public:
 	 cout << "END test" << endl;
 }
 */
+#ifdef false
 void checkGraph(CoverNet<pt, simpleMetr2d > &cvnet)
 {
   vector<vector<int> > M(cvnet.spheres.size(), vector<int>(cvnet.spheres.size(), 0)); // матрица смежности графа
@@ -189,3 +192,4 @@ void testGraph()
    cout << "end building graph" << endl;
    checkGraph(cvnet);
 }
+#endif

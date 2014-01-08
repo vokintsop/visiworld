@@ -1,5 +1,5 @@
-// cover_net.h
-#ifdef false
+// cover_net2.h
+//#ifdef true
 #ifndef __COVER_NET_H
 #define __COVER_NET_H
 
@@ -8,10 +8,12 @@
 #include <cassert>
 #include <queue>
 
-
+#include "graph.h"
 
 #define COVER_NET_VERBOSE
 //#define COVER_NET_VERBOSE_DETAILED
+//#define BUILD_GRAPH // строит граф связности сфер одного уровня
+
 
 template < class PointType >
 struct CoverSphere
@@ -67,11 +69,15 @@ struct CoverRecord // регистрация рекордного расстояния
   int sphereLevel;
 };
 
+
 template < class PointType, class Metrics >
-class CoverNet
+//class CoverNet --- временно, все public для тестирования
+struct CoverNet
 {
   std::vector< CoverSphere< PointType > > spheres;
   std::vector< std::pair< int, int > > ancles; // <ancle sphere, next> списки вершин уровнем выше, которые покрывают данную 
+  
+  std::vector<graph> graphes; // граф для каждого уровня 
 
   Metrics* ruler;
   double rootRadius;  // при создании рута изначально указывается ожидаемое расстояние между наиболее удаленными точками
@@ -110,6 +116,7 @@ public:
      maxRadius = rootRadius; 
 
     double rad = rootRadius;
+    graphes.resize(1000); // лучше по другому - надо найти максимальный уровень 
     for (int i=0; i<256; i++)
     {
      levelsRadii.push_back( rad );
@@ -206,10 +213,6 @@ private:
         {
           spheres[parent].last_kid = iLastSphere;//тогда iLastSphere -- первый ребенок
           spheres[iLastSphere].prev_brother = bro;// = 0;
-          /*if (spheres[iLastSphere].center != spheres[parent].center)
-            cout << "O_O" << endl;
-          else
-            cout << "+" << endl;*/
         }
         else
         {
@@ -275,7 +278,13 @@ private:
     if (best_kid != -1)
        insertPoint( pt, best_kid, iSphereLevel+1, best_dist ); // провалились
     else // нет детей, место свободно, создаем сферу и, возможно, ее прямых наследников
+    {
+      int num = spheres.size();// номер сферы, которую добавим
       makeSphere( iSphereLevel+1,  pt, iSphere, dist );
+#ifdef BUILD_GRAPH
+      addSphereToGraph(num);
+#endif
+    }
 
   }
 
@@ -356,7 +365,7 @@ public:
 
   bool checkCoverNet()
   {
-     for (int i = 0; i < spheres.size(); ++i)
+     for (int i = 0; i < (int)spheres.size(); ++i)
          if (!checkCoverNetSphere(i, i))
            return false;
      return true;
@@ -534,6 +543,60 @@ public:
 	  return ans;
   }
 
+  void addSphereToGraph( //добавляет в граф вершину ( + всех ее клонов) и все ребра из нее выходящие -- запускается сразу после makeSphere
+    int iSphere,// сфера, которую добавили
+    int iRoot = 0,// сфера, с которой (или потомками которой) мы хотим проверить наличие ребра
+    double distanceToRoot = -1// расстояние до iRoot, -1 -- если не посчитано
+    )
+  {
+     // нужны отсечения,  + если уровень стал слишком большим iSphere надо сдвигать на уровень ниже
+    if (spheres[iRoot].level > spheres[iSphere].level)// если уровень root больше уровня исследумой сферы
+    {
+      if (spheres[iSphere].last_kid != 0) // если есть хотя бы один ребенок
+        iSphere = spheres[iSphere].last_kid; // то он является клоном и идем в него
+      else
+        return;
+    }
+    
+    double dist = distanceToRoot;
+    if (dist == -1)// это для не клонов - расстояние до клонов уже посчитано
+      dist = computeDistance(iSphere, spheres[iRoot].center);
+
+    double radRoot = getRadius(spheres[iRoot].level);
+    double radIsphere = getRadius(spheres[iSphere].level);
+
+    if (iRoot == iSphere)
+      return;
+
+    if (spheres[iRoot].level == spheres[iSphere].level && dist <= radRoot * 2.0) // если сферы одного уровня и они пересекаются
+    {
+      graphes[spheres[iRoot].level].addEdge(iRoot, iSphere, dist); // добавляем неориентированное ребро
+      graphes[spheres[iRoot].level].addEdge(iSphere, iRoot, dist);
+    }
+  
+
+    if (dist <= radRoot + radIsphere + getRadius(spheres[iRoot].level + 1)) // только если они пересекаются (или ребенок iRoot может пересечься)
+    { 
+      bool klon = 1;
+
+      double newRadRoot = getRadius(spheres[iRoot].level + 1);
+      double newnewRadRoot = getRadius(spheres[iRoot].level + 2);
+
+      int kid = spheres[iRoot].last_kid;
+      for (; kid > 0; kid = spheres[kid].prev_brother)
+      {
+        //if (radIsphere + newRadRoot + newnewRadRoot < dist - spheres[kid].distance_to_parent)
+        //   continue; // почему неправильно:(
+        if (klon)
+           addSphereToGraph(iSphere, kid, dist);
+        else
+           addSphereToGraph(iSphere, kid, -1);
+        klon = 0;
+      }
+      
+    }
+
+  }
 
   void printNode( int node, int level )
   {
@@ -614,7 +677,8 @@ public:
 
 
 
+
 #endif // __COVER_NET_H
 
+//#endif
 
-#endif
