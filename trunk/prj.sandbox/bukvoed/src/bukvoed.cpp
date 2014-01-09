@@ -22,6 +22,24 @@ using namespace std;
 using namespace cv;
 
 
+
+static void dilate1( Mat& in, Mat& ou, bool inverted = false )
+{
+  int an = 1;
+  int element_shape = MORPH_CROSS; // MORPH_RECT;
+  Mat element = getStructuringElement(element_shape, Size(an*2+1, an*2+1), Point(an, an) );
+  if (!inverted)
+    dilate( in, ou, element, Point( 1, 1 ) );
+  else
+    erode( in, ou, element, Point( 1, 1 ) );
+
+  imshow( "before_dilation", in );
+  imshow( "after_dilation", ou );
+  waitKey(0);
+
+}
+
+
 Mat make_labels( const cv::Mat &bw, int& label_index )
 {
   Ticker t;  
@@ -95,83 +113,22 @@ public:
   }
 };
 
-Mat1b src; // входное изображение, ч-б, 0-черное (сигнал), 255-белое (фон)
-Mat1b src_dilated; // размазанное входное
-Mat1i labels; // карта компонент связности, [2...labels.size()-1] ==> cc[]
-vector< CCData > cc; // информация о компонентах
 
-void dilate1( Mat& in, Mat& ou, bool inverted = false )
+
+struct PageData
 {
-  int an = 1;
-  int element_shape = MORPH_CROSS; // MORPH_RECT;
-  Mat element = getStructuringElement(element_shape, Size(an*2+1, an*2+1), Point(an, an) );
-  if (!inverted)
-    dilate( in, ou, element, Point( 1, 1 ) );
-  else
-    erode( in, ou, element, Point( 1, 1 ) );
-
-  imshow( "before_dilation", in );
-  imshow( "after_dilation", ou );
-  waitKey(0);
-
-}
-
-
-inline bool more_128( int x, int y, Mat1b& m )
-{
-  return x < m.cols && x>=0 && y < m.rows && y >= 0 && m[y][x] > 128;
-}
-class MetrСС // A intersect dilated(B) + B intersect dilated(A)
-{
-public:
-  long long counter; // 
-  MetrСС(): counter(0){}
-
-  double computeDistance( const int& i1,  const int& i2 )  // индексы к сс[]
-  {
-    double dst=0;
-    CCData& ccd1 = cc[i1];
-    CCData& ccd2 = cc[i2];
-    int dx = cvRound( ccd2.xc - ccd1.xc );
-    int dy = cvRound( ccd2.yc - ccd1.yc );
-    for ( int y=ccd1.miny; y<ccd1.maxy; y++ )
-    {
-      for ( int x=ccd1.minx; x<ccd1.maxx; x++ )
-      {
-        if (labels[y][x] == i1) // сигнал
-        {
-          int qqq = src[y][x];
-          assert( src[y][x] < 128 );
-          if (more_128( x+dx, y+dy, src_dilated ))
-            dst++;
-        }
-      }
-    }
-
-    for ( int y=ccd2.miny; y<ccd2.maxy; y++ )
-    {
-      for ( int x=ccd2.minx; x<ccd2.maxx; x++ )
-      {
-        if (labels[y][x] == i2) // сигнал
-        {
-          assert( src[y][x] < 128 );
-          if (more_128( x-dx, y-dy, src_dilated ))
-            dst++;
-        }
-      }
-    }
-
-    counter++;
-    return dst;
-  }
+  Mat1b src; // входное изображение, ч-б, 0-черное (сигнал), 255-белое (фон)
+  Mat1b src_dilated; // размазанное входное
+  Mat1i labels; // карта компонент связности, [2...labels.size()-1] ==> cc[]
+  vector< CCData > cc; // информация о компонентах
+  PageData(){}
+  PageData( const char* filename ) {    compute(filename);  }
+  bool compute( const char* filename );
 };
 
-int bukvoed( int argc, char* argv[] )
+bool PageData::compute( const char* filename )
 {
-	int res = 0;
-  //Mat1b 
-  src = imread( "/images/1.png", IMREAD_GRAYSCALE );
-  //src = imread( "/images/3.png", IMREAD_GRAYSCALE );
+  src = imread( filename, IMREAD_GRAYSCALE );
   dilate1( src, src_dilated, true );
 
 #if 0
@@ -199,7 +156,7 @@ int bukvoed( int argc, char* argv[] )
       cc[ row[x] ].add( x, y );
     }
   }
-  for (int i=3; i< int(cc.size()); i++ ) // <<<<<<<<<<< 2 comp -> gpf
+  for (int i=2; i< int(cc.size()); i++ ) // <<<<<<<<<<< 2 comp -> gpf
   {
     CCData& ccd = cc[i];
     ccd.fix();
@@ -211,55 +168,127 @@ int bukvoed( int argc, char* argv[] )
   //waitKey(0);
 
   //cout << labels;
+  return true;
+}
+
+struct CoverPoint
+{
+  int iPage; // номер страницы, индекс к pages[]
+  int iCC;  // номер компоненты связности, индекс к pages[iPage].cc[]
+  CoverPoint( int iPage, int iCC ): iPage( iPage ), iCC( iCC ) {}
+};
+
+inline bool more_128( int x, int y, Mat1b& m ) // white
+{
+  if ( x < m.cols && x>=0 && y < m.rows && y >= 0 )
+    return m[y][x] > 128;
+  return true; // снаружи считаем все белым
+  //return x < m.cols && x>=0 && y < m.rows && y >= 0 && m[y][x] > 128;
+}
+
+////////////////////////////////////////////////////////////////////////////////////
+class MetrСС // A intersect dilated(B) + B intersect dilated(A)
+{
+public:
+  long long counter; // 
+  vector< PageData >& pages;
+  MetrСС( vector< PageData >& pages ): pages(pages), counter(0){}
+
+  double computeDistance( const CoverPoint& cp1,  const CoverPoint& cp2 )  // индексы к сс[]
+  {
+    PageData& pd1 = pages[cp1.iPage];    
+    PageData& pd2 = pages[cp2.iPage];
+    CCData& ccd1 = pd1.cc[cp1.iCC];            
+    CCData& ccd2 = pd2.cc[cp2.iCC];
+
+    double dst=0;
+    int dx = cvRound( ccd2.xc - ccd1.xc );
+    int dy = cvRound( ccd2.yc - ccd1.yc );
+    for ( int y=ccd1.miny; y<ccd1.maxy; y++ )
+    {
+      for ( int x=ccd1.minx; x<ccd1.maxx; x++ )
+      {
+        if (pd1.labels[y][x] == cp1.iCC) // сигнал
+        {
+          int qqq = pd1.src[y][x];
+          assert( pd1.src[y][x] < 128 );  // буквы -- сигнал -- черные -- 00.
+          if (more_128( x+dx, y+dy, pd2.src_dilated ))
+            dst++;
+        }
+      }
+    }
+
+    for ( int y=ccd2.miny; y<ccd2.maxy; y++ )
+    {
+      for ( int x=ccd2.minx; x<ccd2.maxx; x++ )
+      {
+        if (pd2.labels[y][x] == cp2.iCC) // сигнал
+        {
+          assert( pd2.src[y][x] < 128 );
+          if (more_128( x-dx, y-dy, pd1.src_dilated ))
+            dst++;
+        }
+      }
+    }
+
+    counter++;
+    return dst;
+  }
+};
+
+class Bukvoed
+{
+  vector< PageData > pages;
+  MetrСС ruler;
+  CoverNet< CoverPoint, MetrСС > cvnet;
+public:
+  Bukvoed(): ruler( pages ), cvnet( &ruler, 10000, 1 ){};
+  int Bukvoed::addPage( const char* page_file );
+};
+
+
+
+//Mat1b src; // входное изображение, ч-б, 0-черное (сигнал), 255-белое (фон)
+//Mat1b src_dilated; // размазанное входное
+//Mat1i labels; // карта компонент связности, [2...labels.size()-1] ==> cc[]
+//vector< CCData > cc; // информация о компонентах
+
+int Bukvoed::addPage( const char* page_file )
+{
+  PageData pd( page_file );
+  pages.push_back( pd );
+  int iPage = pages.size()-1;
+
 
   {
     Ticker t;
-    MetrСС ruler;
-    CoverNet< int, MetrСС > cvnet( &ruler, 10000, 1 );
-    for (int i=3; i<int(cc.size()); i++) // <<<<<<<<<<< 2 comp -> gpf
+    //MetrСС ruler;
+    //CoverNet< int, MetrСС > cvnet( &ruler, 10000, 1 );
+    for (int i=2; i<int(pages[iPage].cc.size()); i++) // <<<<<<<<<<< 2 comp -> gpf
     {
-      cvnet.insert(i);
+      CoverPoint p( iPage, i );
+      if (1) // (cc[i].sum_f > 20)
+      {
+
+        cvnet.insert(p);
+      }
     }
     double ms = t.msecs();
-    cout << "\MetrCC metrics (simple L1):" << endl;
+    cout << "MetrCC metrics (simple L1):" << endl;
     cvnet.reportStatistics( 0, 3 ); 
     cout << "Build time = " << ms/1000 << " seconds" << endl;
   }
+  system("pause");
 
-  return res;
+  return 0;
 }
 
-////////////////////////////////////////////////////
 
-/*
-
-void comps( Mat1b& src )
+int bukvoed( int argc, char* argv[] )
 {
-  src = src < 128;
+  Bukvoed bukvoed;
+  bukvoed.addPage( "/images/4.png" );
 
-  vector< vector<Point> > contours;
-  vector< Vec4i > hierarchy;
-  { 
-    Ticker t;  
-    findContours( src, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0) );
-    cout << "findContours()..." << t.msecs() << " milliseconds" << endl;
-  }
+  return 0;
 
-
-  // iterate through all the top-level contours,
-  // draw each connected component with its own random color
-
-  Mat dst = Mat::zeros(src.rows, src.cols, CV_8UC3);
-
-  int idx = 0;
-  for( ; idx >= 0; idx = hierarchy[idx][0] )
-  {
-      Scalar color( rand()&255, rand()&255, rand()&255 );
-      drawContours( dst, contours, idx, color, CV_FILLED, 8, hierarchy );
-  }
-
-  namedWindow( "Components", 1 );
-  imshow( "Components", dst );
-  waitKey(0);
 }
-*/

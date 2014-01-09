@@ -51,7 +51,7 @@ struct CoverSphere
     for (int i=0; i<level; i++)
       indent.push_back('\t');
 
-    std::cout << indent << center;
+///   need to define '<<' operator on PointType /// std::cout << indent << center;
     std::cout  << " parent=" << parent << " last_kid=" << last_kid << " prev_brother=" << prev_brother;
 
     std::cout << std::endl;
