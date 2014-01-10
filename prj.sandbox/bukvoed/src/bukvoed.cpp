@@ -33,29 +33,39 @@ static void dilate1( Mat& in, Mat& ou, bool inverted = false )
   else
     erode( in, ou, element, Point( 1, 1 ) );
 
-  imshow( "before_dilation", in );
-  imshow( "after_dilation", ou );
-  waitKey(0);
+  //imshow( "before_dilation", in );
+  //imshow( "after_dilation", ou );
+  //waitKey(0);
 
 }
 
 
-Mat make_labels( const cv::Mat &bw, int& label_index )
+Mat make_labels( const cv::Mat &bw, int& label_index, vector< cv::Rect >& rects )
 {
   Ticker t;  
   Mat labels;
   bw.convertTo(labels, CV_32SC1);
-  label_index = 2; 
+  label_index = 1; 
+  rects.clear();
+  rects.push_back( Rect() );
   for(int y=0; y < labels.rows; y++)
   {
     int *row = (int*)labels.ptr(y);
     for(int x=0; x < labels.cols; x++) 
     {
-      if( row[x] != 1 )
+      if( row[x] != 255 )
           continue;
       cv::Rect rect;
       cv::floodFill(labels, cv::Point(x,y), label_index, &rect, 0, 0, 4);
       label_index++;
+      rects.push_back( rect );
+      assert( label_index == rects.size() );
+
+      if (label_index == 255)
+      {
+        label_index++;
+        rects.push_back( Rect() );
+      }
     }
   }
   cout << "make_labels() ... " << t.msecs() << " milliseconds" << endl;
@@ -66,7 +76,9 @@ Mat make_labels( const cv::Mat &bw, int& label_index )
 class CCData
 {
 public:
-  int minx, miny, maxx, maxy; // коробка
+  int minx, miny, maxx, maxy; // коробка, включительно
+  int height() { return maxy-miny+1; }
+  int width() { return maxx-minx+1; }
   double xc, yc; // центр масс
   double sum_f;
   double sum_fx,sum_fy;
@@ -119,6 +131,7 @@ struct PageData
 {
   Mat1b src; // входное изображение, ч-б, 0-черное (сигнал), 255-белое (фон)
   Mat1b src_dilated; // размазанное входное
+  Mat1b src_binarized; // 0-background, 255-foreground
   Mat1i labels; // карта компонент связности, [2...labels.size()-1] ==> cc[]
   vector< CCData > cc; // информация о компонентах
   PageData(){}
@@ -126,23 +139,25 @@ struct PageData
   bool compute( const char* filename );
 };
 
+#include "niblack.h"
 bool PageData::compute( const char* filename )
 {
   src = imread( filename, IMREAD_GRAYSCALE );
   dilate1( src, src_dilated, true );
 
+  //src_binarized();
+  double thresh = threshold( src, src_binarized, 128., 255., THRESH_BINARY_INV | CV_THRESH_OTSU );
+  //int res = niblack( src, src_binarized, true );
+  
 #if 0
-  imshow( "input", src );
+  imshow( "src", src );
+  imshow( "src_binarized", src_binarized );
   waitKey(0);
 #endif
 
-  //src = src < 128;
-  Mat1b thr; // 0-background, 1-foreground
-  threshold( src, thr, 128., 1., THRESH_BINARY_INV );
-
-
   int label_index=0;
-  labels = make_labels( thr, label_index );
+  vector< Rect > rects;
+  labels = make_labels( src_binarized, label_index, rects );
 
   cc.clear(); 
   cc.resize( label_index );
@@ -156,7 +171,7 @@ bool PageData::compute( const char* filename )
       cc[ row[x] ].add( x, y );
     }
   }
-  for (int i=2; i< int(cc.size()); i++ ) // <<<<<<<<<<< 2 comp -> gpf
+  for (int i=1; i< int(cc.size()); i++ ) // <<<<<<<<<<< 2 comp -> gpf
   {
     CCData& ccd = cc[i];
     ccd.fix();
@@ -211,7 +226,7 @@ public:
         if (pd1.labels[y][x] == cp1.iCC) // сигнал
         {
           int qqq = pd1.src[y][x];
-          assert( pd1.src[y][x] < 128 );  // буквы -- сигнал -- черные -- 00.
+          //?assert( pd1.src[y][x] < 128 );  // буквы -- сигнал -- черные -- 00.
           if (more_128( x+dx, y+dy, pd2.src_dilated ))
             dst++;
         }
@@ -224,7 +239,7 @@ public:
       {
         if (pd2.labels[y][x] == cp2.iCC) // сигнал
         {
-          assert( pd2.src[y][x] < 128 );
+          //?assert( pd2.src[y][x] < 128 );
           if (more_128( x-dx, y-dy, pd1.src_dilated ))
             dst++;
         }
@@ -242,16 +257,10 @@ class Bukvoed
   MetrСС ruler;
   CoverNet< CoverPoint, MetrСС > cvnet;
 public:
-  Bukvoed(): ruler( pages ), cvnet( &ruler, 10000, 1 ){};
+  Bukvoed(): ruler( pages ), cvnet( &ruler, 1000000, 1 ){};
   int Bukvoed::addPage( const char* page_file );
+  int Bukvoed::browse();
 };
-
-
-
-//Mat1b src; // входное изображение, ч-б, 0-черное (сигнал), 255-белое (фон)
-//Mat1b src_dilated; // размазанное входное
-//Mat1i labels; // карта компонент связности, [2...labels.size()-1] ==> cc[]
-//vector< CCData > cc; // информация о компонентах
 
 int Bukvoed::addPage( const char* page_file )
 {
@@ -262,32 +271,87 @@ int Bukvoed::addPage( const char* page_file )
 
   {
     Ticker t;
-    //MetrСС ruler;
-    //CoverNet< int, MetrСС > cvnet( &ruler, 10000, 1 );
-    for (int i=2; i<int(pages[iPage].cc.size()); i++) // <<<<<<<<<<< 2 comp -> gpf
+    for (int iCC=1; iCC<int(pages[iPage].cc.size()); iCC++) // <<<<<<<<<<< 2 comp -> gpf
     {
-      CoverPoint p( iPage, i );
-      if (1) // (cc[i].sum_f > 20)
-      {
-
-        cvnet.insert(p);
-      }
+      CoverPoint p( iPage, iCC );
+      if (pages[iPage].cc[iCC].sum_f <= 20)
+        continue;
+      if (pages[iPage].cc[iCC].height() > 40 || pages[iPage].cc[iCC].width() > 40)
+        continue;
+      cvnet.insert(p);
     }
     double ms = t.msecs();
     cout << "MetrCC metrics (simple L1):" << endl;
     cvnet.reportStatistics( 0, 3 ); 
     cout << "Build time = " << ms/1000 << " seconds" << endl;
   }
-  system("pause");
 
   return 0;
 }
 
+const int KEY_ESCAPE =27;
+const int KEY_ENTER =13;
+const int KEY_LEFT_ARROW  =2424832;
+const int KEY_RIGHT_ARROW  =2555904;
+const int KEY_PAGE_UP =2162688;
+const int KEY_PAGE_DOWN =2228224;
+const int KEY_SPACE =32;
+const int KEY_GREY_PLUS =43;
+const int KEY_GREY_MINUS =45;
+const int KEY_NO_KEY_PRESSED =-1;  // after positive delay no key pressed -- process next image
 
-int bukvoed( int argc, char* argv[] )
+
+int Bukvoed::browse()
+{
+  int iPage = 0;
+  if (pages.size() > 0) do  
+  {
+    PageData& pd =pages[iPage];
+    Mat draw = pd.src.clone();
+    for (int iCC =0; iCC<pd.cc.size(); iCC++)
+    {
+      CCData& ccd = pd.cc[iCC];
+      rectangle( draw, Point( ccd.minx, ccd.miny ), Point( ccd.maxx, ccd.maxy ), Scalar( 255, 0, 0 )  );
+    }
+
+    imshow("comps", draw); 
+    int key = waitKey(0);
+    switch (key)
+    {
+    case KEY_ESCAPE:
+      return 0;
+    case KEY_RIGHT_ARROW:
+      iPage = ((iPage+1) % int( pages.size()) );
+      break;
+    case KEY_LEFT_ARROW:
+      iPage = ((pages.size()+ iPage-1) % int( pages.size()) );
+      break;
+
+    }
+
+  } while (1);
+  return 0;
+}
+
+
+int run_bukvoed( int argc, char* argv[] )
 {
   Bukvoed bukvoed;
-  bukvoed.addPage( "/images/4.png" );
+  //bukvoed.addPage( "/images/4.png" );
+
+  Ticker t;
+  //bukvoed.addPage( "/testdata/idcard/snippets/US/CA/DL03/ID_US_CA_DL03_0001_003_.jpg" ); /// <<< ломает дерево: все липнет к первым двум уровням, ошибка какая-то
+  bukvoed.addPage( "/testdata/idcard/snippets/US/CA/DL03/ID_US_CA_DL03_0003_005_.jpg" ); 
+  bukvoed.addPage( "/testdata/idcard/snippets/US/CA/DL03/ID_US_CA_DL03_0004_005_.jpg" ); 
+  bukvoed.addPage( "/testdata/idcard/snippets/US/CA/DL03/ID_US_CA_DL03_0005_009_.jpg" ); 
+  bukvoed.addPage( "/testdata/idcard/snippets/US/CA/DL03/ID_US_CA_DL03_0006_009_.jpg" ); 
+  //bukvoed.addPage( "/testdata/idcard/snippets/US/CA/DL03/ID_US_CA_DL03_0001_003_.jpg" ); 
+  bukvoed.addPage( "/testdata/idcard/snippets/US/CA/DL03/ID_US_CA_DL03_0001_004_.jpg" ); 
+  bukvoed.addPage( "/testdata/idcard/snippets/US/CA/DL03/ID_US_CA_DL03_0007_005_.jpg" ); 
+
+  cout << "addPages ... " << t.msecs() << " milliseconds" << endl;
+
+  bukvoed.browse();
 
   return 0;
 

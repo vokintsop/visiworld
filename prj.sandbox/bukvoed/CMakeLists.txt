@@ -6,6 +6,8 @@ IF( MSVC )
     src/ticker.h
     src/bukvoed.cpp 
     src/main.cpp 
+    src/niblack.h
+    src/niblack.cpp
     )
 
   ADD_EXECUTABLE( bukvoed ${SOURCES} )
