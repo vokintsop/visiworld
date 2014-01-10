@@ -7,6 +7,7 @@
 #include <fstream>
 #include <string>
 #include <vector>
+#include <algorithm>
 
 #include <opencv/cv.h>
 #include <opencv/highgui.h>
@@ -279,7 +280,10 @@ int Bukvoed::addPage( const char* page_file )
       if (pages[iPage].cc[iCC].height() > 40 || pages[iPage].cc[iCC].width() > 40)
         continue;
       cvnet.insert(p);
+      //cvnet.reportStatistics( 0, 3 ); 
+
     }
+
     double ms = t.msecs();
     cout << "MetrCC metrics (simple L1):" << endl;
     cvnet.reportStatistics( 0, 3 ); 
@@ -303,6 +307,21 @@ const int KEY_NO_KEY_PRESSED =-1;  // after positive delay no key pressed -- pro
 
 int Bukvoed::browse()
 {
+
+
+  ///// make_index
+  vector< pair< pair< int, int >, int > > index; // < < sphere_level, count_of_points >, sphere_index >
+  for (int i=0; i<cvnet.getSpheresCount(); i++)
+  {
+    const CoverSphere< CoverPoint > & sphere = cvnet.getSphere(i);
+    if (sphere.level == 16)
+      index.push_back( make_pair( make_pair( sphere.level, sphere.points ), i ) );
+  }
+  sort( index.rbegin(), index.rend() );
+  //////////////////
+
+
+
   int iPage = 0;
   if (pages.size() > 0) do  
   {
@@ -340,16 +359,16 @@ int run_bukvoed( int argc, char* argv[] )
   //bukvoed.addPage( "/images/4.png" );
 
   Ticker t;
-  //bukvoed.addPage( "/testdata/idcard/snippets/US/CA/DL03/ID_US_CA_DL03_0001_003_.jpg" ); /// <<< ломает дерево: все липнет к первым двум уровням, ошибка какая-то
+  /////bukvoed.addPage( "/testdata/idcard/snippets/US/CA/DL03/ID_US_CA_DL03_0001_003_.jpg" ); /// <<< ломает дерево: все липнет к первым двум уровням, ошибка какая-то
   bukvoed.addPage( "/testdata/idcard/snippets/US/CA/DL03/ID_US_CA_DL03_0003_005_.jpg" ); 
   bukvoed.addPage( "/testdata/idcard/snippets/US/CA/DL03/ID_US_CA_DL03_0004_005_.jpg" ); 
   bukvoed.addPage( "/testdata/idcard/snippets/US/CA/DL03/ID_US_CA_DL03_0005_009_.jpg" ); 
   bukvoed.addPage( "/testdata/idcard/snippets/US/CA/DL03/ID_US_CA_DL03_0006_009_.jpg" ); 
-  //bukvoed.addPage( "/testdata/idcard/snippets/US/CA/DL03/ID_US_CA_DL03_0001_003_.jpg" ); 
   bukvoed.addPage( "/testdata/idcard/snippets/US/CA/DL03/ID_US_CA_DL03_0001_004_.jpg" ); 
   bukvoed.addPage( "/testdata/idcard/snippets/US/CA/DL03/ID_US_CA_DL03_0007_005_.jpg" ); 
 
   cout << "addPages ... " << t.msecs() << " milliseconds" << endl;
+
 
   bukvoed.browse();
 
