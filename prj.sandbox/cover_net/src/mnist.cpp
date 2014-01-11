@@ -177,9 +177,9 @@ bool _read_samples( string patterns, // images
 		Mat1b mymat(rows, cols);
 		unsigned char label;
 		in1.read(reinterpret_cast<char*>(&label), sizeof(label));
-		for (int i1 = 0; i1 < cols; ++i1)
+		for (int i1 = 0; i1 < rows; ++i1)
 		{
-			for (int i2 = 0; i2 < rows; ++i2)
+			for (int i2 = 0; i2 < cols; ++i2)
 			{
 				unsigned char pixel;
 				in.read(reinterpret_cast<char*>(&pixel), sizeof(pixel));
@@ -403,7 +403,7 @@ void explore_cover_tree()
       //ruler2.samples2 = &trn_samples;    ruler2.samples2_dilated = &trn_samples_dilated;
       int hit=0; int miss=0;
 
-//#define ONLY_ONE
+#define ONLY_ONE
 #ifdef ONLY_ONE
       int kNeighbours = 1; ///  ==> 2.81% error rate, ??> 159 символов в сек <?? 782 расстояния
 #else
@@ -452,17 +452,17 @@ void explore_cover_tree()
           }
         }
 
-		    /*imshow("test_mat", tst_samples[i_tst].second);
+		    imshow("test_mat", tst_samples[i_tst].second);
 		    imshow("best_vertex", trn_samples[i_trn].second);
 		    cerr << "Result:  tst_value = " << tst_samples[i_tst].first << " trn_value = " << trn_samples[i_trn].first << " dist = " << distance << endl;
-		    cvWaitKey(0);*/
+		    cvWaitKey(0);
 
         int winner = -1;
         if (0) //kNeighbours == 1)
           winner = trn_samples[i_trn].first;
         else
         {
-          vector< pair< double, int > > votes(10);
+          vector< pair< double, int > > votes(255);
           for (int i=0;i < int(votes.size()); i++ )
           {
             votes[i].first = 0;
