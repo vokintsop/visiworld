@@ -30,10 +30,13 @@ int SAMPLE_WIDTH = 0;
 
 vector< pair< int, cv::Mat > > samples;  //class_num image, 
 
-//only for intel O_O
 inline unsigned long ntohl(unsigned long n) {
   return ((n & 0xFF) << 24) | ((n & 0xFF00) << 8) | ((n & 0xFF0000) >> 8) | ((n & 0xFF000000) >> 24);
 }
+inline unsigned long htonl(unsigned long n) {
+  return ((n & 0xFF) << 24) | ((n & 0xFF00) << 8) | ((n & 0xFF0000) >> 8) | ((n & 0xFF000000) >> 24);
+}
+
 bool read_samples( string mnist_folder )
 {
 
@@ -50,8 +53,10 @@ bool read_samples( string mnist_folder )
 	} 
  	
 	int magic_number;
-    in.read(reinterpret_cast<char*>(&magic_number), sizeof(magic_number));
+  in.read(reinterpret_cast<char*>(&magic_number), sizeof(magic_number));
 	magic_number = ntohl(magic_number);
+
+  cout << magic_number << endl;
 
 	int magic_number1;
     in1.read(reinterpret_cast<char*>(&magic_number1), sizeof(magic_number1));
@@ -80,15 +85,17 @@ bool read_samples( string mnist_folder )
 		Mat1b mymat(rows, cols);
 		unsigned char label;
 		in1.read(reinterpret_cast<char*>(&label), sizeof(label));
-		for (int i1 = 0; i1 < cols; ++i1)
+    //cout << label << endl;
+		for (int i1 = 0; i1 < rows; ++i1)
 		{
-			for (int i2 = 0; i2 < rows; ++i2)
+			for (int i2 = 0; i2 < cols; ++i2)
 			{
 				unsigned char pixel;
 				in.read(reinterpret_cast<char*>(&pixel), sizeof(pixel));
 				mymat(i1, i2) = pixel;
 			}
-		}
+     
+		} 
 		samples.push_back(make_pair(label, mymat));
 	}
 
@@ -146,7 +153,7 @@ int main( int argc, char* argv[] )
   for ( int frame =0; key != 27 && frame < int( samples.size() ); )
   {
     Mat matx;
-    resize( samples[frame].second, matx, Size(), 16., 16., INTER_AREA ); // расширяем в 16 раз для удобного просмотра
+    resize( samples[frame].second, matx, Size(), 5., 5., INTER_AREA ); // расширяем в 16 раз для удобного просмотра
 
     imshow( "sample", matx );
 	
