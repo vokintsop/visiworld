@@ -220,10 +220,12 @@ private:
 #ifdef DONT_FORCE_DIRECT_SUCCESSORS
       break;
 #endif
-      iSphereLevel++;
+      if ( getRadius(iSphereLevel) <= getMinRadius(iSphereLevel) ) // вместо /// while ( getRadius(iSphereLevel) > getMinRadius(iSphereLevel) );
+        break;
+      iSphereLevel++;                                               // поскольку тут уже как бы переходим на следующий уровень
       parent = iLastSphere;
       distance_to_parent = 0;
-    } while ( getRadius(iSphereLevel) > getMinRadius(iSphereLevel) );
+    } while (1); /// ( getRadius(iSphereLevel) > getMinRadius(iSphereLevel) );
 
     notifyParents( pt, parent, iSphereLevel, SPHERE_CREATED );
     return iLastSphere;
@@ -271,7 +273,7 @@ private:
 
 
     if (best_kid != -1)
-       insertPoint( pt, best_kid, iSphereLevel+1, best_dist ); // провалились
+      insertPoint( pt, best_kid, iSphereLevel+1, best_dist ); // провалились
     else // нет детей, место свободно, создаем сферу и, возможно, ее прямых наследников
       makeSphere( iSphereLevel+1,  pt, iSphere, dist );
 
@@ -290,6 +292,16 @@ private:
     // average radii? other node statistics?
     //spheres[iSphere].sumradii += dist;
     //spheres[iSphere].sumradiisq += dist*dist;
+
+    /////---- увеличиваем счетчик точек, захваченных данной сферой и у прямых наследников тоже (note!)
+    int isp = spheres[iSphere].last_kid;
+    while (isp)
+    {
+      assert( spheres[isp].center == spheres[ spheres[isp].parent ].center );
+      spheres[isp].points++;
+      isp = spheres[isp].last_kid;
+    }
+    ////----
 
     notifyParents( pt, iSphere, iSphereLevel, POINT_ATTACHED );
   }
