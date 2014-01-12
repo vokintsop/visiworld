@@ -40,39 +40,30 @@ static void dilate1( Mat& in, Mat& ou, bool inverted = false )
 
 }
 
-
-Mat make_labels( const cv::Mat &bw, int& label_index, vector< cv::Rect >& rects )
+static void open_close_vertical( Mat& in, Mat& ou, bool inverted = false )
 {
-  Ticker t;  
-  Mat labels;
-  bw.convertTo(labels, CV_32SC1);
-  label_index = 1; 
-  rects.clear();
-  rects.push_back( Rect() );
-  for(int y=0; y < labels.rows; y++)
+  int an = 1;
+  int element_shape = MORPH_RECT;
+  Mat element = getStructuringElement(element_shape, Size(1, an*2+1), Point(0,2) );
+  Mat tmp( in.rows, in.cols, in.type() );
+  if (inverted)
   {
-    int *row = (int*)labels.ptr(y);
-    for(int x=0; x < labels.cols; x++) 
-    {
-      if( row[x] != 255 )
-          continue;
-      cv::Rect rect;
-      cv::floodFill(labels, cv::Point(x,y), label_index, &rect, 0, 0, 4);
-      label_index++;
-      rects.push_back( rect );
-      assert( label_index == rects.size() );
-
-      if (label_index == 255)
-      {
-        label_index++;
-        rects.push_back( Rect() );
-      }
-    }
+    erode( in, tmp, element, Point( 0, 2 ) );
+    dilate( tmp, ou, element, Point( 0, 2 ) );
   }
-  cout << "make_labels() ... " << t.msecs() << " milliseconds" << endl;
-  return labels;
+  else
+  {
+    dilate( in, tmp, element, Point( 0, 2 ) );
+    erode( tmp, ou, element, Point( 0, 2 ) );
+  }
+
+  //imshow( "before_open_close", in );
+  //imshow( "after__open_close", ou );
+  //waitKey(0);
+
 }
 
+///////////////////////////////////////////////////////////////////////////
 
 class CCData
 {
@@ -126,6 +117,56 @@ public:
   }
 };
 
+///////////////////////////////////////////////////////////////////////////
+
+
+Mat make_labels( // на выходе Mat, в котором значения пикселей: 0 -- компонента связности фона
+                 // 1..max_label_index -- соответствуют номерам компонент связности
+                const cv::Mat &bw, // < threshold сигнал, >= threshold фон
+                int& max_label_index, // максимальный индекс компонент связности; 
+                //vector< cv::Rect >& rects,
+                int threshold = 128  // пиксели >= threshold считаются фоновыми (белыми)
+                ) 
+{
+  Ticker t;  
+  Mat labels;
+  bw.convertTo(labels, CV_32SC1);
+  int label_index = 255; 
+  //rects.clear();
+  for(int y=0; y < labels.rows; y++)
+  {
+    int *row = (int*)labels.ptr(y);
+    for(int x=0; x < labels.cols; x++) 
+    {
+      if( row[x] >= threshold && row[x] <= 255 ) // белый фон
+          continue;
+      if ( row[x] < threshold ) // черная не размеченная буква -- новая компонента связности
+      {
+        label_index++;
+        cv::floodFill(labels, cv::Point(x,y), label_index, NULL, 0, 0, 4);
+        //cv::Rect rect;
+        //cv::floodFill(labels, cv::Point(x,y), label_index, &rect, 0, 0, 4);
+        //rects.push_back( rect );
+        //assert( label_index + 255 == rects.size() );
+      }
+    }
+  }
+  for(int y=0; y < labels.rows; y++)
+  {
+    int *row = (int*)labels.ptr(y);
+    for(int x=0; x < labels.cols; x++) 
+    {
+      if( row[x] > 255 )
+        row[x] = row[x]-255;
+      else
+        row[x] = 0;
+    }
+  }
+  max_label_index = label_index - 255;
+
+  cout << "make_labels() ... " << t.msecs() << " milliseconds" << endl;
+  return labels;
+}
 
 
 struct PageData
@@ -144,11 +185,25 @@ struct PageData
 bool PageData::compute( const char* filename )
 {
   src = imread( filename, IMREAD_GRAYSCALE );
+  // set roi
+  int dx =10;
+  int dy = 5;
+  //src = src( Rect( 300-dx, 263-dy, 350+2*dx, 51+2*dy ) ); // address
+  //src = src( Rect( 304-dx, 200-dy, 322+2*dx, 109+2*dy ) ); // name+address
+  src = src( Rect( 392-dx, 477-dy, 279+2*dx, 39+2*dy ) ); // dd
+
+  // filter
+  //open_close_vertical( src, src );
+
   dilate1( src, src_dilated, true );
 
   //src_binarized();
-  double thresh = threshold( src, src_binarized, 128., 255., THRESH_BINARY_INV | CV_THRESH_OTSU );
-  //int res = niblack( src, src_binarized, true );
+  //double thresh = threshold( src, src_binarized, 128., 255., THRESH_BINARY | CV_THRESH_OTSU );
+  int res = niblack( src, src_binarized, 3, true );
+
+  string outbin = filename; outbin += ".png";
+  imwrite( outbin, src_binarized );
+
   
 #if 0
   imshow( "src", src );
@@ -156,18 +211,18 @@ bool PageData::compute( const char* filename )
   waitKey(0);
 #endif
 
-  int label_index=0;
+  int max_label_index=0;
   vector< Rect > rects;
-  labels = make_labels( src_binarized, label_index, rects );
+  labels = make_labels( src_binarized, max_label_index );
 
   cc.clear(); 
-  cc.resize( label_index );
+  cc.resize( max_label_index+1 );
   for(int y=0; y < labels.rows; y++)
   {
     int *row = (int*)labels.ptr(y);
     for(int x=0; x < labels.cols; x++) 
     {
-      if( row[x] <= 1 )
+      if( row[x] == 0  )
           continue;
       cc[ row[x] ].add( x, y );
     }
@@ -192,6 +247,7 @@ struct CoverPoint
   int iPage; // номер страницы, индекс к pages[]
   int iCC;  // номер компоненты связности, индекс к pages[iPage].cc[]
   CoverPoint( int iPage, int iCC ): iPage( iPage ), iCC( iCC ) {}
+  bool operator == ( const CoverPoint & other ) const { return iPage == other.iPage && iCC == other.iCC; }
 };
 
 inline bool more_128( int x, int y, Mat1b& m ) // white
@@ -326,14 +382,20 @@ int Bukvoed::browse()
   if (pages.size() > 0) do  
   {
     PageData& pd =pages[iPage];
-    Mat draw = pd.src.clone();
+    Mat draw_bin = pd.src_binarized.clone();
+    Mat draw_src = pd.src.clone();
+    int ratio =3;
+    resize( draw_bin, draw_bin, Size(), ratio, ratio, INTER_AREA );
+    resize( draw_src, draw_src, Size(), ratio, ratio, INTER_AREA );
     for (int iCC =0; iCC<pd.cc.size(); iCC++)
     {
       CCData& ccd = pd.cc[iCC];
-      rectangle( draw, Point( ccd.minx, ccd.miny ), Point( ccd.maxx, ccd.maxy ), Scalar( 255, 0, 0 )  );
+      rectangle( draw_bin, Point( ccd.minx*ratio, ccd.miny*ratio ), Point( (ccd.maxx+1)*ratio, (ccd.maxy+1)*ratio ), Scalar( 128, 0, 0 )  );
+      rectangle( draw_src, Point( ccd.minx*ratio, ccd.miny*ratio ), Point( (ccd.maxx+1)*ratio, (ccd.maxy+1)*ratio ), Scalar( 255, 0, 0 )  );
     }
 
-    imshow("comps", draw); 
+    imshow("comps_bin", draw_bin); 
+    imshow("comps_src", draw_src); 
     int key = waitKey(0);
     switch (key)
     {
