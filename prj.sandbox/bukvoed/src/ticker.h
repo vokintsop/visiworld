@@ -18,8 +18,8 @@ public:
   Ticker() { reset(); }
   int64 reset() { start = cv::getTickCount(); return start; } // старт отсчета
   int64 ticks() { return cv::getTickCount()-start; } // время после старта отсчета в тиках
-  dsec  dsecs() { return dsec(ticks()) / cv::getTickFrequency(); } // время после старта отсчета в миллисекундах
-  msec  msecs() { return msec( (1000*ticks()) / cv::getTickFrequency() ); } // время после старта отсчета в миллисекундах
+  dsec  dsecs() { return dsec(ticks()) / cv::getTickFrequency(); } // время после старта отсчета в секундах (double)
+  msec  msecs() { return msec( (1000*ticks()) / cv::getTickFrequency() ); } // время после старта отсчета в целочисленных миллисекундах
 };
 
 #endif // __TICKER_H
