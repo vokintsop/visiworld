@@ -95,7 +95,7 @@ int niblack( cv::Mat1b& src, cv::Mat1b& res
       dbin.at<uchar>(i,j) = 255 - dbin.at<uchar>(i,j);
   //imshow( "blocks", dbin );
 
-  double koeff = 0.2;
+  double koeff = 0.15; // 0.2;
 
   for (int y=0; y<src.rows; y++)
     for (int x=0; x<src.cols; x++)
