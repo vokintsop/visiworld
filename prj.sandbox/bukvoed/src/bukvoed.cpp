@@ -185,21 +185,28 @@ struct PageData
 bool PageData::compute( const char* filename )
 {
   src = imread( filename, IMREAD_GRAYSCALE );
+////////////// preprocess image
   // set roi
   int dx =10;
   int dy = 5;
-  //src = src( Rect( 300-dx, 263-dy, 350+2*dx, 51+2*dy ) ); // address
+  src = src( Rect( 300-dx, 263-dy, 350+2*dx, 51+2*dy ) ); // address
   //src = src( Rect( 304-dx, 200-dy, 322+2*dx, 109+2*dy ) ); // name+address
-  src = src( Rect( 392-dx, 477-dy, 279+2*dx, 39+2*dy ) ); // dd
+  //src = src( Rect( 392-dx, 477-dy, 279+2*dx, 39+2*dy ) ); // dd
+
+
+  //src = src( Rect( 765-dx, 1751-dy, 847+2*dx, 315+2*dy ) ); // bankimage
 
   // filter
   //open_close_vertical( src, src );
+  //blur( src, src, Size(3,3) );
+  //equalizeHist( src, src );
+////////////////////////////////
 
   dilate1( src, src_dilated, true );
 
   //src_binarized();
   //double thresh = threshold( src, src_binarized, 128., 255., THRESH_BINARY | CV_THRESH_OTSU );
-  int res = niblack( src, src_binarized, 3, true );
+  int res = niblack( src, src_binarized, 5, true );
 
   string outbin = filename; outbin += ".png";
   imwrite( outbin, src_binarized );
@@ -317,6 +324,7 @@ public:
   Bukvoed(): ruler( pages ), cvnet( &ruler, 1000000, 1 ){};
   int Bukvoed::addPage( const char* page_file );
   int Bukvoed::browse();
+  void Bukvoed::makeIndex();
 };
 
 int Bukvoed::addPage( const char* page_file )
@@ -361,22 +369,33 @@ const int KEY_GREY_MINUS =45;
 const int KEY_NO_KEY_PRESSED =-1;  // after positive delay no key pressed -- process next image
 
 
-int Bukvoed::browse()
+void Bukvoed::makeIndex()
 {
-
-
   ///// make_index
   vector< pair< pair< int, int >, int > > index; // < < sphere_level, count_of_points >, sphere_index >
   for (int i=0; i<cvnet.getSpheresCount(); i++)
   {
     const CoverSphere< CoverPoint > & sphere = cvnet.getSphere(i);
-    if (sphere.level == 16)
+    if (1)//(sphere.level == 16)
       index.push_back( make_pair( make_pair( sphere.level, sphere.points ), i ) );
   }
   sort( index.rbegin(), index.rend() );
   //////////////////
+  int level=100;
+  for (int i=0; i<index.size(); i++)
+  {
+    if (index[i].first.first < level)
+    {
+      level = index[i].first.first; 
+      cout << "\n\nlevel= " << level << endl;
+    }
+    printf( "\tpnts=%d ", index[i].first.second );
+  }
 
+}
 
+int Bukvoed::browse()
+{
 
   int iPage = 0;
   if (pages.size() > 0) do  
@@ -422,7 +441,8 @@ int run_bukvoed( int argc, char* argv[] )
 
   Ticker t;
   /////bukvoed.addPage( "/testdata/idcard/snippets/US/CA/DL03/ID_US_CA_DL03_0001_003_.jpg" ); /// <<< ломает дерево: все липнет к первым двум уровням, ошибка какая-то
-  bukvoed.addPage( "/testdata/idcard/snippets/US/CA/DL03/ID_US_CA_DL03_0003_005_.jpg" ); 
+  //bukvoed.addPage( "/images/bankimage004.jpg" ); 
+  bukvoed.addPage( "/testdata/idcard/snippets/US/CA/DL03/ID_US_CA_DL03_0003_005_.jpg" );
   bukvoed.addPage( "/testdata/idcard/snippets/US/CA/DL03/ID_US_CA_DL03_0004_005_.jpg" ); 
   bukvoed.addPage( "/testdata/idcard/snippets/US/CA/DL03/ID_US_CA_DL03_0005_009_.jpg" ); 
   bukvoed.addPage( "/testdata/idcard/snippets/US/CA/DL03/ID_US_CA_DL03_0006_009_.jpg" ); 
@@ -432,6 +452,7 @@ int run_bukvoed( int argc, char* argv[] )
   cout << "addPages ... " << t.msecs() << " milliseconds" << endl;
 
 
+  bukvoed.makeIndex();
   bukvoed.browse();
 
   return 0;
