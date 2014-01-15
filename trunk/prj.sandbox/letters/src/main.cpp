@@ -126,8 +126,8 @@ bool write_samples( string &imgfile, string &labelfile, vector<pair<char, Mat> >
 int main( int argc, char* argv[] )
 {
   //string exe = argv[0];
-  string beg = "C:/visiroad_3/idcards/characters/";
-  string tst_folder = "C:/visiroad_3/idcards/characters/test_set/";
+  string beg = "/testdata/idcards/characters/";
+  string tst_folder = "/testdata/idcards/characters/test_set/";
 	read_samples(tst_folder, tst_samples);
 
   string trn_folder = "C:/visiroad_3/idcards/characters/train_set/";
