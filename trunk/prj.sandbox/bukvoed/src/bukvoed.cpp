@@ -171,11 +171,21 @@ Mat make_labels( // на выходе Mat, в котором значения пикселей: 0 -- компонента 
 
 struct PageData
 {
+  // input
+  std::string source_filename;
+  int source_frame_index;
+
+  // рабочие битмапы
   Mat1b src; // входное изображение, ч-б, 0-черное (сигнал), 255-белое (фон)
   Mat1b src_dilated; // размазанное входное
   Mat1b src_binarized; // 0-background, 255-foreground
+
+  // компоненты связности
   Mat1i labels; // карта компонент связности, [2...labels.size()-1] ==> cc[]
   vector< CCData > cc; // информация о компонентах
+  // настройки препроцессинга
+  Rect ROI;
+
   PageData(){}
   PageData( const char* filename ) {    compute(filename);  }
   bool compute( const char* filename );
@@ -184,17 +194,13 @@ struct PageData
 #include "niblack.h"
 bool PageData::compute( const char* filename )
 {
+  source_filename = filename;
   src = imread( filename, IMREAD_GRAYSCALE );
 ////////////// preprocess image
-  // set roi
-  int dx =10;
-  int dy = 5;
-  src = src( Rect( 300-dx, 263-dy, 350+2*dx, 51+2*dy ) ); // address
-  //src = src( Rect( 304-dx, 200-dy, 322+2*dx, 109+2*dy ) ); // name+address
-  //src = src( Rect( 392-dx, 477-dy, 279+2*dx, 39+2*dy ) ); // dd
 
+  if (ROI.area() > 0)
+    src = src( ROI ); 
 
-  //src = src( Rect( 765-dx, 1751-dy, 847+2*dx, 315+2*dy ) ); // bankimage
 
   // filter
   //open_close_vertical( src, src );
@@ -437,17 +443,32 @@ int Bukvoed::browse()
 int run_bukvoed( int argc, char* argv[] )
 {
   Bukvoed bukvoed;
+
+#if 0
+  // set roi
+  int dx =10;
+  int dy = 5;
+  //bukvoed.ROI = Rect( 300-dx, 263-dy, 350+2*dx, 51+2*dy );// address
+  //bukvoed.ROI = Rect( 304-dx, 200-dy, 322+2*dx, 109+2*dy ); // name+address
+  //bukvoed.ROI = Rect( 392-dx, 477-dy, 279+2*dx, 39+2*dy ); // dd
+  //bukvoed.ROI = Rect( 765-dx, 1751-dy, 847+2*dx, 315+2*dy ); // bankimage
+#endif
+
   //bukvoed.addPage( "/images/4.png" );
 
   Ticker t;
   /////bukvoed.addPage( "/testdata/idcard/snippets/US/CA/DL03/ID_US_CA_DL03_0001_003_.jpg" ); /// <<< ломает дерево: все липнет к первым двум уровням, ошибка какая-то
+  //bukvoed.addPage( "/images/niblack/board1.png" ); 
+  bukvoed.addPage( "/images/niblack/board1_snippet.png" ); 
   //bukvoed.addPage( "/images/bankimage004.jpg" ); 
+#if 0
   bukvoed.addPage( "/testdata/idcard/snippets/US/CA/DL03/ID_US_CA_DL03_0003_005_.jpg" );
   bukvoed.addPage( "/testdata/idcard/snippets/US/CA/DL03/ID_US_CA_DL03_0004_005_.jpg" ); 
   bukvoed.addPage( "/testdata/idcard/snippets/US/CA/DL03/ID_US_CA_DL03_0005_009_.jpg" ); 
   bukvoed.addPage( "/testdata/idcard/snippets/US/CA/DL03/ID_US_CA_DL03_0006_009_.jpg" ); 
   bukvoed.addPage( "/testdata/idcard/snippets/US/CA/DL03/ID_US_CA_DL03_0001_004_.jpg" ); 
   bukvoed.addPage( "/testdata/idcard/snippets/US/CA/DL03/ID_US_CA_DL03_0007_005_.jpg" ); 
+#endif
 
   cout << "addPages ... " << t.msecs() << " milliseconds" << endl;
 
