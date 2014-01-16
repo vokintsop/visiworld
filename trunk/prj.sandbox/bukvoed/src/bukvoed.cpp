@@ -1,44 +1,30 @@
 // bukvoed
-#include <conio.h>
-#include <cassert>
-#include <climits>
-
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <vector>
-#include <algorithm>
-
-#include <opencv/cv.h>
-#include <opencv/highgui.h>
-
-#include <opencv2/core/core.hpp>
-#include <opencv2/highgui/highgui.hpp>
-#include "opencv2/imgproc/imgproc.hpp"
+#include "precomp.h"
+//
+//#include <conio.h>
+//#include <cassert>
+//#include <climits>
+//
+//#include <iostream>
+//#include <fstream>
+//#include <string>
+//#include <vector>
+//#include <algorithm>
+//
+//#include <opencv/cv.h>
+//#include <opencv/highgui.h>
+//
+//#include <opencv2/core/core.hpp>
+//#include <opencv2/highgui/highgui.hpp>
+//#include "opencv2/imgproc/imgproc.hpp"
 
 #include "cover_net.h"
 #include "ticker.h"
+#include "pagedata.h"
 
 using namespace std;
 using namespace cv;
 
-
-
-static void dilate1( Mat& in, Mat& ou, bool inverted = false )
-{
-  int an = 1;
-  int element_shape = MORPH_CROSS; // MORPH_RECT;
-  Mat element = getStructuringElement(element_shape, Size(an*2+1, an*2+1), Point(an, an) );
-  if (!inverted)
-    dilate( in, ou, element, Point( 1, 1 ) );
-  else
-    erode( in, ou, element, Point( 1, 1 ) );
-
-  //imshow( "before_dilation", in );
-  //imshow( "after_dilation", ou );
-  //waitKey(0);
-
-}
 
 static void open_close_vertical( Mat& in, Mat& ou, bool inverted = false )
 {
@@ -65,195 +51,9 @@ static void open_close_vertical( Mat& in, Mat& ou, bool inverted = false )
 
 ///////////////////////////////////////////////////////////////////////////
 
-class CCData
-{
-public:
-  int minx, miny, maxx, maxy; // коробка, включительно
-  int height() { return maxy-miny+1; }
-  int width() { return maxx-minx+1; }
-  double xc, yc; // центр масс
-  double sum_f;
-  double sum_fx,sum_fy;
-  double sum_fxx, sum_fxy, sum_fyy;
-  CCData():
-    minx( INT_MAX ), miny( INT_MAX ), maxx( INT_MIN ), maxy(INT_MIN ),
-    sum_f(0.), sum_fx(0.), sum_fy(0.), sum_fxx(0.), sum_fxy(0.), sum_fyy(0.)
-  {}
-  void add( int x, int y, double f = 1. )
-  {
-    minx = min( x, minx );     miny = min( y, miny ); 
-    maxx = max( x, maxx );     maxy = max( y, maxy ); 
-    sum_f += f;
-    sum_fx += f*x; 
-    sum_fy += f*y;
-    sum_fxx += f * x * x;  
-    sum_fxy += f * x * y;
-    sum_fyy += f * y * y;
-  }
-  void fix()
-  {
-    xc = sum_fx / sum_f;
-    yc = sum_fy / sum_f;
-    /*
-    // sum_fxx_ == sum( f * (x-xc) * (x-xc) ) == sum( f*x*x - 2*f*x*xc + f*xc*xc ) ==
-    // == sum_fxx - 2*sum_fx * xc  + sum_f * xc * xc
-    double sum_fxx_ = sum_fxx - 2*sum_fx * xc  + sum_f * xc * xc;
-    double sum_fyy_ = sum_fyy - 2*sum_fy * yc  + sum_f * yc * yc;
-
-    // fxy_ == sum( f * (x-xc) * (y-yc) ) == sum( f*x*x - f*x*yc - f*y*xc + f*xc*yc ) ==
-    // == sum_fxy - sum_fy * xc - sum_fx * yc + sum_f * xc * yc
-    double sum_fxy_ = sum_fxy - sum_fy * xc - sum_fx * yc + sum_f * xc * yc;
-
-    double ds = sum_fxx_ - sum_fyy_;
-    double phi_rad =  ( abs( ds ) <= 0.000001 ) ? 0. 
-      : 0.5 * atan( 2*sum_fxy_ / ds );
-      //: 0.5 * atan2( 2*sum_fxy_ , ds );
-
-    double I1 = 0.5*( sum_fxx_ + sum_fyy_  + sqrt( ds*ds + 4* sum_fxy_*sum_fxy_ ));
-    double I2 = 0.5*( sum_fxx_ + sum_fyy_  - sqrt( ds*ds + 4* sum_fxy_*sum_fxy_ ));
-
-    double phi_degree = phi_rad * 360./ (CV_PI*2);
-    */
-  }
-};
-
 ///////////////////////////////////////////////////////////////////////////
 
 
-Mat make_labels( // на выходе Mat, в котором значения пикселей: 0 -- компонента связности фона
-                 // 1..max_label_index -- соответствуют номерам компонент связности
-                const cv::Mat &bw, // < threshold сигнал, >= threshold фон
-                int& max_label_index, // максимальный индекс компонент связности; 
-                //vector< cv::Rect >& rects,
-                int threshold = 128  // пиксели >= threshold считаются фоновыми (белыми)
-                ) 
-{
-  Ticker t;  
-  Mat labels;
-  bw.convertTo(labels, CV_32SC1);
-  int label_index = 255; 
-  //rects.clear();
-  for(int y=0; y < labels.rows; y++)
-  {
-    int *row = (int*)labels.ptr(y);
-    for(int x=0; x < labels.cols; x++) 
-    {
-      if( row[x] >= threshold && row[x] <= 255 ) // белый фон
-          continue;
-      if ( row[x] < threshold ) // черная не размеченная буква -- новая компонента связности
-      {
-        label_index++;
-        cv::floodFill(labels, cv::Point(x,y), label_index, NULL, 0, 0, 4);
-        //cv::Rect rect;
-        //cv::floodFill(labels, cv::Point(x,y), label_index, &rect, 0, 0, 4);
-        //rects.push_back( rect );
-        //assert( label_index + 255 == rects.size() );
-      }
-    }
-  }
-  for(int y=0; y < labels.rows; y++)
-  {
-    int *row = (int*)labels.ptr(y);
-    for(int x=0; x < labels.cols; x++) 
-    {
-      if( row[x] > 255 )
-        row[x] = row[x]-255;
-      else
-        row[x] = 0;
-    }
-  }
-  max_label_index = label_index - 255;
-
-  cout << "make_labels() ... " << t.msecs() << " milliseconds" << endl;
-  return labels;
-}
-
-
-struct PageData
-{
-  // input
-  std::string source_filename;
-  int source_frame_index;
-
-  // рабочие битмапы
-  Mat1b src; // входное изображение, ч-б, 0-черное (сигнал), 255-белое (фон)
-  Mat1b src_dilated; // размазанное входное
-  Mat1b src_binarized; // 0-background, 255-foreground
-
-  // компоненты связности
-  Mat1i labels; // карта компонент связности, [2...labels.size()-1] ==> cc[]
-  vector< CCData > cc; // информация о компонентах
-  // настройки препроцессинга
-  Rect ROI;
-
-  PageData(){}
-  PageData( const char* filename ) {    compute(filename);  }
-  bool compute( const char* filename );
-};
-
-#include "niblack.h"
-bool PageData::compute( const char* filename )
-{
-  source_filename = filename;
-  src = imread( filename, IMREAD_GRAYSCALE );
-////////////// preprocess image
-
-  if (ROI.area() > 0)
-    src = src( ROI ); 
-
-
-  // filter
-  //open_close_vertical( src, src );
-  //blur( src, src, Size(3,3) );
-  //equalizeHist( src, src );
-////////////////////////////////
-
-  dilate1( src, src_dilated, true );
-
-  //src_binarized();
-  //double thresh = threshold( src, src_binarized, 128., 255., THRESH_BINARY | CV_THRESH_OTSU );
-  int res = niblack( src, src_binarized, 5, true );
-
-  string outbin = filename; outbin += ".png";
-  imwrite( outbin, src_binarized );
-
-  
-#if 0
-  imshow( "src", src );
-  imshow( "src_binarized", src_binarized );
-  waitKey(0);
-#endif
-
-  int max_label_index=0;
-  vector< Rect > rects;
-  labels = make_labels( src_binarized, max_label_index );
-
-  cc.clear(); 
-  cc.resize( max_label_index+1 );
-  for(int y=0; y < labels.rows; y++)
-  {
-    int *row = (int*)labels.ptr(y);
-    for(int x=0; x < labels.cols; x++) 
-    {
-      if( row[x] == 0  )
-          continue;
-      cc[ row[x] ].add( x, y );
-    }
-  }
-  for (int i=1; i< int(cc.size()); i++ ) // <<<<<<<<<<< 2 comp -> gpf
-  {
-    CCData& ccd = cc[i];
-    ccd.fix();
-#if 0 // draw rects
-    rectangle( src, Point( ccd.minx, ccd.miny ), Point( ccd.maxx, ccd.maxy ), Scalar( 128, 0, 0 ) );
-#endif
-  }
-  //imshow( "comps", src );
-  //waitKey(0);
-
-  //cout << labels;
-  return true;
-}
 
 struct CoverPoint
 {
