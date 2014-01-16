@@ -1,3 +1,6 @@
+#ifndef __PAGEDATA_H
+#define __PAGEDATA_H
+
 // pagedata.h
 #include <string>
 #include <vector>
@@ -26,3 +29,5 @@ struct PageData
   PageData( const char* filename ) {    compute(filename);  }
   bool compute( const char* filename );
 };
+
+#endif // __PAGEDATA_H

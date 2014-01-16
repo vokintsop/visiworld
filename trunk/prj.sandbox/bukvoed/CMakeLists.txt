@@ -2,6 +2,7 @@ IF( MSVC )
   PROJECT( bukvoed )
   
   SET( SOURCES
+    src/bukvoed.h
     src/pagedata.h
     src/pagedata.cpp
     src/precomp.h
