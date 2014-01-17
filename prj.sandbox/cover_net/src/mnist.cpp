@@ -16,8 +16,8 @@
 
 #include <cassert>
 
+
 #include "cover_net.h"
-#include "cover_net2.h"
 #include "ticker.h"
 #include "test.h"
 
@@ -47,6 +47,17 @@ static bool _read_samples( string data, // images
                     vector< pair< int, cv::Mat > >& samples // result vector
                     );
 
+static void _invert_samples( vector< pair< int, cv::Mat > >& smp )
+{
+  for (int i=0; i<smp.size(); i++)
+  {
+    Mat& m = smp[i].second;
+    for (int r=0; r<m.rows; r++)
+      for (int c=0; c<m.cols; c++)
+        m.at<uchar>(r,c) = 255 - m.at<uchar>(r,c);
+  }
+}
+
 static bool read_samples( string mnist_folder )
 {
 	string trndata = mnist_folder + "/train-images.idx3-ubyte";
@@ -59,6 +70,25 @@ static bool read_samples( string mnist_folder )
   
   return ok1 && ok2;
 }
+
+static bool read_mrz_samples( string mrz_folder )
+{
+	string trndata = mrz_folder + "/testdata/mrz/dem.idx/feature_vectors.idx";
+	string trndata1 = mrz_folder + "/testdata/mrz/dem.idx/labels.idx";
+  bool ok1 = _read_samples( trndata, trndata1, trn_samples );
+  if (ok1)
+    _invert_samples(trn_samples);
+
+	string tstdata = mrz_folder + "/testdata/mrz/ipc.idx/feature_vectors.idx";
+	string tstdata1 = mrz_folder + "/testdata/mrz/ipc.idx/labels.idx";
+  bool ok2 = _read_samples( tstdata, tstdata1, tst_samples );
+  if (ok1)
+    _invert_samples(tst_samples);
+  
+  return ok1 && ok2;
+}
+
+
 
 Mat rotateImage(const Mat& source, double angle)
 {
@@ -120,7 +150,29 @@ Mat1b pca( Mat1b& m ) // возвращает Mat повернутый главной осью вверх
 #endif
   return mm;
 
+}
 
+Mat1b normalize( Mat1b& m ) // возвращает Mat с выравненным уровнем €ркости
+{
+  Mat1b mm;
+  //int block_size=11; double param1=5;
+  //adaptiveThreshold( m, mm, 255, CV_ADAPTIVE_THRESH_MEAN_C, CV_THRESH_BINARY, block_size, param1 );
+
+  //// ----catch gpf!
+  //threshold( m, mm, 0, 255,  CV_THRESH_BINARY|CV_THRESH_OTSU );
+
+  blur( m, mm, Size(3,3) );
+  return mm;
+
+  Mat1b mmm;
+  equalizeHist( mm, mmm );
+#if 0
+  imshow( "img", m );
+  imshow( "img-blurred", mm );
+  imshow( "img-equalized", mmm );
+  waitKey(0);
+#endif
+  return mmm;
 }
 
 bool _read_samples( string patterns, // images
@@ -196,10 +248,13 @@ bool _read_samples( string patterns, // images
     }
 #endif
 
-    Mat1b mm = pca( mymat );
+    //if (label==0)
+    //  continue;
 
+    Mat1b mm = normalize( mymat );//доворачиваем? нормализуем
 		samples.push_back(make_pair(label, mm));
-		//samples.push_back(make_pair(label, mymat));
+
+
 	}
   cout << endl << samples.size() << " samples read from " << patterns << endl;
 
@@ -403,15 +458,17 @@ void explore_cover_tree()
       //ruler2.samples2 = &trn_samples;    ruler2.samples2_dilated = &trn_samples_dilated;
       int hit=0; int miss=0;
 
-#define ONLY_ONE
+//#define ONLY_ONE
 #ifdef ONLY_ONE
       int kNeighbours = 1; ///  ==> 2.81% error rate, ??> 159 символов в сек <?? 782 рассто€ни€
 #else
+      // 1250 err on mrz, 
       int kNeighbours = 1; // ==> 2.81% error rate, 387 символ в сек, 782 рассто€ние на точку
       //int kNeighbours = 2; // ==> 2.72% error rate, 351 символ в сек, 861 рассто€ние на точку
       //int kNeighbours = 4; // ==> 2.34% error rate, 301 символ в сек
       //int kNeighbours = 6; // ==> 2.29% error rate, 272 символ в сек, 1041 рассто€ние на точку
       //int kNeighbours = 7; // ==> 2.28% error rate, 260 символ в сек, 1175 рассто€ние на точку
+      //1250
       //int kNeighbours = 8; // ==> 2.22% error rate, 250 символ в сек, 1105 рассто€ние на точку
       //int kNeighbours = 9; // ==> 2.24% error rate, 240 символ в сек, 1135 рассто€ние на точку
       //int kNeighbours = 10; // ==> 2.24% error rate, 232 символ в сек, 1162 рассто€ние на точку
@@ -452,17 +509,17 @@ void explore_cover_tree()
           }
         }
 
-		    imshow("test_mat", tst_samples[i_tst].second);
+		    /*imshow("test_mat", tst_samples[i_tst].second);
 		    imshow("best_vertex", trn_samples[i_trn].second);
 		    cerr << "Result:  tst_value = " << tst_samples[i_tst].first << " trn_value = " << trn_samples[i_trn].first << " dist = " << distance << endl;
-		    cvWaitKey(0);
+		    cvWaitKey(0);*/
 
         int winner = -1;
         if (0) //kNeighbours == 1)
           winner = trn_samples[i_trn].first;
         else
         {
-          vector< pair< double, int > > votes(255);
+          vector< pair< double, int > > votes(256);
           for (int i=0;i < int(votes.size()); i++ )
           {
             votes[i].first = 0;
@@ -493,9 +550,9 @@ void explore_cover_tree()
         {
           min_miss_distance = min( min_miss_distance, distance );
           miss++;
-//#ifdef ___SHOW___
+//#define ___SHOW___
 #ifdef ___SHOW___
-          /*imshow("tst", tst_samples[i_tst].second);
+          imshow("tst", tst_samples[i_tst].second);
           Mat near_mats(trn_samples[nearest[0].first].second.rows, trn_samples[nearest[0].first].second.cols * nearest.size(), trn_samples[0].second.type());
           for (int i1 = 0; i1 < nearest.size(); ++i1)
           {
@@ -504,7 +561,7 @@ void explore_cover_tree()
             //imshow("nya", trn_samples[nearest[i1].second].second);
           }
           imshow("nearest", near_mats);
-          cvWaitKey(0);*/
+          cvWaitKey(0);
 #endif
         }
         
@@ -532,10 +589,20 @@ int explore_mnist( int argc, char* argv[] )
 {
 #ifdef simple_tester
 	test_cover_net();
-#else
+  return 0;
+#endif
+
+#if 0 // mnist 
   string exe = argv[0];
   string mnist_folder = exe + "/../../../testdata/mnist";
 	read_samples(mnist_folder);
+#endif
+
+#if 1 // mrz 
+  string exe = argv[0];
+  string mrz_folder = ""; //exe + "/../../../testdata/mnist";
+	read_mrz_samples(mrz_folder);
+#endif
 
   dilate_samples();
 
@@ -560,7 +627,5 @@ int explore_mnist( int argc, char* argv[] )
       frame = (frame+1) % tst_samples.size();
     }
   }
-
-#endif
 	return 0;
 }
