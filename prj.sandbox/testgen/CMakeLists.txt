@@ -6,7 +6,8 @@ IF( MSVC )
     src/points2lines_2d.cpp
     src/points2points_2d.cpp
     src/precomp.h
-    src/main.cpp 
+    src/main.cpp
+    src/gen.h 
     )
 
   ADD_EXECUTABLE( testgen ${SOURCES} )

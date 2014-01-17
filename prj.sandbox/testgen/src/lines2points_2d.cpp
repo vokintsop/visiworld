@@ -3,4 +3,5 @@
 
 void  testgen_lines2points_2d( string res_folder )
 {
+  
 }
