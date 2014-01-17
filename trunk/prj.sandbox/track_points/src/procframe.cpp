@@ -31,7 +31,16 @@ preprocess_frame( Mat& img )
   Rect roi( xx, yy, min( ww, img.cols-xx ), min( hh, img.rows-yy ) ); ////// <<< danger
   img = img( roi );
 
-  //resize( img, img, Size(0,0), 0.5, 0.5 );
+  resize( img, img, Size(0,0), 0.5, 0.5 );
+
+  //static Mat prev_img;
+  //if (prev_img.empty())
+  //  prev_img = img;
+  //Mat diff_img = img - prev_img;
+  //prev_img = img.clone();
+  //img = diff_img;
+
+
 
   return 0;
 }
@@ -45,7 +54,10 @@ void detect_points( Mat& img, vector< KeyPoint >& pts )
 {
 
 #if 1
-  SURF detector( 20000);
+  cv::SURF detector( 4000, 4, 2, 
+    true, 
+    true  // no orientation
+    );
   detector.detect( img, pts );
 #endif
 
@@ -53,6 +65,24 @@ void detect_points( Mat& img, vector< KeyPoint >& pts )
   SIFT detector( 600 );
   detector.detect( img, pts );
 #endif
+
+#if 0
+  ORB detector( 100 ); // nfeatures
+  detector.detect( img, pts );
+#endif
+
+#if 0
+  BRISK detector; // slow...
+  detector.detect( img, pts );
+#endif
+
+#if 0
+  MSER detector; // slow
+  detector.detect( img, pts );
+#endif
+
+
+
 
   //int minHessian = 400;
   //SurfFeatureDetector detector( minHessian );

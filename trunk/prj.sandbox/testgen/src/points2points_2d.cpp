@@ -4,7 +4,7 @@
 const int xMax = 1000;
 const int yMax = 1000;
 const int sigma = 20; // радиус кластера, сигма
-const int countPoints = 500; // количество точек в кластере
+const int countPoints = 100; // количество точек в кластере
 
 void  testgen_points2points_2d( string res_folder )
 {
@@ -31,18 +31,23 @@ void  testgen_points2points_2d( string res_folder )
     random_shuffle(p.begin(), p.end());
 
     string test_name = res_folder + format( "clu%.03d", num_clusters );
-    Mat1b res( 1000, 1000, 255 );
+    Mat1b res( yMax+1, xMax+1, 255 );
     ofstream out((test_name + ".txt").c_str());
     for (int i=0; i<clusters.size(); i++)
     {
-      circle( res, clusters[i].first, clusters[i].second, Scalar(0,0,0,0), 2 );
+      circle( res, clusters[i].first, clusters[i].second, Scalar(128,0,0,0), 2 );
       out <<  clusters[i].first.x << "\t" <<  clusters[i].first.y  << "\t" <<  clusters[i].second << endl;
     }
     out << p.size() << endl; // количество точек
     for (int i = 0; i < p.size(); ++i)
     {
       out << p[i].x << " " << p[i].y << endl;
-      circle( res, p[i], 2, Scalar(0, 0, 0), 2); //сами точки
+      //circle( res, p[i], 2, Scalar(0, 0, 0), 2); //сами точки
+      if ( p[i].y < 0 ||  p[i].x < 0 )
+        continue;
+      if ( p[i].y >= yMax ||  p[i].x >= xMax )
+        continue;
+      res[p[i].y][p[i].x] = 0;
     }
     imwrite( test_name+".png", res );
   }
