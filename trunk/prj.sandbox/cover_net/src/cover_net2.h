@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <cassert>
 #include <queue>
+#include <iostream>
 
 #include "graph.h"
 
@@ -671,6 +672,36 @@ public:
     for (int i=0; i< int(spheres.size()); i++)
       spheres[i].print( 0 );
 
+  }
+
+  PointType // находит првое ветвление или лист
+  findFirstRamification(
+    int iStartSphere = 0// с какой сферы начинать поиск, 0 - корень дерева 
+  )
+  {
+    int isp=iStartSphere; // текущая сфера
+
+	  int kid = spheres[isp].last_kid;
+    int count = 0, ch = 0, kid1 = 0;
+
+	  for (; kid > 0; kid = spheres[kid].prev_brother)// идем по всем детям
+    {
+      if (spheres[kid].distance_to_parent == 0)// клоны не нужны
+      {
+        ++ch;
+      }
+       ++count;
+       if (count > 2)
+         break;
+    }
+	  
+    if (count == 0 && ch == 0)
+      std::cerr << "list" << std::endl;
+	  if ((count == 0 && ch == 0) || count - ch > 1)
+      return spheres[isp].center;
+   
+    std::cerr << "down" << std::endl;
+	  return findFirstRamification(spheres[isp].last_kid);
   }
 
 };

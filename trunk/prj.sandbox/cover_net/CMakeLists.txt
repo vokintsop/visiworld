@@ -11,6 +11,7 @@ IF( MSVC )
 
     src/cover_net2.h
     src/graph.h
+    src/simpletest.h
     )
 
   ADD_EXECUTABLE( cover_net ${SOURCES} )
