@@ -38,10 +38,10 @@ static void open_close_vertical( Mat& in, Mat& ou, bool inverted = false )
 
 ///////////////////////////////////////////////////////////////////////////
 
-
-int Bukvoed::addPage( const char* page_file )
+int Bukvoed::addPage( const char* page_file, Rect roi )
 {
   PageData pd;
+  pd.ROI = roi;
   try {
     pd.compute( page_file );
   } catch (...) {
@@ -168,7 +168,13 @@ int run_bukvoed( int argc, char* argv[] )
   Ticker t;
   //bukvoed.addPage( (string(argv[0]) +"/../../../testdata/bukvoed/arial_zero_norm.png").c_str() ); 
   //bukvoed.addPage( (string(argv[0]) +"/../../../testdata/bukvoed/arial_zero_bold.png").c_str() ); 
-  bukvoed.addPage( (string(argv[0]) +"/../../../testdata/bukvoed/arial_digits_norm.png").c_str() ); 
+
+  string filename = string(argv[0]) +"/../../../testdata/bukvoed/arial_digits_norm.png";
+  //Rect roi;
+  //Rect roi = Rect( 29, 15, 103, 133 ); // 00 11 -- четыре символа -- два ноля и две единицы -- ok, две сферы в ответе с 12 по 20 уровень
+  Rect roi = Rect( 29, 15, 103, 641 ); // <<<!!! 00 11 .. 99 -- 20 символов -- матрица 2х10 -- ??? на 19 и 20 уровнях откуда то берется 11-я сфера!!!
+  bukvoed.addPage( filename.c_str(), roi ); 
+
   //bukvoed.addPage( (string(argv[0]) +"/../../../testdata/bukvoed/arial_digits_bold.png").c_str() ); 
   //bukvoed.addPage( (string(argv[0]) +"/../../../testdata/bukvoed/arial_digits2_norm.png").c_str() ); 
   //bukvoed.addPage( (string(argv[0]) +"/../../../testdata/bukvoed/arial_digits2_bold.png").c_str() ); 
