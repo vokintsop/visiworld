@@ -40,7 +40,7 @@ struct CoverSphere
     prev_brother(0),
     last_kid(0),
     ancle(-1),
-    points(0),
+    points(1),
     distance_to_parent(distance_to_parent)
   {
   } 
@@ -125,7 +125,6 @@ public:
     if (spheres.size() == 0)
     {
       makeRoot( pt );
-      spheres[0].points++;
       return true;
     }
 
