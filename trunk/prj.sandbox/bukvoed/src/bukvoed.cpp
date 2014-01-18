@@ -3,8 +3,8 @@
 
 #include "bukvoed.h"
 
-#include "cover_net.h"
-#include "ticker.h"
+#include "../../cover_net.h"
+#include "../../ticker.h"
 #include "pagedata.h"
 
 using namespace std;
@@ -41,7 +41,13 @@ static void open_close_vertical( Mat& in, Mat& ou, bool inverted = false )
 
 int Bukvoed::addPage( const char* page_file )
 {
-  PageData pd( page_file );
+  PageData pd;
+  try {
+    pd.compute( page_file );
+  } catch (...) {
+    cout << "Can't add page " << page_file << endl;
+    return -1;
+  }
   pages.push_back( pd );
   int iPage = pages.size()-1;
 
@@ -157,24 +163,16 @@ int run_bukvoed( int argc, char* argv[] )
   //bukvoed.ROI = Rect( 300-dx, 263-dy, 350+2*dx, 51+2*dy );// address
   //bukvoed.ROI = Rect( 304-dx, 200-dy, 322+2*dx, 109+2*dy ); // name+address
   //bukvoed.ROI = Rect( 392-dx, 477-dy, 279+2*dx, 39+2*dy ); // dd
-  //bukvoed.ROI = Rect( 765-dx, 1751-dy, 847+2*dx, 315+2*dy ); // bankimage
 #endif
-
-  //bukvoed.addPage( "/images/4.png" );
 
   Ticker t;
-  /////bukvoed.addPage( "/testdata/idcard/snippets/US/CA/DL03/ID_US_CA_DL03_0001_003_.jpg" ); /// <<< ломает дерево: все липнет к первым двум уровням, ошибка какая-то
-  //bukvoed.addPage( "/images/niblack/board1.png" ); 
-  bukvoed.addPage( "/images/niblack/board1_snippet.png" ); 
-  //bukvoed.addPage( "/images/bankimage004.jpg" ); 
-#if 0
-  bukvoed.addPage( "/testdata/idcard/snippets/US/CA/DL03/ID_US_CA_DL03_0003_005_.jpg" );
-  bukvoed.addPage( "/testdata/idcard/snippets/US/CA/DL03/ID_US_CA_DL03_0004_005_.jpg" ); 
-  bukvoed.addPage( "/testdata/idcard/snippets/US/CA/DL03/ID_US_CA_DL03_0005_009_.jpg" ); 
-  bukvoed.addPage( "/testdata/idcard/snippets/US/CA/DL03/ID_US_CA_DL03_0006_009_.jpg" ); 
-  bukvoed.addPage( "/testdata/idcard/snippets/US/CA/DL03/ID_US_CA_DL03_0001_004_.jpg" ); 
-  bukvoed.addPage( "/testdata/idcard/snippets/US/CA/DL03/ID_US_CA_DL03_0007_005_.jpg" ); 
-#endif
+  //bukvoed.addPage( (string(argv[0]) +"/../../../testdata/bukvoed/arial_zero_norm.png").c_str() ); 
+  //bukvoed.addPage( (string(argv[0]) +"/../../../testdata/bukvoed/arial_zero_bold.png").c_str() ); 
+  bukvoed.addPage( (string(argv[0]) +"/../../../testdata/bukvoed/arial_digits_norm.png").c_str() ); 
+  //bukvoed.addPage( (string(argv[0]) +"/../../../testdata/bukvoed/arial_digits_bold.png").c_str() ); 
+  //bukvoed.addPage( (string(argv[0]) +"/../../../testdata/bukvoed/arial_digits2_norm.png").c_str() ); 
+  //bukvoed.addPage( (string(argv[0]) +"/../../../testdata/bukvoed/arial_digits2_bold.png").c_str() ); 
+
 
   cout << "addPages ... " << t.msecs() << " milliseconds" << endl;
 
