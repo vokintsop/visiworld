@@ -118,15 +118,16 @@ public:
     rejectedInserts=0; // счетчик числа попыток вставки слишком далеких точек
   };
 
-  bool insert( const PointType& pt ) // false -- лежит за пределами центра нашей вселенной (радиуса рута)
+  int insert( 
+    // вставляет точку, возвращает положительный номер сферы нижнего уровня, к которой прилепилась или создала; 
+    // возвращает 0 если точка лежит за пределами центра нашей вселенной (радиуса рута)
+    const PointType& pt // вставляемая точка 
+    )
   {
     attemptsToInsert++;
 
     if (spheres.size() == 0)
-    {
-      makeRoot( pt );
-      return true;
-    }
+      return makeRoot( pt );
 
     double dist_root = computeDistance( 0, pt );
     if ( !(dist_root < getRadius(0)) )
@@ -135,7 +136,7 @@ public:
       std::cout << "Point " << pt << " lies too far, distance to root == " << dist_root << std::endl;
 #endif
       rejectedInserts++;
-      return false; // игнорируем слишком далекую точку
+      return 0; // игнорируем слишком далекую точку
     }
 
 ////////#define NO_SEQUENTAL_PROXIMITY_ASSUMPTION
@@ -156,9 +157,7 @@ public:
 //////    }
 //////#endif
 
-    insertPoint( pt, 0, 0, dist_root ); // добавляем спускаясь с рута
-
-    return true;
+    return insertPoint( pt, 0, 0, dist_root ); // добавляем спускаясь с рута
   }
 
 
@@ -230,9 +229,10 @@ private:
     return iLastSphere;
   }
 
-  void makeRoot( const PointType& pt )  {   makeSphere( 0, pt, -1, 0 );  }
+  int makeRoot( const PointType& pt )  {   return makeSphere( 0, pt, -1, 0 );  }
 
-  void insertPoint( 
+  int insertPoint( 
+    // возвращает положительный номер сферы на нижнем уровне, к которой прилепилась или которая была создана
     const PointType& pt, // точка внутри сферы iSphere на уровне iSphereLevel
     int iSphere, 
     int iSphereLevel, 
@@ -246,8 +246,7 @@ private:
     double minrad = getMinRadius(iSphereLevel);
     if (dist < minrad)
     { // лепим непосредственно к данной сфере
-      attachPoint( pt, iSphere, iSphereLevel, dist ); // лепим непосредственно к данной сфере, не пытаясь свалиться вниз
-      return;
+      return attachPoint( pt, iSphere, iSphereLevel, dist ); // лепим непосредственно к данной сфере и ее прямым наследникам
     }
 
     // поищем нет ли ребенка
@@ -271,15 +270,17 @@ private:
     }
 
 
+    int isp=0;
     if (best_kid != -1)
-      insertPoint( pt, best_kid, iSphereLevel+1, best_dist ); // провалились
+      isp = insertPoint( pt, best_kid, iSphereLevel+1, best_dist ); // провалились
     else // нет детей, место свободно, создаем сферу и, возможно, ее прямых наследников
-      makeSphere( iSphereLevel+1,  pt, iSphere, dist );
+      isp = makeSphere( iSphereLevel+1,  pt, iSphere, dist );
 
+    return isp;
   }
 
 
-  void attachPoint( const PointType& pt, int iSphere, int iSphereLevel, double dist )
+  int attachPoint( const PointType& pt, int iSphere, int iSphereLevel, double dist )
     // лепим непосредственно к данной сфере, не пытаясь свалиться вниз
   {
 #ifdef COVER_NET_VERBOSE_DETAILED
@@ -298,11 +299,13 @@ private:
     {
       assert( spheres[isp].center == spheres[ spheres[isp].parent ].center );
       spheres[isp].points++;
+      iSphere = isp;
       isp = spheres[isp].last_kid;
     }
     ////----
 
     notifyParents( pt, iSphere, iSphereLevel, POINT_ATTACHED );
+    return iSphere;
   }
 
   // ---- запросы и навигация ----
