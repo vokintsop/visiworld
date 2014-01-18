@@ -80,9 +80,10 @@ class Bukvoed
   vector< PageData > pages;
   Metr—— ruler;
   CoverNet< CoverPoint, Metr—— > cvnet;
+
 public:
   Bukvoed(): ruler( pages ), cvnet( &ruler, 1000000, 1 ){};
-  int Bukvoed::addPage( const char* page_file );
+  int Bukvoed::addPage( const char* page_file, Rect roi=Rect() );
   int Bukvoed::browse();
   void Bukvoed::makeIndex();
 };
