@@ -48,7 +48,13 @@ int Bukvoed::addPage( const char* page_file, Rect roi )
     cout << "Can't add page " << page_file << endl;
     return -1;
   }
+
+  for (int y=0; y<pd.src.rows; y++) for (int x=0; x<pd.src.cols-45; x++)
+    if (pd.src[y][x] != pd.src[y][x+45])
+      cout << "diff at: y=" << y << " x=" << x << endl;
+
   pages.push_back( pd );
+
   int iPage = pages.size()-1;
 
 
@@ -121,18 +127,23 @@ int Bukvoed::browse()
     PageData& pd =pages[iPage];
     Mat draw_bin = pd.src_binarized.clone();
     Mat draw_src = pd.src.clone();
+    Mat draw_dil = pd.src_dilated.clone();
+
     int ratio =3;
     resize( draw_bin, draw_bin, Size(), ratio, ratio, INTER_AREA );
     resize( draw_src, draw_src, Size(), ratio, ratio, INTER_AREA );
+    resize( draw_dil, draw_dil, Size(), ratio, ratio, INTER_AREA );
     for (int iCC =0; iCC<pd.cc.size(); iCC++)
     {
       CCData& ccd = pd.cc[iCC];
       rectangle( draw_bin, Point( ccd.minx*ratio, ccd.miny*ratio ), Point( (ccd.maxx+1)*ratio, (ccd.maxy+1)*ratio ), Scalar( 128, 0, 0 )  );
       rectangle( draw_src, Point( ccd.minx*ratio, ccd.miny*ratio ), Point( (ccd.maxx+1)*ratio, (ccd.maxy+1)*ratio ), Scalar( 255, 0, 0 )  );
+      rectangle( draw_dil, Point( ccd.minx*ratio, ccd.miny*ratio ), Point( (ccd.maxx+1)*ratio, (ccd.maxy+1)*ratio ), Scalar( 255, 0, 0 )  );
     }
 
     imshow("comps_bin", draw_bin); 
     imshow("comps_src", draw_src); 
+    imshow("comps_src_dilated", draw_dil); 
     int key = waitKey(0);
     switch (key)
     {
@@ -172,7 +183,8 @@ int run_bukvoed( int argc, char* argv[] )
   string filename = string(argv[0]) +"/../../../testdata/bukvoed/arial_digits_norm.png";
   //Rect roi;
   //Rect roi = Rect( 29, 15, 103, 133 ); // 00 11 -- четыре символа -- два ноля и две единицы -- ok, две сферы в ответе с 12 по 20 уровень
-  Rect roi = Rect( 29, 15, 103, 641 ); // <<<!!! 00 11 .. 99 -- 20 символов -- матрица 2х10 -- ??? на 19 и 20 уровнях откуда то берется 11-я сфера!!!
+  // <<<>>>> Rect roi = Rect( 29, 15, 103, 641 ); // <<<!!! 00 11 .. 99 -- 20 символов -- матрица 2х10 -- ??? на 19 и 20 уровнях откуда то берется 11-я сфера!!!
+  Rect roi = Rect( 29, 208, 103, 64 ); // <<<!!! 00 11 .. 99 -- 20 символов -- матрица 2х10 -- ??? на 19 и 20 уровнях откуда то берется 11-я сфера!!!
   bukvoed.addPage( filename.c_str(), roi ); 
 
   //bukvoed.addPage( (string(argv[0]) +"/../../../testdata/bukvoed/arial_digits_bold.png").c_str() ); 

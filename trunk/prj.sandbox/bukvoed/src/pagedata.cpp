@@ -91,11 +91,17 @@ bool PageData::compute( const char* filename )
   //equalizeHist( src, src );
 ////////////////////////////////
 
-  dilate1( src, src_dilated, true );
 
   //src_binarized();
   //double thresh = threshold( src, src_binarized, 128., 255., THRESH_BINARY | CV_THRESH_OTSU );
   int res = niblack( src, src_binarized, 5, true );
+
+#define DILATE_AFTER_BINARIZATION
+#ifdef DILATE_AFTER_BINARIZATION
+  dilate1( src_binarized, src_dilated, true );
+#else
+  dilate1( src, src_dilated, true );
+#endif
 
   string outbin = filename; outbin += ".png";
   imwrite( outbin, src_binarized );
