@@ -53,8 +53,8 @@ public:
           if (more_128( x+dx, y+dy, pd2.src_dilated ))
           {
             dst++;
-            cout << "pd1_src[" << y    << "][" << x    << "] " << int( pd1.src[y][x] ) << endl;
-            cout << "pd2_dil[" << y+dy << "][" << x+dx << "] " << int( pd2.src_dilated[y][x] ) << endl;
+            //cout << "pd1_src[" << y    << "][" << x    << "] " << int( pd1.src[y][x] ) << endl;
+            //cout << "pd2_dil[" << y+dy << "][" << x+dx << "] " << int( pd2.src_dilated[y][x] ) << endl;
           }
         }
       }
@@ -70,8 +70,8 @@ public:
           if (more_128( x-dx, y-dy, pd1.src_dilated ))
           {
             dst++;
-            cout << "pd2_src[" << y    << "][" << x    << "] " << int( pd2.src[y][x] ) << endl;
-            cout << "pd1_dil[" << y-dy << "][" << x-dx << "] " << int( pd1.src_dilated[y][x] ) << endl;
+            //cout << "pd2_src[" << y    << "][" << x    << "] " << int( pd2.src[y][x] ) << endl;
+            //cout << "pd1_dil[" << y-dy << "][" << x-dx << "] " << int( pd1.src_dilated[y][x] ) << endl;
           }
         }
       }
