@@ -9,6 +9,7 @@ const int addy = 30;
 const int sigma = 10; // радиус кластера, сигма
 const int countPoints = 100; // количество точек в кластере
 
+
 struct Line
 {
   double a, b, c;

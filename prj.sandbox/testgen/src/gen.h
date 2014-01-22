@@ -3,7 +3,7 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
-double Gauss_(double M, double sigma)
+inline double Gauss_(double M, double sigma)
 //генерирует нормально распределенные числа
 {
 	double sum = 0;
@@ -15,7 +15,7 @@ double Gauss_(double M, double sigma)
 	return M + sigma * (sum - 6.0);
 }
 
-cv::Point gen_point(cv::Point c, double R)
+inline cv::Point gen_point(cv::Point c, double R)
 //  генерирует числа в окружности с мат ожиданием центр и радиусом в точке
 {
 
