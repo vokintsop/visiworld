@@ -101,7 +101,7 @@ void  testgen_points2lines_2d( string res_folder )
     for (int i = 0; i < p.size(); ++i)
     {
       out << p[i].x << " " << p[i].y << endl;
-      circle( res, p[i], 2, Scalar(0, 0, 0), 2); //сами точки
+      //circle( res, p[i], 2, Scalar(0, 0, 0), 2); //сами точки
       if ( p[i].y < 0 ||  p[i].x < 0 )
         continue;
       if ( p[i].y >= yMax ||  p[i].x >= xMax )
