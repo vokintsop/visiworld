@@ -35,6 +35,8 @@ void  testgen_points2points_2d( string res_folder )
     string test_name = res_folder + format( "clu%.03d", num_clusters );
     Mat1b res( yMax+1, xMax+1, 255 );
     ofstream out((test_name + ".txt").c_str());
+
+    out << num_clusters << endl;
     for (int i=0; i<clusters.size(); i++)
     {
       circle( res, clusters[i].first, clusters[i].second, Scalar(128,0,0,0), 2 );

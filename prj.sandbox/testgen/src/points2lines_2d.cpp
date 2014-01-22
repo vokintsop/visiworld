@@ -92,6 +92,7 @@ void  testgen_points2lines_2d( string res_folder )
     string test_name = res_folder + format( "line%.03d", num_clusters );
     Mat1b res( yMax+1, xMax+1, 255 );
     ofstream out((test_name + ".txt").c_str());
+    out << num_clusters << endl;
     for (int i=0; i<clusters.size(); i++)
     {
       draw_Line(res, clusters[i].first);
