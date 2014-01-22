@@ -1,22 +1,9 @@
 // ‘ункции генерации, общие дл€ всех трех случаев
 
-#include <conio.h>
-#include <cassert>
-#include <climits>
-
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <vector>
-#include <algorithm>
-
-#include <opencv/cv.h>
-#include <opencv/highgui.h>
-
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
-double Gauss(double M, double sigma)
+double Gauss_(double M, double sigma)
 //генерирует нормально распределенные числа
 {
 	double sum = 0;
@@ -33,10 +20,8 @@ cv::Point gen_point(cv::Point c, double R)
 {
 
    cv::Point ans;
-   ans.x = Gauss(c.x, R);
-   ans.y = Gauss(c.y, R);
+   ans.x = Gauss_(c.x, R);
+   ans.y = Gauss_(c.y, R);
 
    return ans;
 }
-
-

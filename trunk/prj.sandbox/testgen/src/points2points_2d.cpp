@@ -1,6 +1,8 @@
 // 2d points clusters generator
 #include "precomp.h"
 #include "gen.h"
+
+
 const int xMax = 1000;
 const int yMax = 1000;
 const int sigma = 20; // радиус кластера, сигма
