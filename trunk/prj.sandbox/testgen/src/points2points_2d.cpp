@@ -5,12 +5,22 @@
 
 const int xMax = 1000;
 const int yMax = 1000;
-const int sigma = 20; // радиус кластера, сигма
-const int countPoints = 100; // количество точек в кластере
+
+
+static int sigma = 20; // радиус кластера, сигма
+static int countOfPointsPerCluster = 300; // количество точек в кластере
+static int countOfClusters = 10; // количество кластеров
+
+void  testgen_points2points_2d_setup( int _sigma, int _countOfPointsPerCluster, int _countOfClusters )
+{
+  sigma = _sigma;
+  countOfPointsPerCluster = _countOfPointsPerCluster;
+  countOfClusters = _countOfClusters;  
+}
 
 void  testgen_points2points_2d( string res_folder )
 {
-  for ( double num_clusters_f = 1; num_clusters_f < 10; num_clusters_f *= 1.2 )
+  for ( double num_clusters_f = 1; num_clusters_f < countOfClusters; num_clusters_f *= 1.2 )
   {
     // generate clusters
     int num_clusters = int(num_clusters_f);
@@ -25,7 +35,7 @@ void  testgen_points2points_2d( string res_folder )
     vector<Point> p;// все точки в кластере
     for (int i_cluster = 0; i_cluster < num_clusters; i_cluster++)
     {
-      for (int i = 0; i < countPoints; ++i)
+      for (int i = 0; i < countOfPointsPerCluster; ++i)
       {
         p.push_back(gen_point(clusters[i_cluster].first, clusters[i_cluster].second));
       }
