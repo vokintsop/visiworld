@@ -14,16 +14,20 @@ void testGauss()
   Mat1b img(yMax, xMax);
   img = 0;
 
+  int _sigma = 50;
   vector<int> X(xMax, 0);
-  for(int i = 0; i < 5000; ++i)
+  for(int i = 0; i < 50000; ++i)
   {
-     int x = Gauss_(xMax / 2, sigma);
+     int x = Gauss_(xMax / 2, _sigma);
      if (x >= 0 && x < xMax)
      {
       X[x] += 1;
-      img(X[x], x) = 255;
+      int y = 500-X[x] < 0 ? 0 : 500-X[x];
+      img(y, x) = 255;
      }
   }
+  line(img, Point( xMax / 2 +_sigma, 0 ), Point( xMax / 2 +_sigma, yMax ), Scalar(128) );
+  line(img, Point( xMax / 2 -_sigma, 0 ), Point( xMax / 2 -_sigma, yMax ), Scalar(128) );
   imshow("img", img);
   cvWaitKey(0);
 }
