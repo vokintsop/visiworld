@@ -15,7 +15,7 @@ void testGauss()
   img = 0;
 
   vector<int> X(xMax, 0);
-  for(int i = 0; i < X.size(); ++i)
+  for(int i = 0; i < 5000; ++i)
   {
      int x = Gauss_(xMax / 2, sigma);
      if (x >= 0 && x < xMax)
