@@ -2,8 +2,8 @@
 #include "precomp.h"
 #include "gen.h"
 
-const int xMax = 1000;
-const int yMax = 1000;
+const int xMax = 1024;
+const int yMax = 512;
 const int addx = 30;
 const int addy = 30;
 const int sigma = 10; // радиус кластера, сигма
