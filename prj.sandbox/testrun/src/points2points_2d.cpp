@@ -1,7 +1,24 @@
 // 2d points clusters DEgenerator
 #include "precomp.h"
 
+class MetricsL2ReferredToVectorOfPoints2i  //template it 
+{
+public:
+  long long counter; // dbg/stat -- счетчик вызовов
 
+  vector< Point2i > *samples1; // main dataset of points
+  MetricsL2ReferredToVectorOfPoints2i() : samples1(0),counter(0) {};
+
+  double computeDistance( const int& i1,  const int& i2 )  // индексы к samples[]
+  {
+    double dst=0;
+    Point p1 = (*samples1)[i1];
+    Point p2 = (*samples1)[i2];
+    dst = sqrt( double( sq(p2.x-p1.x) + sq(p2.y-p1.y) ) );
+    counter++;
+    return dst;
+  }
+};
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 #include "../../cover_net.h"
 void find_clusters( vector< Point >&  points, // есть набор точек на плоскости
@@ -9,6 +26,14 @@ void find_clusters( vector< Point >&  points, // есть набор точек на плоскости
                     vector< pair< Point, int > >& res_clusters // надо построить кластеры { center, sigma }
                    )
 {
+  MetricsL2ReferredToVectorOfPoints2i ruler; // tipical ruler
+  ruler.samples1 = &points;
+  CoverNet< int, MetricsL2ReferredToVectorOfPoints2i > cvnet( &ruler, 20000, 1 ); // индекс -- points[]
+
+  for (int i=0; i<points.size(); i++)
+    cvnet.insert(i);
+
+  cvnet.reportStatistics();
   cout << "find_clusters()" << endl; // todo
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
