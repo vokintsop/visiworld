@@ -3,8 +3,8 @@
 #include "gen.h"
 
 
-const int xMax = 1000;
-const int yMax = 1000;
+int xMax = 1024;
+int yMax = 512;
 
 
 static int sigma = 20; // радиус кластера, сигма
