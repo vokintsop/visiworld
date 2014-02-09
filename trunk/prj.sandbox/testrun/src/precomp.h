@@ -21,7 +21,6 @@
 using namespace std;
 using namespace cv;
 
-
 //template< class Type, class TypeSq = Type >  // возведение в квадрат
 template< class Type >  // возведение в квадрат
 Type sq( const Type& a ) { return a*a; };
