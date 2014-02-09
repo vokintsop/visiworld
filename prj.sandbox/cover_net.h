@@ -556,7 +556,7 @@ public:
     }
   }
 
-  void reportStatistics( int node =0,  int detailsLevel=2 ) 
+  void reportStatistics( int node =0,  int detailsLevel=3 ) 
     // 0-none, 1-overall statistics, 2-by levels, 3-print tree hierarchy, 4-print tree array with links
   {
     if (detailsLevel < 1)

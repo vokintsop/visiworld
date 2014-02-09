@@ -78,11 +78,19 @@ static Mat make_labels( // на выходе Mat, в котором значения пикселей: 0 -- комп
 bool PageData::compute( const char* filename )
 {
   source_filename = filename;
+#if 0
+  {
+    Mat src_rgb = imread( filename ); 
+    if (ROI.area() > 0)
+      src_rgb = src_rgb( ROI ); 
+    imshow( "Original image", src_rgb );
+  }
+#endif
   src = imread( filename, IMREAD_GRAYSCALE );
 ////////////// preprocess image
-
   if (ROI.area() > 0)
     src = src( ROI ); 
+
 
 
   // filter
@@ -94,7 +102,10 @@ bool PageData::compute( const char* filename )
 
   //src_binarized();
   //double thresh = threshold( src, src_binarized, 128., 255., THRESH_BINARY | CV_THRESH_OTSU );
-  int res = niblack( src, src_binarized, 5, true );
+  
+  //int res = niblack( src, src_binarized, 5, 0.2 );
+  
+  int res = niblack( src, src_binarized );
 
 #define DILATE_AFTER_BINARIZATION
 #ifdef DILATE_AFTER_BINARIZATION

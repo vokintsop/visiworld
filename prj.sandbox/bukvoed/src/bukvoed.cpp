@@ -57,16 +57,19 @@ int Bukvoed::addPage( const char* page_file, Rect roi )
 
   int iPage = pages.size()-1;
 
+  cout << "Adding page #" << iPage << endl;
+  cout << "Total comps count = " << pages[iPage].cc.size() << endl;
+
 
   {
     Ticker t;
     for (int iCC=1; iCC<int(pages[iPage].cc.size()); iCC++) // <<<<<<<<<<< 2 comp -> gpf
     {
       CoverPoint p( iPage, iCC );
-      if (pages[iPage].cc[iCC].sum_f <= 20)
-        continue;
-      if (pages[iPage].cc[iCC].height() > 40 || pages[iPage].cc[iCC].width() > 40)
-        continue;
+      //if (pages[iPage].cc[iCC].sum_f <= 20)
+      //  continue;
+      //if (pages[iPage].cc[iCC].height() > 60 || pages[iPage].cc[iCC].width() > 60)
+      //  continue;
       cvnet.insert(p);
       //cvnet.reportStatistics( 0, 3 ); 
 
@@ -129,16 +132,18 @@ int Bukvoed::browse()
     Mat draw_src = pd.src.clone();
     Mat draw_dil = pd.src_dilated.clone();
 
-    int ratio =3;
+    double ratio = min( 4., 600./pd.src.rows );
     resize( draw_bin, draw_bin, Size(), ratio, ratio, INTER_AREA );
     resize( draw_src, draw_src, Size(), ratio, ratio, INTER_AREA );
     resize( draw_dil, draw_dil, Size(), ratio, ratio, INTER_AREA );
     for (int iCC =0; iCC<pd.cc.size(); iCC++)
     {
       CCData& ccd = pd.cc[iCC];
+#if 0
       rectangle( draw_bin, Point( ccd.minx*ratio, ccd.miny*ratio ), Point( (ccd.maxx+1)*ratio, (ccd.maxy+1)*ratio ), Scalar( 128, 0, 0 )  );
       rectangle( draw_src, Point( ccd.minx*ratio, ccd.miny*ratio ), Point( (ccd.maxx+1)*ratio, (ccd.maxy+1)*ratio ), Scalar( 255, 0, 0 )  );
       rectangle( draw_dil, Point( ccd.minx*ratio, ccd.miny*ratio ), Point( (ccd.maxx+1)*ratio, (ccd.maxy+1)*ratio ), Scalar( 255, 0, 0 )  );
+#endif
     }
 
     imshow("comps_bin", draw_bin); 
@@ -179,16 +184,41 @@ int run_bukvoed( int argc, char* argv[] )
   Ticker t;
   //bukvoed.addPage( (string(argv[0]) +"/../../../testdata/bukvoed/arial_zero_norm.png").c_str() ); 
   //bukvoed.addPage( (string(argv[0]) +"/../../../testdata/bukvoed/arial_zero_bold.png").c_str() ); 
-
+#if 0
   string filename = string(argv[0]) +"/../../../testdata/bukvoed/arial_digits_norm.png";
   Rect roi; // полная страница
   //Rect roi = Rect( 29, 15, 103, 133 ); // 00 11 -- четыре символа -- два ноля и две единицы -- ok, две сферы в ответе с 12 по 20 уровень
   // <<<>>>> Rect roi = Rect( 29, 15, 103, 641 ); // <<<!!! 00 11 .. 99 -- 20 символов -- матрица 2х10 -- ??? на 19 и 20 уровнях откуда то берется 11-я сфера!!!
   //Rect roi = Rect( 29, 208, 103, 64 ); // <<<!!! 00 11 .. 99 -- 20 символов -- матрица 2х10 -- ??? на 19 и 20 уровнях откуда то берется 11-я сфера!!!
   bukvoed.addPage( filename.c_str(), roi ); 
+#endif
 
+#if 0
+  string filename = string(argv[0]) +"/../../../testdata/bukvoed/arial_latin_capital_norm.png";
+  // 13 sizes x 26 letters == 338 -- 6,7,8,9,10,11,12,14,16,18,20,22,24
+  Rect roi; // полная страница
+  //Rect roi = Rect( 29, 15, 103, 133 ); // 00 11 -- четыре символа -- два ноля и две единицы -- ok, две сферы в ответе с 12 по 20 уровень
+  // <<<>>>> Rect roi = Rect( 29, 15, 103, 641 ); // <<<!!! 00 11 .. 99 -- 20 символов -- матрица 2х10 -- ??? на 19 и 20 уровнях откуда то берется 11-я сфера!!!
+  //Rect roi = Rect( 29, 208, 103, 64 ); // <<<!!! 00 11 .. 99 -- 20 символов -- матрица 2х10 -- ??? на 19 и 20 уровнях откуда то берется 11-я сфера!!!
+  bukvoed.addPage( filename.c_str(), roi ); 
+#endif
+
+#if 0 // use niblack with 3
+  Rect roi = Rect( 2, 61, 238, 85 );
+  string filename = string(argv[0]) +"/../../../testdata/temp2013/passport_date.png";
+  bukvoed.addPage( filename.c_str(), roi ); 
+#endif
+
+#if 1
+  //Rect roi = Rect(13, 79, 280, 195 );
+  Rect roi = Rect(0,0, 645, 318);
+  string filename = "/testdata/dibco11/hw/hw1.png";
+  bukvoed.addPage( filename.c_str(), roi ); 
+#endif
   //bukvoed.addPage( (string(argv[0]) +"/../../../testdata/bukvoed/arial_digits_bold.png").c_str() ); 
+
   //bukvoed.addPage( (string(argv[0]) +"/../../../testdata/bukvoed/arial_digits2_norm.png").c_str() ); 
+
   //bukvoed.addPage( (string(argv[0]) +"/../../../testdata/bukvoed/arial_digits2_bold.png").c_str() ); 
 
 
