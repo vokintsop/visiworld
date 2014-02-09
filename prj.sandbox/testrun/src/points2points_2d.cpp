@@ -1,6 +1,8 @@
 // 2d points clusters DEgenerator
 #include "precomp.h"
 
+#include "../../cover_net.h"
+
 class MetricsL2ReferredToVectorOfPoints2i  //template it 
 {
 public:
@@ -21,30 +23,16 @@ public:
 };
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 typedef int MyPoint;
-struct _Cluster
-{
-  Point center;
-  double radius;
-  double weight;
-  _Cluster():radius(0),weight(0){};
-  _Cluster(  Point center, double radius, double weight ):
-    center(center), radius(radius),weight(weight)
-    {};
 
-};
-
-
-
-#include "../../cover_net.h"
 int find_clusters( // возвращает число кластеров (=res_clusters.size())
   vector< Point >&  points, // есть набор точек на плоскости
   //???? int sigma, // будем считать что разброс изестен, кластеры круглые
-  vector< _Cluster >& res_clusters, // надо построить кластеры { center, points } // { center, sigma }
+  vector< PointsCluster< MyPoint > >& res_clusters, // надо построить кластеры { center, points } // { center, sigma }
   int   minPoints = 3,  // кластер должен содержать не меньше указанного кол-ва точек
   int   maxClusters = 100 // but not more than maxClustersCount
                    )
 {
-  MetricsL2ReferredToVectorOfPoints2i ruler; // tipical ruler
+  MetricsL2ReferredToVectorOfPoints2i ruler; // typical ruler
   ruler.samples1 = &points;
 
   // тут интересно. если примерно знаем сигму -- можем настроить дерево на нее
@@ -54,41 +42,10 @@ int find_clusters( // возвращает число кластеров (=res_clusters.size())
   double rootRaius = 20000;
   CoverNet< MyPoint, MetricsL2ReferredToVectorOfPoints2i > cvnet( &ruler, rootRaius, 1 ); // индекс -- points[]
 
-  for (int i=0; i<points.size(); i++)
+  for (int i=0; i< int( points.size( )); i++)
     cvnet.insert(i);
-
-  vector< pair< int , int > > proper_spheres; ///<points, index>
-  // select proper level of tree
-  int i_level =9; // magic, got from tests ~  log(rootRaius) // <<<<<<<<<<<<<<<<<<< ???????
-  for (int i=0; i< cvnet.getSpheresCount(); i++)
-  {
-    const CoverSphere< MyPoint  > & s = cvnet.getSphere( i );
-    if (s.level != i_level) 
-      continue;
-    proper_spheres.push_back( make_pair( s.points, i ) );
-  }
-
-  sort( proper_spheres.rbegin(), proper_spheres.rend() );
-  
-  // upload to res_clusters
-  res_clusters.clear();
-  for (int i=0; i< proper_spheres.size(); i++)
-  {
-    if (proper_spheres[i].first < minPoints)
-      break; // мало точек в кластере
-    if (res_clusters.size() >= maxClusters)
-      break; // надоело, слишком много кластеров
-    int isphere = proper_spheres[i].second; // отсортировали по качеству, а тут номер сферы
-    const CoverSphere< MyPoint  > & s = cvnet.getSphere( isphere );
-    MyPoint center = s.center;
-    Point xycenter = points[center];
-    int rad = cvnet.getRadius( s.level );
-    _Cluster cluster( xycenter, rad, s.points );
-    res_clusters.push_back( cluster );
-  }
-
-
   cvnet.reportStatistics();
+  cvnet.makeClusters( 9, res_clusters );
   cout << "find_clusters()" << res_clusters.size() << endl; // todo
 
   return res_clusters.size();
@@ -123,7 +80,7 @@ void  testrun_points2points_2d( const string& input_template,  const string& out
       points.push_back( Point( x, y ) );
     }
 
-    vector< _Cluster > res_clusters; // center+sigma
+    vector< PointsCluster< MyPoint > > res_clusters; // center+sigma
     find_clusters( points, res_clusters, 10  ); // <<<<<<<<<<<<<<<<<<<<< main pointua
 
     // draw
@@ -132,11 +89,12 @@ void  testrun_points2points_2d( const string& input_template,  const string& out
     if (res_clusters.size() >0 )
     {
       double best_cluster_weight = res_clusters[0].weight; // чернее -- лучше 
-      for (int i=0; i<res_clusters.size(); i++)
+      for (int i=0; i< int(res_clusters.size()); i++)
       {
         double this_cluster_weight = res_clusters[i].weight;
         int color = 255 * (1 - this_cluster_weight / best_cluster_weight );
-        circle( img, res_clusters[i].center, res_clusters[i].radius, Scalar(color) );
+        Point center = points[ res_clusters[i].center ];
+        circle( img, center, cvRound( res_clusters[i].radius ), Scalar(color) );
       }
     }
 

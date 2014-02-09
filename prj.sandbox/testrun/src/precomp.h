@@ -26,5 +26,15 @@ using namespace cv;
 template< class Type >  // возведение в квадрат
 Type sq( const Type& a ) { return a*a; };
 
+namespace cv {
+template< class T >
+bool operator < ( const cv::Point3_< T >& a, const cv::Point3_< T >& b ) 
+///bool operator < ( cv::Point3_< T > a, cv::Point3_< T > b ) 
+///bool operator < ( const cv::Point3d& a, const cv::Point3d& b ) 
+{
+  return a.x < b.x;
+}
+};
+
 
 #endif // __PRECOMP_H
