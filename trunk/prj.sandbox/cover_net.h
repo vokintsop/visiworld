@@ -11,6 +11,18 @@
 #define COVER_NET_VERBOSE
 //#define COVER_NET_VERBOSE_DETAILED
 
+template< class PointType >
+struct PointsCluster // по идее CoverSphere должен выводиться из PointsCluster, дополняя деревянными ссылками
+{
+  PointType center;
+  double radius;
+  double weight;
+  PointsCluster():radius(0),weight(0){};
+  PointsCluster(  PointType center, double radius, double weight ):
+    center(center), radius(radius),weight(weight)
+    {};
+};
+
 template < class PointType >
 struct CoverSphere
 {
@@ -544,6 +556,53 @@ public:
 	  }
 
 	  return ans;
+  }
+
+  void  uploadSpheresByLevel( 
+    int i_level, // requested level
+    vector< pair< int , int > >& proper_spheres ///<.points, index>
+    )
+  {
+    for (int i=0; i < getSpheresCount(); i++)
+    {
+      const CoverSphere< PointType  > & s = getSphere( i );
+      if (s.level != i_level) 
+        continue;
+      proper_spheres.push_back( make_pair( s.points, i ) );
+    }
+
+    sort( proper_spheres.rbegin(), proper_spheres.rend() );
+  }
+
+  int makeClusters( // возвращает число кластеров (=res_clusters.size())
+    //vector< PointType >&  points, // есть набор точек
+    //???? int sigma, // будем считать что разброс изестен, кластеры круглые
+    int   i_level, // использовать сферы указанного уровня
+    vector< PointsCluster< PointType> >& res_clusters, // надо построить кластеры { center, points } // { center, sigma }
+    int   minPoints = 3,  // кластер должен содержать не меньше указанного кол-ва точек
+    int   maxClusters = 100 // but not more than maxClustersCount
+                     )
+  {
+    vector< pair< int , int > > proper_spheres; ///<points, index>
+    uploadSpheresByLevel( i_level, proper_spheres );
+    // upload to res_clusters
+    res_clusters.clear();
+
+    for (int i=0; i< int( proper_spheres.size() ); i++)
+    {
+      if (proper_spheres[i].first < minPoints)
+        break; // мало точек в кластере
+      if (int(res_clusters.size()) >= maxClusters)
+        break; // надоело, слишком много кластеров
+      int isphere = proper_spheres[i].second; // отсортировали по качеству, а тут номер сферы
+      const CoverSphere< PointType  > & s = getSphere( isphere );
+      //MyPoint center = s.center;
+      //Point xycenter = points[center];
+      double rad = getRadius( s.level );
+      PointsCluster<PointType> cluster( s.center, rad, s.points );
+      res_clusters.push_back( cluster );
+    }
+    return res_clusters.size();
   }
 
 
