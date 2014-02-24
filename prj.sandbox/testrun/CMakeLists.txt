@@ -3,6 +3,7 @@ IF( MSVC )
   
   SET( SOURCES
     ../cover_net.h
+    ../Hcoords.h
     ../ticker.h
     src/lines2points_2d.cpp
     src/points2lines_2d.cpp
