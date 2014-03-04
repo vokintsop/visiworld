@@ -2,6 +2,7 @@ IF( MSVC )
   PROJECT( testgen )
   
   SET( SOURCES
+    ../Hcoords.h
     src/lines2points_2d.cpp
     src/points2lines_2d.cpp
     src/points2points_2d.cpp

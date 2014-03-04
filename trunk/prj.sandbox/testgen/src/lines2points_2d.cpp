@@ -1,79 +1,118 @@
 // 2d lines with vanish points clusters generator
 #include "precomp.h"
+#include "gen.h"
+#include "Hcoords.h"
 
-const int w = 1024;
-const int h = 512;
-const int depth = 512;
-const Point2f zero(w / 2, h / 2);
 
-/*Point2f norm(Point3f &p)// из однородных в обычные
+const int countLines = 10;
+double sigma = 0.1;
+
+HCoords c(1024, 512);
+
+void draw_Line(Mat &img, Point3d l, int color)
 {
-  Point2f res(p.x / p.z, py / p.z);
-  return res;
-}
-Point3f gen_Line() // генерирует прямую в однородных координатах ? нормировать по длине или z
-{
-  Point3f res;
-  res.x = rand() % 10000 - 20000;
-  res.y = rand() % 10000 - 20000;
-  res.z = rand() % 10000 - 20000;
-  
-  res = norm(res);// ???
-  return res;
-}
-Point3f gen_focus(Point3f &L1, Point3f &L2)// Генерирует фокус по двум прямым
-{
-  Point f = L1.cross(L2);
-  return norm(f);
+  double xMin = -c.width / 2;
+  double xMax = c.width / 2;
+  double yMin = -c.height / 2;
+  double yMax = c.height/ 2;
+  Point zero(xMax, yMax);
+  l.z *= c.depth;
+  //cout << l.x << " " << l.y << " " << l.z << endl;
+   if (abs(l.x) > abs(l.y))
+     line(img, Point((-yMin * l.y - l.z) / l.x, yMin) + zero, Point((-yMax * 1ll * l.y - l.z) / l.x, yMax) + zero, Scalar(color,0,0,0), 2 );
+   else
+     line(img, Point(xMin, (-xMin * l.x - l.z) / l.y) + zero, Point(xMax, (-xMax * 1ll * l.x - l.z) / l.y) + zero, Scalar(color,0,0,0), 2 );
 }
 
-void  testgen_lines2points_2d( string res_folder )
+void testgen_lines2points_2d( string res_folder )
 {
+  //HCoords c(1024, 512);
+  //cout << c.width << " " << c.height << " " << c.depth << endl;
+  c.depth = c.width/2;
   for ( double num_clusters_f = 1; num_clusters_f < 10; num_clusters_f *= 1.2 )
   {
-    // generate clusters
+    Mat1b res(c.height, c.width, 255 );
+    // generate clusters  
     int num_clusters = int(num_clusters_f);
-    vector< pair< pair<Point3f, Point3f>, int > > clusters; // каждый клвстер - две прямые // кластер = центр + среднеквадратичный радиус
+    vector< pair< Point3d, Point3d > > clusters; //кластер = 2 прямые 
     for (int i_cluster = 0; i_cluster < num_clusters; i_cluster++)
     {
-      pair<Point3f, Point3f> center = make_pair(gen_Line(), gen_Line());
-      clusters.push_back( make_pair( center, sigma ) ); // tmp
+      Point3d a1(rand() % c.width, rand() % c.height, c.depth);
+      Point3d a2(rand() % c.width, rand() % c.height, c.depth);
+      while (a1 == a2)
+      {
+        a2 = Point3d(rand() % c.width, rand() % c.height, c.depth);
+      }
+      Point3d b1(rand() % c.width, rand() % c.height, c.depth);
+      Point3d b2(rand() % c.width, rand() % c.height, c.depth);
+      while (b1 == b2)
+      {
+        b2 = Point3d(rand() % c.width, rand() % c.height, c.depth);
+      }
+
+      a1.x -= c.width / 2;
+      a1.y -= c.height / 2;
+      a2.x -= c.width / 2;
+      a2.y -= c.height / 2;
+      b1.x -= c.width / 2;
+      b1.y -= c.height / 2;
+      b2.x -= c.width / 2;
+      b2.y -= c.height / 2;
+      //cout << a1.x << " " << a1.y << " " << a1.z << endl;
+      //cout << a2.x << " " << a2.y << " " << a2.z << endl;
+
+      Point3d l1 = a1.cross(a2);
+      Point3d l2 = b1.cross(b2);
+      l1 = normalize(l1);
+      l2 = normalize(l2);
+      //cout << l1.x << " " << l1.y << " " << l1.z << endl;
+
+      pair<Point3d, Point3d> center = make_pair(l1, l2);
+      clusters.push_back(center);
+        
+      draw_Line(res, l1, 128);
+      draw_Line(res, l2, 128);
     }
 
     ////////// generate points around clusters
-    vector<Point3f> p;// все прямые в кластере
+    vector<Point3d> p;// все прямые в кластере
     for (int i_cluster = 0; i_cluster < num_clusters; i_cluster++)
     {
-      for (int i = 0; i < countPoints; ++i)
+      for (int i1 = 0; i1 < countLines; ++i1)
       {
-        double k = 1.0 * (rand() % 1000) / 1000.0;
-        p.push_back(gen_nearLine(clusters[i].first.first * k + clusters[i].first.second * (1.0 - k), sigma));
+        double k = 1.0 * (rand() % 1000) / 1000.0 ;
+        Point3d c = clusters[i_cluster].first * k + clusters[i_cluster].second * (1.0 - k);
+        p.push_back(gen_point_on_sphere(c, sigma));// немного сдвинутая прямая
+        //p.push_back(c);
+        //cout << c.x << " " << c.y << " " << c.z << endl;
+        //cout << p.back().x << " " << p.back().y << " " << p.back().z << endl;
+        //cout << endl;
+        draw_Line(res, p.back(), 0);
       }
     }
     random_shuffle(p.begin(), p.end());
 
     string test_name = res_folder + format( "line%.03d", num_clusters );
-    Mat1b res( yMax+1, xMax+1, 255 );
+  //  cerr << res_folder << endl;
     ofstream out((test_name + ".txt").c_str());
+    out << c.width << " " << c.height << endl;
     out << num_clusters << endl;
+
+    out.precision(6);
     for (int i=0; i<clusters.size(); i++)
     {
-      draw_Line(res, clusters[i].first);
-      out <<  clusters[i].first.a << "\t" <<  clusters[i].first.b << "\t" << clusters[i].first.c  << "\t" <<  clusters[i].second << endl;
+      //draw_Line(res, clusters[i].first);
+      //draw_Line(res, clusters[i].second);
+      out << fixed <<  clusters[i].first.x << "\t" <<  clusters[i].first.y << "\t" << clusters[i].first.z  << "\t" <<  clusters[i].second.x << "\t" << clusters[i].second.y << "\t" << clusters[i].second.z << "\t" << sigma << endl;
     }
-    out << p.size() << endl; // количество точек
+
+    out << p.size() << endl;
     for (int i = 0; i < p.size(); ++i)
     {
-      out << p[i].x << " " << p[i].y << endl;
-      //circle( res, p[i], 2, Scalar(0, 0, 0), 2); //сами точки
-      if ( p[i].y < 0 ||  p[i].x < 0 )
-        continue;
-      if ( p[i].y >= yMax ||  p[i].x >= xMax )
-        continue;
-      res[p[i].y][p[i].x] = 0;
+
+      out << fixed << p[i].x << "\t" << p[i].y << "\t" << p[i].z << endl;
     }
+    
     imwrite( test_name+".png", res );
-  }
-  
+   }  
 }
-*/

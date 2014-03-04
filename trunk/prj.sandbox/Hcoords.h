@@ -5,6 +5,16 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
+inline double length( const cv::Point3d& v ){  return sqrt(v.ddot(v)); }
+
+inline cv::Point3d& normalize( cv::Point3d& v ) // set length == 1
+{
+  double len = length(v);
+  v = (1./len)* v;
+  return v;
+}
+
+
 struct HCoords
 {
   int width, height, depth; // image bitmap size and camera angle
