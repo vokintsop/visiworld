@@ -4,15 +4,6 @@
 #include "../../cover_net.h"
 
 
-double length( const Point3d& v ){  return sqrt(v.ddot(v)); }
-
-Point3d& normalize( Point3d& v ) // set length == 1
-{
-  double len = length(v);
-  v = (1./len)* v;
-  return v;
-}
-
 struct FoundLine
 {
   Point pt1, pt2; // в координатах битмапа
