@@ -2,6 +2,8 @@ IF( MSVC )
   PROJECT( testgen )
   
   SET( SOURCES
+    ../cover_net.h
+    ../ticker.h
     ../Hcoords.h
     src/lines2points_2d.cpp
     src/points2lines_2d.cpp
