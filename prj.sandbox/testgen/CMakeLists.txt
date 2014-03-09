@@ -4,7 +4,7 @@ IF( MSVC )
   SET( SOURCES
     ../cover_net.h
     ../ticker.h
-    ../Hcoords.h
+    ../hcoords.h
     src/lines2points_2d.cpp
     src/points2lines_2d.cpp
     src/points2points_2d.cpp
