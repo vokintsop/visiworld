@@ -2,6 +2,7 @@
 #include "precomp.h"
 
 #include "../../cover_net.h"
+#include "../../hcoords.h"
 
 
 struct FoundLine
