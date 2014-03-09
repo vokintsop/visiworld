@@ -10,7 +10,7 @@ int main( int argc, char* argv[] )
   string testdata = exe + "/../../../testdata/";
   //testrun_points2points_2d( testdata + "points2points_2d/clu%03d" ,   testdata + "points2points_2d/clu%03d" );
   testrun_points2lines_2d( testdata + "points2lines_2d/line%03d" ,   testdata + "points2lines_2d/line%03d" );
-  //testrun_lines2points_2d( exe +  "/../../../testdata/lines2points_2d/" );
+  testrun_lines2points_2d( exe +  "/../../../testdata/lines2points_2d/" );
 
  
 	return 0;
