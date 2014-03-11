@@ -3,7 +3,7 @@
 #define __BUKVOED_H
 
 #include "pagedata.h"
-#include "cover_net.h"
+#include "../../cover_net.h"
 
 
 

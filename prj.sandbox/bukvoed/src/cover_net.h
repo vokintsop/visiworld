@@ -1,7 +1,8 @@
 // cover_net.h
 
-#ifndef __COVER_NET_H
-#define __COVER_NET_H
+#ifdef false
+//#ifndef __COVER_NET_H
+//#define __COVER_NET_H
 
 #include <vector>
 #include <algorithm>

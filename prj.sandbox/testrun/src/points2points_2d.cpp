@@ -1,5 +1,7 @@
 // 2d points clusters DEgenerator
 #include "precomp.h"
+//#include <iostream>
+//using namespace std;
 
 #include "../../cover_net.h"
 
@@ -91,11 +93,13 @@ void  testrun_points2points_2d( const string& input_template,  const string& out
       double best_cluster_weight = res_clusters[0].weight; // чернее -- лучше 
       for (int i=0; i< int(res_clusters.size()); i++)
       {
+        //cout << res_clusters[i].weight << " ";
         double this_cluster_weight = res_clusters[i].weight;
         int color = 255 * (1 - this_cluster_weight / best_cluster_weight );
         Point center = points[ res_clusters[i].center ];
         circle( img, center, cvRound( res_clusters[i].radius ), Scalar(color) );
       }
+      //cout << endl;
     }
 
     imshow(input_name, img);
