@@ -1,4 +1,5 @@
 // cover_net.h
+//#ifdef false
 
 #ifndef __COVER_NET_H
 #define __COVER_NET_H
@@ -171,6 +172,46 @@ public:
 
     return insertPoint( pt, 0, 0, dist_root ); // добавляем спускаясь с рута
   }
+
+  void countTrueWeight(vector<int> &result) // вычисляет для каждой сферы сколько точек она покрывает на самом деле
+  {
+    result.assign(spheres.size(), -1);
+    for (int i = 0; i < spheres.size(); ++i)
+    {
+      //result[i] = spheres[i].points;
+      result[i] = countTrueWeight_(i, getRadius(spheres[i].level), 0);
+    }
+  }
+private: int countTrueWeight_(int fromNum, double fromRad, int num) // Динамика для вычисления веса, fromNum - номер сферы, для которой считается вес, num - номер перебираемой сферы
+  {
+    int local_result = 0;
+    int level = spheres[num].level;
+    double radius = getRadius(level);
+    double dist = computeDistance(fromNum, spheres[num].center);
+  
+    if (fromRad >= dist + radius) // если сфера лежит полность внутри исходной !
+    {
+      local_result += spheres[num].points; 
+      return local_result;
+    } 
+   
+    if (fromRad + radius < dist) // если сферы вообще не пересекаются !
+    {
+      local_result = 0;
+      return local_result;
+    } 
+
+    //оставшийся случай -- сферы пересекаются но не лежат друг в друге
+    int kid = spheres[num].last_kid;// последний ребенок
+    while (kid > 0)// идем по всем детям
+    {
+      local_result += countTrueWeight_(fromNum, fromRad, kid);
+      kid = spheres[kid].prev_brother;
+    }
+
+    return local_result;
+  }
+
 
 
 
@@ -560,15 +601,17 @@ public:
 
   void  uploadSpheresByLevel( 
     int i_level, // requested level
-    vector< pair< int , int > >& proper_spheres ///<.points, index>
+    vector< pair< int , int > >& proper_spheres, vector<int> &trueWeight ///<.points, index>
     )
   {
+    
+
     for (int i=0; i < getSpheresCount(); i++)
     {
       const CoverSphere< PointType  > & s = getSphere( i );
       if (s.level != i_level) 
         continue;
-      proper_spheres.push_back( make_pair( s.points, i ) );
+      proper_spheres.push_back( make_pair( trueWeight[i], i ) );
     }
 
     sort( proper_spheres.rbegin(), proper_spheres.rend() );
@@ -584,7 +627,9 @@ public:
                      )
   {
     vector< pair< int , int > > proper_spheres; ///<points, index>
-    uploadSpheresByLevel( i_level, proper_spheres );
+    vector<int> W;
+    countTrueWeight(W);
+    uploadSpheresByLevel( i_level, proper_spheres, W);
     // upload to res_clusters
     res_clusters.clear();
 
@@ -599,9 +644,11 @@ public:
       //MyPoint center = s.center;
       //Point xycenter = points[center];
       double rad = getRadius( s.level );
-      PointsCluster<PointType> cluster( s.center, rad, s.points );
+      PointsCluster<PointType> cluster( s.center, rad, W[proper_spheres[i].second] );
+    //  cout << W[proper_spheres[i].second] << endl;;
       res_clusters.push_back( cluster );
     }
+   // cout << endl;
     return res_clusters.size();
   }
 
@@ -687,4 +734,3 @@ public:
 
 
 #endif // __COVER_NET_H
-
