@@ -4,6 +4,7 @@
 void  testgen_points2points_2d( string res_folder );
 void  testgen_points2lines_2d( string res_folder );
 void  testgen_lines2points_2d( string res_folder );
+void  testgen_points3d_line_vconst( string res_folder );
 
 
 void testGauss()
@@ -41,7 +42,7 @@ int main( int argc, char* argv[] )
   testgen_points2points_2d( exe +  "/../../../testdata/points2points_2d/" );
   testgen_points2lines_2d( exe +  "/../../../testdata/points2lines_2d/" );
   testgen_lines2points_2d( exe +  "/../../../testdata/lines2points_2d/" );
-
+  testgen_points3d_line_vconst( exe +  "/../../../testdata/points3d_line_vconst/" );
  
 	return 0;
 }
