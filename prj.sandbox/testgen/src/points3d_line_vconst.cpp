@@ -15,11 +15,11 @@ public:
   Track(cv::Point3d p1,cv::Point3d p2)
     : m_p1( p1 ), m_p2( p2 ){};
 
-  void make_uniform_motion();//равномерно
+  cv::Point3d make_uniform_motion(const int frame_count);//равномерно
+  bool predict_collision(const cv::Point3d& step);//продолжение траектории до плоскости изображения
   void print_motion(cv::Mat1b& img, ofstream& out);
 
   double length();
-
  
 private:
   cv::Point3d m_p1;
@@ -28,19 +28,25 @@ private:
 };
 
 //имитация равномерного движения
-void Track::make_uniform_motion()
+cv::Point3d Track::make_uniform_motion(const int frame_count)//количество кадров время
 {
-  const double track_length = this->length();
   const int max_points_number = 10;//количество точек на прямой не превышает этого значения
   //srand( time( 0 ) );
-  const int segm_number = (rand() % max_points_number) + 10;// [10..19]
+  const int segm_count = (rand() % max_points_number) + frame_count;// [10..19]
 
-  const cv::Point3d step( 
-    (m_p1.x - m_p2.x) / segm_number,
-    (m_p1.y - m_p2.y) / segm_number,
-    (m_p1.z - m_p2.z) / segm_number );
+  //пусть p1 ближе по оси z, чем p2
+  if (m_p1.z > m_p2.z)
+  {
+    std::swap(m_p1, m_p2);
+  }
+
+  //dS = V, т.к t = 1 
+  const cv::Point3d step( //единичный вектор направления от p2 к p1
+    (m_p1.x - m_p2.x) / segm_count,
+    (m_p1.y - m_p2.y) / segm_count,
+    (m_p1.z - m_p2.z) / segm_count ); 
   
-  for(size_t i = 0; i < segm_number + 1; i++)//точек на прямой segm_number + 1
+  for(size_t i = 0; i < frame_count; i++)//точек по количеству кадров
   {
     cv::Point3d p;
     p.x = m_p2.x + (i * step.x);
@@ -48,21 +54,44 @@ void Track::make_uniform_motion()
     p.z = m_p2.z + (i * step.z);
     m_points.push_back(p);
   }
+  return step;
 }
 
-double Track::length()
+bool Track::predict_collision(const cv::Point3d& step)//расстояние, которое успевает преодолеть объект между 2-я последовательными кадрами
+{
+  Point3d start = m_points[ m_points.size() - 1 ];//ближайшая к плоскости изображения точка траектории 
+  
+  //вычисление числа "шагов",оставшихся до плоскости изображения
+  const int count_steps = static_cast< int >(abs(F - start.z) / step.z);
+  cv::Point3d finish = start + count_steps * step;//точка перед плоскостью изображения,по ней делаем вывод - есть столкновение или нет
+
+  //пересчет в координаты изображения
+  cv::Point p;
+  p.x = -1 * (F * finish.x / finish.z) + img_height / 2;// 256 = img_height / 2
+  p.y = F * finish.y / finish.z + img_width / 2;// 512 = img_width / 2
+
+  if( (0 <= p.x) && (p.x <= img_height) && (0 <= p.y) && (p.y <= img_width) )//если последняя точка предполагаемой траектории проецируется внутрь изображения
+  {
+    return true;//есть столкновение
+  }
+  return false;//нет столкновения
+}
+
+/*double Track::length()
 {
   return sqrt(
     (m_p1.x - m_p2.x)*(m_p1.x - m_p2.x) + 
     (m_p1.y - m_p2.y)*(m_p1.y - m_p2.y) +
     (m_p1.z - m_p2.z)*(m_p1.z - m_p2.z) );
-}
+}*/
 
 static Scalar randomColor( RNG& rng )
 {
   int icolor = (unsigned) rng;
   return Scalar( icolor&255, (icolor>>8)&255, (icolor>>16)&255 );
 }
+
+
 
 void Track::print_motion(cv::Mat1b& img, ofstream& out)
  {
@@ -74,15 +103,15 @@ void Track::print_motion(cv::Mat1b& img, ofstream& out)
      img_points[i].y = F * m_points[i].y / m_points[i].z + 512;
 
      out << img_points[i].x << " " << img_points[i].y << " "
-       << m_points[i].x << " " << m_points[i].y << " " << m_points[i].z << endl;
+       << m_points[i].x << " " << m_points[i].y << " " << m_points[i].z << " " << i << endl;
    }
-   cv::Point p1( ( F * m_points[0].y / m_points[0].z ) + 512,
-     -1 * ( F * m_points[0].x / m_points[0].z ) + 256);
+   cv::Point p1( ( F * m_p1.y / m_p1.z ) + 512,
+     -1 * ( F * m_p1.x / m_p1.z ) + 256);
    
    const int index = img_points.size() - 1;
-   cv::Point p2( ( F * m_points[index].y / m_points[index].z ) + 512,
-     -1 * ( F * m_points[index].x / m_points[index].z ) + 256);
-
+   cv::Point p2( ( F * m_p2.y / m_p2.z ) + 512,
+     -1 * ( F * m_p2.x / m_p2.z ) + 256);
+  
    cv::line( img, p1, p2, randomColor(rng), 2 );
    //со смещением 
    for(size_t i = 0; i < img_points.size(); i++)
@@ -176,27 +205,34 @@ Track gen_track_inside_pyramid( const std::vector<Point3d>& pyr )
     p2 = gen_point_inside(edges);
   }
 
-
   return  Track(p1, p2);//начало и конец траектории
 }
 
+//Вывод в файл:
+//1с) # прямых 
+//2с) номер прямой_{1 = есть столкновение, 0 = нет) 
+//3с) координата по высоте_координата по ширине (на изображении)_3D координаты_t 
+//повтор 2) и 3) по количеству прямых 
 void testgen_points3d_line_vconst( string res_folder )
 {  
-  const int dist = 3 * img_width;//расстояние от плоскости изображения до плоскости, огр пирамиду
+  const int dist = 3 * img_width;//расстояние от плоскости изображения до плоскости, ограничивающей пирамиду
   std::vector< cv::Point3d > pyramid(8,0);
   building_pyramid(pyramid, dist);//пирамида из точек реального мира, которые окажутся при проектировании на плоскости изображения
  
   const int max_img_count = 10;
-  for(size_t i = 0; i < max_img_count; i++)
+  for(size_t i = 0; i < max_img_count; i++)//по количеству рисунков
   {
     Mat1b res( img_height+1, img_width+1, 255 );
     string test_name = res_folder + format( "line%.03d", i+1 );
     ofstream out((test_name + ".txt").c_str());
-    out << i+1 << endl;//количество прямых
-    for(size_t j = 0; j < i+1; j++)
+    out << i+1  << endl;//количество прямых -> в файл
+    const int frame_count = rand() % 10 + 5;
+    for(size_t j = 0; j < i+1; j++)//по количеству прямых на рисунке
     {
       Track tr = gen_track_inside_pyramid(pyramid);//генерация прямой внутри пирамиды без верхушки
-      tr.make_uniform_motion();//считаем движение равномерным(линия разбивается равномерными отрезками) 
+      cv::Point3d step = tr.make_uniform_motion(frame_count);//считаем движение равномерным(линия разбивается равномерными отрезками)
+      bool collision_will_happen = tr.predict_collision(step);
+      out << j+1 << " " << collision_will_happen << endl ;//какая по счету прямая в файле и случится ли столкновение
       tr.print_motion(res, out);
     }
     imwrite( test_name+".png", res );
