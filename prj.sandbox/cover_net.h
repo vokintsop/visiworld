@@ -173,7 +173,7 @@ public:
     return insertPoint( pt, 0, 0, dist_root ); // добавляем спускаясь с рута
   }
 
-  void countTrueWeight(vector<int> &result) // вычисляет для каждой сферы сколько точек она покрывает на самом деле
+  void countTrueWeight(std::vector<int> &result) // вычисляет для каждой сферы сколько точек она покрывает на самом деле
   {
     result.assign(spheres.size(), -1);
     for (int i = 0; i < spheres.size(); ++i)
@@ -601,7 +601,7 @@ public:
 
   void  uploadSpheresByLevel( 
     int i_level, // requested level
-    vector< pair< int , int > >& proper_spheres, vector<int> &trueWeight ///<.points, index>
+    std::vector< std::pair< int , int > >& proper_spheres, std::vector<int> &trueWeight ///<.points, index>
     )
   {
     
@@ -621,7 +621,7 @@ public:
     //vector< PointType >&  points, // есть набор точек
     //???? int sigma, // будем считать что разброс изестен, кластеры круглые
     int   i_level, // использовать сферы указанного уровня
-    vector< PointsCluster< PointType> >& res_clusters, // надо построить кластеры { center, points } // { center, sigma }
+    std::vector< PointsCluster< PointType> >& res_clusters, // надо построить кластеры { center, points } // { center, sigma }
     int   minPoints = 3,  // кластер должен содержать не меньше указанного кол-ва точек
     int   maxClusters = 100 // but not more than maxClustersCount
                      )
