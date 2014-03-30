@@ -88,9 +88,9 @@ public:
     string s1 = (*samples1)[i1];
     string s2 = (*samples2)[i2];
     vector<vector<int> > dp(s1.length() + 1, vector<int> (s2.length() + 1, 0));
-    for (int i = 1; i <= s1.length(); ++i)
+    for (int i = 1; i <= (int)s1.length(); ++i)
     {
-      for (int i1 = 1; i1 <= s2.length(); ++i1)
+      for (int i1 = 1; i1 <= (int)s2.length(); ++i1)
       {
         if (s1[i - 1] == s2[i1 - 1])
           dp[i][i1] = dp[i - 1][i1 - 1] + 1;

@@ -75,7 +75,7 @@ int Bukvoed::addPage( const char* page_file, Rect roi )
 
     }
 
-    double ms = t.msecs();
+    double ms = (double)t.msecs();
     cout << "MetrCC metrics (simple L1):" << endl;
     cvnet.reportStatistics( 0, 3 ); 
     cout << "Build time = " << ms/1000 << " seconds" << endl;
@@ -109,7 +109,7 @@ void Bukvoed::makeIndex()
   sort( index.rbegin(), index.rend() );
   //////////////////
   int level=100;
-  for (int i=0; i<index.size(); i++)
+  for (int i=0; i<(int)index.size(); i++)
   {
     if (index[i].first.first < level)
     {
@@ -136,7 +136,7 @@ int Bukvoed::browse()
     resize( draw_bin, draw_bin, Size(), ratio, ratio, INTER_AREA );
     resize( draw_src, draw_src, Size(), ratio, ratio, INTER_AREA );
     resize( draw_dil, draw_dil, Size(), ratio, ratio, INTER_AREA );
-    for (int iCC =0; iCC<pd.cc.size(); iCC++)
+    for (int iCC =0; iCC<(int)pd.cc.size(); iCC++)
     {
       CCData& ccd = pd.cc[iCC];
 #if 0

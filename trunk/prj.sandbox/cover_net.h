@@ -176,7 +176,7 @@ public:
   void countTrueWeight(std::vector<int> &result) // вычисляет для каждой сферы сколько точек она покрывает на самом деле
   {
     result.assign(spheres.size(), -1);
-    for (int i = 0; i < spheres.size(); ++i)
+    for (int i = 0; i < (int)spheres.size(); ++i)
     {
       //result[i] = spheres[i].points;
       result[i] = countTrueWeight_(i, getRadius(spheres[i].level), 0);

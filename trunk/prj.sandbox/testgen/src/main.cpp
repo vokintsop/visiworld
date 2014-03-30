@@ -21,7 +21,7 @@ void testGauss()
   vector<int> X(xMax, 0);
   for(int i = 0; i < 50000; ++i)
   {
-     int x = Gauss_(xMax / 2, _sigma);
+     int x = (int)Gauss_(xMax / 2, _sigma);
      if (x >= 0 && x < xMax)
      {
       X[x] += 1;

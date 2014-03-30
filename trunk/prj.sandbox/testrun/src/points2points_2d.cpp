@@ -95,7 +95,7 @@ void  testrun_points2points_2d( const string& input_template,  const string& out
       {
         //cout << res_clusters[i].weight << " ";
         double this_cluster_weight = res_clusters[i].weight;
-        int color = 255 * (1 - this_cluster_weight / best_cluster_weight );
+        int color = (int)(255 * (1 - this_cluster_weight / best_cluster_weight ));
         Point center = points[ res_clusters[i].center ];
         circle( img, center, cvRound( res_clusters[i].radius ), Scalar(color) );
       }

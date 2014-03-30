@@ -96,7 +96,7 @@ bool write_samples( string &imgfile, string &labelfile, vector<pair<char, Mat> >
 	out.write(reinterpret_cast<char*>(&cols), sizeof(cols));
   //SAMPLE_WIDTH = cols;
 
-	for (int i = 0; i < samples.size(); ++i)
+	for (int i = 0; i < (int)samples.size(); ++i)
 	{
     Mat1b mymat = samples[i].second;
     resize(samples[i].second, mymat, Size(21, 32));
