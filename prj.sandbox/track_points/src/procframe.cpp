@@ -18,14 +18,14 @@ preprocess_frame( Mat& img )
   const double TRUNCATE_TOP = 0.22;
   const double TRUNCATE_HEIGHT = 1 - TRUNCATE_TOP - 0.15;
 
-  int yy = img.rows * TRUNCATE_TOP; // желаемый старт сверху
-  int hh = img.rows * TRUNCATE_HEIGHT; // желаемая высота
+  int yy = (int)(img.rows * TRUNCATE_TOP); // желаемый старт сверху
+  int hh = (int)(img.rows * TRUNCATE_HEIGHT); // желаемая высота
 
   const double TRUNCATE_LEFT = 0.2;
   const double TRUNCATE_WIDTH = 1 - 2*TRUNCATE_LEFT;
 
-  int xx = img.cols * TRUNCATE_LEFT; // желаемый старт слева
-  int ww = img.cols * TRUNCATE_WIDTH; // желаемая ширина
+  int xx = (int)(img.cols * TRUNCATE_LEFT); // желаемый старт слева
+  int ww = (int)(img.cols * TRUNCATE_WIDTH); // желаемая ширина
 
   //Rect roi( 0, yy, img.cols, min( hh, img.rows-yy ) ); ////// <<< danger
   Rect roi( xx, yy, min( ww, img.cols-xx ), min( hh, img.rows-yy ) ); ////// <<< danger

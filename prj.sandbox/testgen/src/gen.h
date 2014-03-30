@@ -19,8 +19,8 @@ inline cv::Point gen_point(cv::Point c, double R)
 //  генерирует числа в окружности с мат ожиданием центр и радиусом в точке
 {
    cv::Point ans;
-   ans.x = Gauss_(c.x, R);
-   ans.y = Gauss_(c.y, R);
+   ans.x = (int)Gauss_(c.x, R);
+   ans.y = (int)Gauss_(c.y, R);
 
    return ans;
 }

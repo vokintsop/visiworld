@@ -15,13 +15,13 @@ void draw_Line(Mat &img, Point3d l, int color)
   double xMax = c.width / 2;
   double yMin = -c.height / 2;
   double yMax = c.height/ 2;
-  Point zero(xMax, yMax);
+  Point zero((int)xMax, (int)yMax);
   l.z *= c.depth;
   //cout << l.x << " " << l.y << " " << l.z << endl;
    if (abs(l.x) > abs(l.y))
-     line(img, Point((-yMin * l.y - l.z) / l.x, yMin) + zero, Point((-yMax * 1ll * l.y - l.z) / l.x, yMax) + zero, Scalar(color,0,0,0), 2 );
+     line(img, Point((int)((-yMin * l.y - l.z) / l.x), (int)yMin) + zero, Point((int)((-yMax * 1ll * l.y - l.z) / l.x),(int) yMax) + zero, Scalar(color,0,0,0), 2 );
    else
-     line(img, Point(xMin, (-xMin * l.x - l.z) / l.y) + zero, Point(xMax, (-xMax * 1ll * l.x - l.z) / l.y) + zero, Scalar(color,0,0,0), 2 );
+     line(img, Point((int)xMin, (int)((-xMin * l.x - l.z) / l.y)) + zero, Point((int)xMax, (int)((-xMax * 1ll * l.x - l.z) / l.y)) + zero, Scalar(color,0,0,0), 2 );
 }
 
 void testgen_lines2points_2d( string res_folder )

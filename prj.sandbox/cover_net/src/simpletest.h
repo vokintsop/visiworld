@@ -111,9 +111,9 @@ line result(std::vector<pt> L) // возвращает оптимальную прямую по вектору точек
   angleMetr rule;
   CoverNet<line, angleMetr> cvnet(&rule, 1e5, 1);
   
-  for (int i = 0; i < L.size(); ++i)
+  for (int i = 0; i < (int)L.size(); ++i)
   {
-    for (int i1 = i + 1; i1 < L.size(); ++i1)
+    for (int i1 = i + 1; i1 < (int)L.size(); ++i1)
     {
       line l(L[i], L[i1]);
       cvnet.insert(l);
@@ -135,7 +135,7 @@ void draw_line (cv::Mat &img, line l, cv:: Scalar &color)
   to.x = size_;
   to.y = (-to.x * l.a - l.c) / l.b;
 
-  cv::line(img,cv::Point(from.x + img_size, from.y + img_size), cv::Point(to.x + img_size, to.y + img_size), color, 3);
+  cv::line(img,cv::Point((int)(from.x + img_size), (int)(from.y + img_size)), cv::Point((int)(to.x + img_size), (int)(to.y + img_size)), color, 3);
 }
 
 void console_test()
@@ -145,7 +145,7 @@ void console_test()
   
   time_t t;
   time(&t);
-  srand(t);
+  srand((unsigned int)t);
   line L = gen_line();
   draw_line(img, L, cv::Scalar(255, 0, 0));
   std::cout << "generate line: " << L.a <<" * x + " << L.b << " * y + " << L.c << std::endl;
@@ -162,7 +162,7 @@ void console_test()
     p = add_rand(p);
     std::cout << "points[" << i << "] = (" <<p.x + img_size << "; " << p.y + + img_size << ")" << std::endl;
    // system ("pause");
-    cv:: circle(img, cv::Point(p.x + img_size, p.y + img_size), 3, cv::Scalar(0, 255, 0), 4);
+    cv:: circle(img, cv::Point((int)(p.x + img_size), (int)(p.y + img_size)), 3, cv::Scalar(0, 255, 0), 4);
   
     points[i] = p;
   }

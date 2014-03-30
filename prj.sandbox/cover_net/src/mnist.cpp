@@ -49,7 +49,7 @@ static bool _read_samples( string data, // images
 
 static void _invert_samples( vector< pair< int, cv::Mat > >& smp )
 {
-  for (int i=0; i<smp.size(); i++)
+  for (int i=0; i<(int)smp.size(); i++)
   {
     Mat& m = smp[i].second;
     for (int r=0; r<m.rows; r++)
@@ -412,7 +412,7 @@ void explore_cover_tree()
           cvnet1.insert( i );
         }
       }
-      double ms = t.msecs();
+      double ms = (double)t.msecs();
       cout << "\nHamming metrics (simple L1):" << endl;
       cvnet1.reportStatistics( 0, 3 ); 
       cout << "Build time = " << ms/1000 << " seconds" << endl;
@@ -428,7 +428,7 @@ void explore_cover_tree()
           cvnet2.insert( i );
         }
       }
-      double ms = t.msecs();
+      double ms = (double)t.msecs();
       cout << "\nA vs dilate(B) + B vs dilate(A) metrics (L1):" << endl;
       cvnet2.reportStatistics( 0, 3 ); 
       cout << "Build time = " << ms/1000 << " seconds" << endl;

@@ -58,9 +58,9 @@ struct HCoords
       h1.x = -width/2.; h1.y = (CC - A*h1.x) / B;
       h2.x =  width/2.; h2.y = (CC - A*h2.x) / B;
     }
-    pt1.x = h1.x + width/2; 
-    pt2.x = h2.x + width/2; 
-    pt1.y = h1.y + height/2; 
-    pt2.y = h2.y + height/2; 
+    pt1.x = (int)(h1.x + width/2); 
+    pt2.x = (int)(h2.x + width/2); 
+    pt1.y = (int)(h1.y + height/2); 
+    pt2.y = (int)(h2.y + height/2); 
   }
 };

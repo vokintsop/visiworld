@@ -45,12 +45,12 @@ Point gen_point_on_Line(Line &l) //генерирует случайную точку на прямой
     if (abs(l.a) > abs(l.b))
     {
       res.y = rand() % yMax;
-      res.x = ((long long)-res.y * l.b - l.c) / l.a;
+      res.x = (int)(((long long)-res.y * l.b - l.c) / l.a);
     }
     else
     {
       res.x = rand() % xMax;
-      res.y = ((long long)-res.x * l.a - l.c) / l.b;
+      res.y = (int)(((long long)-res.x * l.a - l.c) / l.b);
     }
     if (res.x >= 0 && res.x < xMax && res.y >= 0 && res.y < yMax)
       return res;
@@ -60,9 +60,9 @@ Point gen_point_on_Line(Line &l) //генерирует случайную точку на прямой
 void draw_Line(Mat &img, Line &l)
 {
    if (abs(l.a) > abs(l.b))
-     line(img, Point((-0ll * l.b - l.c) / l.a, 0), Point((-yMax * 1ll * l.b - l.c) / l.a, yMax), Scalar(128,0,0,0), 2 );
+     line(img, Point((int)((-0ll * l.b - l.c) / l.a), 0), Point((int)((-yMax * 1ll * l.b - l.c) / l.a), yMax), Scalar(128,0,0,0), 2 );
    else
-     line(img, Point(0, (-0ll * l.a - l.c) / l.b), Point(xMax, (-xMax * 1ll * l.a - l.c) / l.b), Scalar(128,0,0,0), 2 );
+     line(img, Point(0, (int)((-0ll * l.a - l.c) / l.b)), Point((int)xMax,(int)( (-xMax * 1ll * l.a - l.c) / l.b)), Scalar(128,0,0,0), 2 );
 }
 
 void  testgen_points2lines_2d( string res_folder )
@@ -93,13 +93,13 @@ void  testgen_points2lines_2d( string res_folder )
     Mat1b res( yMax+1, xMax+1, 255 );
     ofstream out((test_name + ".txt").c_str());
     out << num_clusters << endl;
-    for (int i=0; i<clusters.size(); i++)
+    for (int i=0; i<(int)clusters.size(); i++)
     {
       draw_Line(res, clusters[i].first);
       out <<  clusters[i].first.a << "\t" <<  clusters[i].first.b << "\t" << clusters[i].first.c  << "\t" <<  clusters[i].second << endl;
     }
     out << p.size() << endl; // количество точек
-    for (int i = 0; i < p.size(); ++i)
+    for (int i = 0; i < (int)p.size(); ++i)
     {
       out << p[i].x << " " << p[i].y << endl;
       //circle( res, p[i], 2, Scalar(0, 0, 0), 2); //сами точки
