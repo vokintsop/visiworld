@@ -21,7 +21,7 @@
 
 #include <cassert>
 
-#include "cover_net.h"
+
 #include "imagerecord.h"
 
 using namespace std;
@@ -48,24 +48,6 @@ int main( int argc, char* argv[] )
   return 0;
 }
 
-bool read_image_records( string& root, vector< ImageRecord >& image_records )
-{
-  // todo: fill image_records[] inputs
-  return true;
-}
-
-void ImageRecord::explore()
-{
-
-  ////Metr1 ruler;  CoverTree< int, Metr1 > tree( &ruler, 1000, 1 );
-  //Metr2 ruler;  CoverTree< int, Metr2 > tree( &ruler, 1000, 1 );
-
-  //for (int i=0; i< int( samples.size() ); i++)
-  //  tree.insert( i );
-
-  //tree.reportStatistics( 0, 3 ); 
-
-}
 
 
 //
