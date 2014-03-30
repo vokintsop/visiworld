@@ -463,13 +463,13 @@ void explore_cover_tree()
       int kNeighbours = 1; ///  ==> 2.81% error rate, ??> 159 символов в сек <?? 782 расстояния
 #else
       // 1250 err on mrz, 
-      int kNeighbours = 1; // ==> 2.81% error rate, 387 символ в сек, 782 расстояние на точку
+      //int kNeighbours = 1; // ==> 2.81% error rate, 387 символ в сек, 782 расстояние на точку
       //int kNeighbours = 2; // ==> 2.72% error rate, 351 символ в сек, 861 расстояние на точку
       //int kNeighbours = 4; // ==> 2.34% error rate, 301 символ в сек
       //int kNeighbours = 6; // ==> 2.29% error rate, 272 символ в сек, 1041 расстояние на точку
       //int kNeighbours = 7; // ==> 2.28% error rate, 260 символ в сек, 1175 расстояние на точку
       //1250
-      //int kNeighbours = 8; // ==> 2.22% error rate, 250 символ в сек, 1105 расстояние на точку
+      int kNeighbours = 8; // ==> 2.22% error rate, 250 символ в сек, 1105 расстояние на точку
       //int kNeighbours = 9; // ==> 2.24% error rate, 240 символ в сек, 1135 расстояние на точку
       //int kNeighbours = 10; // ==> 2.24% error rate, 232 символ в сек, 1162 расстояние на точку
       //int kNeighbours = 16; // ==> 2.44% error rate, 198 символ в сек, 1302 расстояние на точку
@@ -592,13 +592,13 @@ int explore_mnist( int argc, char* argv[] )
   return 0;
 #endif
 
-#if 0 // mnist 
+#if 1 // mnist 
   string exe = argv[0];
   string mnist_folder = exe + "/../../../testdata/mnist";
 	read_samples(mnist_folder);
 #endif
 
-#if 1 // mrz 
+#if 0 // mrz 
   string exe = argv[0];
   string mrz_folder = ""; //exe + "/../../../testdata/mnist";
 	read_mrz_samples(mrz_folder);
