@@ -9,7 +9,7 @@ double sigma = 0.01;
 
 HCoords c(1024, 512);
 
-void draw_Line(Mat &img, Point3d l, int color)
+void draw_Line(Mat &img, Point3d l, Scalar color)
 {
   double xMin = -c.width / 2;
   double xMax = c.width / 2;
@@ -19,9 +19,9 @@ void draw_Line(Mat &img, Point3d l, int color)
   l.z *= c.depth;
   //cout << l.x << " " << l.y << " " << l.z << endl;
    if (abs(l.x) > abs(l.y))
-     line(img, Point((int)((-yMin * l.y - l.z) / l.x), (int)yMin) + zero, Point((int)((-yMax * 1ll * l.y - l.z) / l.x),(int) yMax) + zero, Scalar(color,0,0,0), 2 );
+     line(img, Point((int)((-yMin * l.y - l.z) / l.x), (int)yMin) + zero, Point((int)((-yMax * 1ll * l.y - l.z) / l.x),(int) yMax) + zero, color, 2 );
    else
-     line(img, Point((int)xMin, (int)((-xMin * l.x - l.z) / l.y)) + zero, Point((int)xMax, (int)((-xMax * 1ll * l.x - l.z) / l.y)) + zero, Scalar(color,0,0,0), 2 );
+     line(img, Point((int)xMin, (int)((-xMin * l.x - l.z) / l.y)) + zero, Point((int)xMax, (int)((-xMax * 1ll * l.x - l.z) / l.y)) + zero, color, 2 );
 }
 
 void testgen_lines2points_2d( string res_folder )
@@ -31,7 +31,7 @@ void testgen_lines2points_2d( string res_folder )
   c.depth = c.width/2;
   for ( double num_clusters_f = 1; num_clusters_f < 10; num_clusters_f *= 1.2 )
   {
-    Mat1b res(c.height, c.width, 255 );
+    Mat3b res(c.height, c.width, Vec3b(255, 255, 255) );
     // generate clusters  
     int num_clusters = int(num_clusters_f);
     vector< pair< Point3d, Point3d > > clusters; //кластер = 2 прямые 
@@ -70,14 +70,15 @@ void testgen_lines2points_2d( string res_folder )
       pair<Point3d, Point3d> center = make_pair(l1, l2);
       clusters.push_back(center);
         
-      draw_Line(res, l1, 128);
-      draw_Line(res, l2, 128);
+      draw_Line(res, l1, 0);
+      draw_Line(res, l2, 0);
     }
 
     ////////// generate points around clusters
     vector<Point3d> p;// все прямые в кластере
     for (int i_cluster = 0; i_cluster < num_clusters; i_cluster++)
     {
+      Scalar color = Scalar(rand() % 256, rand() % 256, rand() % 256) ;
       for (int i1 = 0; i1 < countLines; ++i1)
       {
         double k = 1.0 * (rand() % 1000) / 1000.0 ;
@@ -87,7 +88,7 @@ void testgen_lines2points_2d( string res_folder )
         //cout << c.x << " " << c.y << " " << c.z << endl;
         //cout << p.back().x << " " << p.back().y << " " << p.back().z << endl;
         //cout << endl;
-        draw_Line(res, p.back(), 0);
+        draw_Line(res, p.back(), color);
       }
     }
     random_shuffle(p.begin(), p.end());
