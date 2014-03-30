@@ -2,14 +2,13 @@ IF( MSVC )
   PROJECT( cover_net )
   
   SET( SOURCES
-    src/cover_net.h
+    ../cover_net.h
     src/ticker.h
     src/main.cpp 
     src/mnist.cpp 
     src/words.cpp 
     src/test.h
 
-    src/cover_net2.h
     src/graph.h
     src/simpletest.h
     )
