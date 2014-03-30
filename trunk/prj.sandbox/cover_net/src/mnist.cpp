@@ -250,10 +250,12 @@ bool _read_samples( string patterns, // images
 
     //if (label==0)
     //  continue;
-
+#if 0
     Mat1b mm = normalize( mymat );//доворачиваем? нормализуем
 		samples.push_back(make_pair(label, mm));
-
+#else
+		samples.push_back(make_pair(label, mymat));
+#endif
 
 	}
   cout << endl << samples.size() << " samples read from " << patterns << endl;
