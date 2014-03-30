@@ -46,7 +46,7 @@ cv::Point3d Track::make_uniform_motion(const int frame_count)//количество кадров
     (m_p1.y - m_p2.y) / segm_count,
     (m_p1.z - m_p2.z) / segm_count ); 
   
-  for(size_t i = 0; i < frame_count; i++)//точек по количеству кадров
+  for(size_t i = 0; i < (int)frame_count; i++)//точек по количеству кадров
   {
     cv::Point3d p;
     p.x = m_p2.x + (i * step.x);
