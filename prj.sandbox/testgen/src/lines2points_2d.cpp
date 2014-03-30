@@ -5,7 +5,7 @@
 
 
 const int countLines = 10;
-double sigma = 0.1;
+double sigma = 0.01;
 
 HCoords c(1024, 512);
 
