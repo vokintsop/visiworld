@@ -72,13 +72,49 @@ public:
   }
 };
 
-void test_Metr1Str( int start =0, int step = 1 )
+class Metr2Str // наибольшая общая подпослеловательность
+{
+public:
+  long long counter;
+
+  vector< string > *samples1, *samples2;
+  Metr2Str() : samples1(0),samples2(0), counter(0) {};
+
+  double computeDistance( const int& i1,  const int& i2 )  // индексы к samples[]
+  {
+    counter++;
+
+    double dst=0;
+    string s1 = (*samples1)[i1];
+    string s2 = (*samples2)[i2];
+    vector<vector<int> > dp(s1.length() + 1, vector<int> (s2.length() + 1, 0));
+    for (int i = 1; i <= s1.length(); ++i)
+    {
+      for (int i1 = 1; i1 <= s2.length(); ++i1)
+      {
+        if (s1[i - 1] == s2[i1 - 1])
+          dp[i][i1] = dp[i - 1][i1 - 1] + 1;
+        dp[i][i1] = max(dp[i][i1], max(dp[i - 1][i1], dp[i][i1 - 1]));
+      }
+    }
+    return s1.length() + s2.length() - 2 * dp[s1.length()][s2.length()];
+  }
+};
+//#define metr1
+void test_MetrStr( int start =0, int step = 1 )
 {
   Ticker t;
+#ifdef metr1
   Metr1Str ruler1;
   ruler1.samples1 = &samples;
   ruler1.samples2 = &samples;
   CoverNet< int, Metr1Str > cvnet1( &ruler1, 300, 1 );
+#else
+  Metr2Str ruler1;
+  ruler1.samples1 = &samples;
+  ruler1.samples2 = &samples;
+  CoverNet< int, Metr2Str > cvnet1( &ruler1, 300, 1 );
+#endif
 
   for (int i=start; i< int( samples.size() ); i+= step)
     cvnet1.insert( i );
@@ -140,11 +176,11 @@ int explore_words( int argc, char* argv[] )
 #endif
   cout << "======== Shuffled list of words:" << endl;
   std::random_shuffle(samples.begin(), samples.end());
-  test_Metr1Str(0,1);
+  test_MetrStr(0,1);
   cout << "======== Odd half list of words:" << endl;
-  test_Metr1Str(1,2);
+  test_MetrStr(1,2);
   cout << "======== Even half list of words:" << endl;
-  test_Metr1Str(0,2);
+  test_MetrStr(0,2);
 
 
   return 0;

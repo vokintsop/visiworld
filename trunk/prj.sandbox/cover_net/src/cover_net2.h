@@ -417,7 +417,7 @@ public:
        best_kth_distance = dist;
 	  }
 
-	  const int MAX_KIDS_SIZE = 1000;
+	  const int MAX_KIDS_SIZE = 2000;
 	  pair<double, int> kids[MAX_KIDS_SIZE];
 
 	  if (spheres[isp].last_kid == 0) // лист
