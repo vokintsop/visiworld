@@ -8,12 +8,16 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
+#include "../../Hcoords.h"
+
 class ImageRecord // результаты по картинке 
 {
 public:
+  ImageRecord(): hcoords(640, 480), how_to_use(0) {};
   // входные данные 
   std::string name; // полное (от корн€) им€ картинки, без расширени€, например, "//testdata/yorkurbandb/P1020171/P1020171"
-  int camera_foo; // что то про камеру
+  /// ???? int camera_foo; // что то про камеру
+  HCoords hcoords; // конвертер координат камеры
 
   // рабочие данные по текущей картинке: 
   std::vector< std::pair< cv::Point, cv::Point > > segments; // отрезки, выделенные на текущем изображении
