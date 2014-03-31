@@ -13,11 +13,16 @@
 class ImageRecord // результаты по картинке 
 {
 public:
-  ImageRecord(): hcoords(640, 480), how_to_use(0) {};
+  ImageRecord(): hcoords(640, 480), how_to_use(0), sigma(0) {};
   // входные данные 
   std::string name; // полное (от корня) имя картинки, без расширения, например, "//testdata/yorkurbandb/P1020171/P1020171"
   /// ???? int camera_foo; // что то про камеру
   HCoords hcoords; // конвертер координат камеры
+
+  // ground truth
+  cv::Point3d truth[3]; // правильные значения точек схода
+  cv::Point3d truth_ort[3]; // ортогонализированные правильные значения точек схода
+  double sigma;
 
   // рабочие данные по текущей картинке: 
   std::vector< std::pair< cv::Point, cv::Point > > segments; // отрезки, выделенные на текущем изображении
