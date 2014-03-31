@@ -69,6 +69,15 @@ bool read_image_records( std::string& root, std::vector< ImageRecord >& image_re
     }
   }
 
+  // read cameraParameters.txt
+  // ...
+  //int depth = focal_length / ...
+  // ...
+  int width  = 640; // todo - read,initialize in pixels
+  int height = 480; // todo - read,initialize in pixels
+  int depth  = 0; // ????????? todo - read,initialize in pixels
+  HCoords hcoords( width, height, depth ); // все в пикселях
+
 
   vector<int> flags(dirs.size());
   AddValues(flags, test, 0);
@@ -82,6 +91,7 @@ bool read_image_records( std::string& root, std::vector< ImageRecord >& image_re
       return false;
     ImageRecord cur;
     cur.how_to_use = flags[i];
+    cur.hcoords = hcoords;
     while (ifile) {
       int x1 = 0, y1 = 0, x2 = 0, y2 = 0, vp = 0;
       ifile >> x1 >> y1 >> x2 >> y2 >> vp;
