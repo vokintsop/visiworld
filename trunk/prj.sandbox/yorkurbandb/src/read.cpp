@@ -16,8 +16,9 @@ bool read_image_records( std::string& root, std::vector< ImageRecord >& image_re
 {
   // todo: fill image_records[] inputs
 
-  string fnames_file = root + "/Manhattan_Image_DB_Names.txt";
-  string train_test_idxs_file = root + "/ECCV_TrainingAndTestImageNumbers.txt";
+  const string fnames_file = root + "/Manhattan_Image_DB_Names.txt";
+  const string train_test_idxs_file = root + "/ECCV_TrainingAndTestImageNumbers.txt";
+  const string cam_param_file = root + "/cameraParameters.txt";
 
   vector<string> dirs;
   {
@@ -69,13 +70,21 @@ bool read_image_records( std::string& root, std::vector< ImageRecord >& image_re
     }
   }
 
-  // read cameraParameters.txt
-  // ...
-  //int depth = focal_length / ...
-  // ...
+  double flen_mm = 0.0;
+  double pixsize = 0.0;
+
+  {
+    ifstream ifile(cam_param_file.c_str());
+    string flen, psize, tmp0, tmp1;
+    ifile >> tmp0 >> flen >> tmp1 >> psize;
+    flen_mm = atof(flen.c_str());
+    pixsize = atof(psize.c_str());
+    ifile.close();
+  }
+
   int width  = 640; // todo - read,initialize in pixels
   int height = 480; // todo - read,initialize in pixels
-  int depth  = 0; // ????????? todo - read,initialize in pixels
+  int depth  = (flen_mm / pixsize) + 0.5; // ????????? todo - read,initialize in pixels
   HCoords hcoords( width, height, depth ); // все в пикселях
 
 
