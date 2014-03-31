@@ -100,7 +100,7 @@ public:
     return s1.length() + s2.length() - 2 * dp[s1.length()][s2.length()];
   }
 };
-//#define metr1
+#define metr1
 void test_MetrStr( int start =0, int step = 1 )
 {
   Ticker t;
