@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <cassert>
 #include <queue>
+#include <iomanip>
 
 #define COVER_NET_VERBOSE
 //#define COVER_NET_VERBOSE_DETAILED

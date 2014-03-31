@@ -17,10 +17,12 @@ public:
 
   // рабочие данные по текущей картинке: 
   std::vector< std::pair< cv::Point, cv::Point > > segments; // отрезки, выделенные на текущем изображении
-  std::vector< cv::Point3f > lines; // отрезки, преобразованные к линиям (с учетом параметров камеры)
-  std::vector< cv::Point3f > vanish_points; // точки схода (с учетом параметров камеры)
+  std::vector< cv::Point3d > lines; // отрезки, преобразованные к линиям (с учетом параметров камеры)
+  std::vector< cv::Point3d > vanish_points; // точки схода (с учетом параметров камеры)
   void explore();
   
+  int how_to_use; // 0 - test, 1 - train, 2+ - reserved 
+
   // на выход
   int results_bee; // результаты обработки картинки для подсчета статистики
 };

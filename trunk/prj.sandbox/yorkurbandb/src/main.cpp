@@ -28,14 +28,11 @@ using namespace std;
 using namespace cv;
 
 
-
-
-
 int main( int argc, char* argv[] )
 {
   string exe  = argv[0];
   //string folder = exe + "/../../../testdata/yorkurbandb";
-  string folder = "//testdata/yorkurbandb";
+  string folder = "d:/_visiroad/yudb_txt";
   vector< ImageRecord > image_records; // данные по картинкам
   if (!read_image_records( folder, image_records ) || image_records.size() < 1 )
     return -1;
