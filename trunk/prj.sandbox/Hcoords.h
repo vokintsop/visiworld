@@ -28,26 +28,26 @@ struct HCoords
       depth = width/2; // предположим, что 90 градусов по горизонтали
   }
 
-  Point3d convert( // << результат = нормализованный вектор
-  const Point& p // на входе точка в исходных координатах изображения
+  cv::Point3d convert( // << результат = нормализованный вектор
+  const cv::Point& p // на входе точка в исходных координатах изображения
                 )
   {
     if (depth == 0)
       depth = width/2; // 90 градусов по умолчанию
-    Point3d res = Point3d( p.x - width/2, p.y - height/2, depth );
+    cv::Point3d res = cv::Point3d( p.x - width/2, p.y - height/2, depth );
     return normalize( res );
   }
 
   void hline2points( 
-    const Point3d& hline, // линия в однородных координатах
-    Point& pt1, Point& pt2 // линия как две точки на краях битмапа
+    const cv::Point3d& hline, // линия в однородных координатах
+    cv::Point& pt1, cv::Point& pt2 // линия как две точки на краях битмапа
     )
   {
     // hline == A, B, C,  Ax+By+Cz = 0; z = depth;
     double A = hline.x;
     double B = hline.y;
     double CC = -hline.z*depth;
-    Point2d h1, h2;
+    cv::Point2d h1, h2;
     if (abs(A) > abs(B))
     {
       h1.y = -height/2.; h1.x = (CC - B*h1.y) / A;
