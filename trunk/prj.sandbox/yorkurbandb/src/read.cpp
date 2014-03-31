@@ -93,20 +93,46 @@ bool read_image_records( std::string& root, std::vector< ImageRecord >& image_re
   AddValues(flags, train, 1);
 
   for (size_t i = 0; i < dirs.size(); ++i) {
-    std::string __name = root + "/" + dirs[i] + "/" + dirs[i];
-    std::string vplname = __name + "LinesAndVP.txt";
-    std::ifstream ifile(vplname.c_str());
-    if (!ifile.good())
-      return false;
     ImageRecord cur;
-    cur.how_to_use = flags[i];
-    cur.hcoords = hcoords;
-    while (ifile) {
-      int x1 = 0, y1 = 0, x2 = 0, y2 = 0, vp = 0;
-      ifile >> x1 >> y1 >> x2 >> y2 >> vp;
-      cur.name = __name;
-      cur.segments.push_back(make_pair(cv::Point(x1, y2), cv::Point(x2, y2)));
+    string __name = root + "/" + dirs[i] + "/" + dirs[i];
+    string vplname = __name + "LinesAndVP.txt";
+    {
+      ifstream ifile(vplname.c_str());
+      if (!ifile.good())
+        return false;
+      cur.how_to_use = flags[i];
+      cur.hcoords = hcoords;
+      while (ifile) {
+        int x1 = 0, y1 = 0, x2 = 0, y2 = 0, vp = 0;
+        ifile >> x1 >> y1 >> x2 >> y2 >> vp;
+        cur.name = __name;
+        cur.segments.push_back(make_pair(cv::Point(x1, y2), cv::Point(x2, y2)));
+      }
+      ifile.close();
     }
+
+    string gtvp = __name + "GroundTruthVP_CamParams.txt";
+    {
+      ifstream ifile(gtvp.c_str());
+      if (!ifile.good())
+        return false;
+      for (int i = 0; i < 3; ++i) {
+        ifile >> cur.truth[i].x >> cur.truth[i].y >> cur.truth[i].z;
+      }
+      ifile.close();
+    }
+
+    string gtvp_ort = __name + "GroundTruthVP_Orthogonal_CamParams.txt";
+    {
+      ifstream ifile(gtvp_ort.c_str());
+      if (!ifile.good())
+        return false;
+      for (int i = 0; i < 3; ++i) {
+        ifile >> cur.truth_ort[i].x >> cur.truth_ort[i].y >> cur.truth_ort[i].z;
+      }
+      ifile.close();
+    }
+
     image_records.push_back(cur);
   }
 
