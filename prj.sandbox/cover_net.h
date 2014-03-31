@@ -24,7 +24,7 @@ struct PointsCluster // по идее CoverSphere должен выводиться из PointsCluster, 
     {};
 };
 
-template < class PointType >
+template < class PointType>
 struct CoverSphere
 {
   int parent;    // родитель // fat -- не обязательно для основных операций
@@ -135,6 +135,111 @@ public:
     // вставляет точку, возвращает положительный номер сферы нижнего уровня, к которой прилепилась или создала; 
     // возвращает 0 если точка лежит за пределами центра нашей вселенной (радиуса рута)
     const PointType& pt // вставляемая точка 
+    );
+
+  void countTrueWeight(std::vector<int> &result); // вычисляет для каждой сферы сколько точек она покрывает на самом деле
+ 
+private: int countTrueWeight_(int fromNum, double fromRad, int num);// Динамика для вычисления веса, fromNum - номер сферы, для которой считается вес, num - номер перебираемой сферы
+
+private:
+  enum { SPHERE_CREATED, POINT_ATTACHED };
+  void  notifyParents( const PointType& pt, int iSphere, int iSphereLevel, int eventToNote  );
+
+//#define DONT_FORCE_DIRECT_SUCCESSORS
+  int makeSphere( // создает сферу, ее прямых наследников и возвращает ее номер
+    int iSphereLevel, // уровень создаваемой сферы
+    const PointType& pt, // центр сферы
+    int parent, // родительская сфера (гарантируется, что центр лежит внутри родительской и не покрыт братьями
+    double distance_to_parent // расстояние до центра родительской сферы
+    ) ;
+  
+   int makeRoot( const PointType& pt )  {   return makeSphere( 0, pt, -1, 0 );  }
+
+  int insertPoint( 
+    // возвращает положительный номер сферы на нижнем уровне, к которой прилепилась или которая была создана
+    const PointType& pt, // точка внутри сферы iSphere на уровне iSphereLevel
+    int iSphere, 
+    int iSphereLevel, 
+    double dist // расстояние до центра сферы iSphere (уже измерено)
+    );
+
+
+  int attachPoint( const PointType& pt, int iSphere, int iSphereLevel, double dist );
+    // лепим непосредственно к данной сфере, не пытаясь свалиться вниз
+ 
+  // ---- запросы и навигация ----
+public:  
+  double computeDistance( int iSphere,  const PointType& pt );
+ 
+  int getSpheresCount() { return int( spheres.size() ); };
+  const CoverSphere< PointType >& getSphere( int iSphere ) { return spheres[iSphere]; };
+  int countKids( int iSphere ) ;// подсчитывает количество непосредственных детей у вершины
+
+public:
+  const PointType& 
+  findNearestPoint( // ближайший к указанной точке центр сферы из дерева
+    const PointType& pt, // точка для которой ищем сферу с ближайшим центром
+    double &best_distance,// [in/out] рекорд расстояния -- оно же и отсечение (не искать дальше чем указано)
+    int iStartSphere = 0// с какой сферы начинать поиск, 0 - корень дерева 
+  );
+public:
+  bool checkCoverNetSphere(int iSphere, int iKidSphere); // функция, проверяющая корректность построения дерева -- на данный момент тот факт, что все потомки внутри данной сферы
+  
+
+  bool checkCoverNet();
+
+  double// возвращает худшее из k расстояний в best_spheres
+  findKNearestSpheres(// результат в best_spheres - если best_spheres.size() < k, то нету сфер лучше, чем k
+    const PointType& pt, // точка для которой ищем сферы с ближайшими центрами
+    int k,// количество сфер, которые мы хотим найти
+    std::priority_queue<std::pair<double, int> > &best_spheres,// куча лучштх сфер (пара - расстояние, радиус), начиная с максимально удаленной
+	  double distanceToPt = -1, // расстояние до точки, -1 -- если не посчитано
+    int iStartSphere = 0,// с какой сферы начинать поиск, 0 - корень дерева
+    bool is_copy = false //а не является ли эта сфера копией какой-то
+  );
+  
+
+  public:
+    std::vector<std::pair<PointType, double> >  // а надо ли возвращать расстояния? -- возвращаем пары точка, расстояния -- отсортированы по возрастанию расстояния
+  findKNearestPoints( // ближайшие к указанной точке центры сфер из дерева
+    const PointType& pt,// точка для которой ищем сферу с ближайшим центром
+    int k, // количество вершин
+    double best_distance// [in/out] рекорд расстояния -- оно же и отсечение (не искать дальше чем указано)
+  , int iStartSphere = 0// с какой сферы начинать поиск, 0 - корень дерева 
+  );
+
+  int // номер сферы, (-1 если за пределами радиуса стартовой)
+  findNearestSphere(
+    const PointType& pt, // точка для которой ищем сферу с ближайшим центром
+    double& best_distance,// [in/out] рекорд расстояния -- оно же и отсечение (не искать дальше чем указано)
+	double distanceToPt = -1, // расстояние до точки, -1 -- если не посчитано
+    int iStartSphere = 0// с какой сферы начинать поиск, 0 - корень дерева 
+  );
+
+  void  uploadSpheresByLevel( 
+    int i_level, // requested level
+    std::vector< std::pair< int , int > >& proper_spheres, std::vector<int> &trueWeight ///<.points, index>
+    );
+
+  int makeClusters( // возвращает число кластеров (=res_clusters.size())
+    //vector< PointType >&  points, // есть набор точек
+    //???? int sigma, // будем считать что разброс изестен, кластеры круглые
+    int   i_level, // использовать сферы указанного уровня
+    std::vector< PointsCluster< PointType> >& res_clusters, // надо построить кластеры { center, points } // { center, sigma }
+    int   minPoints = 3,  // кластер должен содержать не меньше указанного кол-ва точек
+    int   maxClusters = 100 // but not more than maxClustersCount
+                     );
+  
+  void printNode( int node, int level );
+  
+  void reportStatistics( int node =0,  int detailsLevel=3 ); 
+};
+
+template < class PointType, class Metrics>
+int CoverNet<PointType, Metrics>::insert( 
+    // вставляет точку, возвращает положительный номер сферы нижнего уровня, к которой прилепилась или создала; 
+    // возвращает 0 если точка лежит за пределами центра нашей вселенной (радиуса рута)
+    const PointType& pt // вставляемая точка 
     )
   {
     attemptsToInsert++;
@@ -151,29 +256,11 @@ public:
       rejectedInserts++;
       return 0; // игнорируем слишком далекую точку
     }
-
-////////#define NO_SEQUENTAL_PROXIMITY_ASSUMPTION
-//////#ifndef NO_SEQUENTAL_PROXIMITY_ASSUMPTION  // если регистрируем пиксели подряд, то соседи вероятно близки
-//////    if (iLastSphere != -1)
-//////    {
-//////      double dist = computeDistance( iLastSphere, pt );
-//////      double rad = getRadius(iLastSphereLevel);
-//////      assert( spheres[iLastSphere].level == iLastSphereLevel );
-//////      if ( dist < rad ) // <<<<<<<<<<<<<<< MUST CHECK PARENT, GRANDPARENT and so on !!!!!
-//////      {
-//////        int start=iLastSphere;
-//////        insertPoint( pt, iLastSphere, iLastSphereLevel, dist ); // изменяет iLastSphere & iLastSphereLevel
-//////        for (int isp = spheres[start].parent; isp >=0; isp = spheres[isp].parent)
-//////          spheres[isp].points++;
-//////        return true;
-//////      }
-//////    }
-//////#endif
-
-    return insertPoint( pt, 0, 0, dist_root ); // добавляем спускаясь с рута
+	return insertPoint( pt, 0, 0, dist_root ); // добавляем спускаясь с рута
   }
-
-  void countTrueWeight(std::vector<int> &result) // вычисляет для каждой сферы сколько точек она покрывает на самом деле
+  
+  template < class PointType, class Metrics>
+  void CoverNet<PointType, Metrics>::countTrueWeight(std::vector<int> &result) // вычисляет для каждой сферы сколько точек она покрывает на самом деле
   {
     result.assign(spheres.size(), -1);
     for (int i = 0; i < (int)spheres.size(); ++i)
@@ -182,7 +269,9 @@ public:
       result[i] = countTrueWeight_(i, getRadius(spheres[i].level), 0);
     }
   }
-private: int countTrueWeight_(int fromNum, double fromRad, int num) // Динамика для вычисления веса, fromNum - номер сферы, для которой считается вес, num - номер перебираемой сферы
+
+  template < class PointType, class Metrics>
+  int CoverNet<PointType, Metrics>::countTrueWeight_(int fromNum, double fromRad, int num) // Динамика для вычисления веса, fromNum - номер сферы, для которой считается вес, num - номер перебираемой сферы
   {
     int local_result = 0;
     int level = spheres[num].level;
@@ -212,12 +301,8 @@ private: int countTrueWeight_(int fromNum, double fromRad, int num) // Динамика 
     return local_result;
   }
 
-
-
-
-private:
-  enum { SPHERE_CREATED, POINT_ATTACHED };
-  void  notifyParents( const PointType& pt, int iSphere, int iSphereLevel, int eventToNote  )
+  template < class PointType, class Metrics>
+  void  CoverNet<PointType, Metrics>::notifyParents( const PointType& pt, int iSphere, int iSphereLevel, int eventToNote  )
   {
     switch (eventToNote) 
     {
@@ -225,9 +310,9 @@ private:
       case POINT_ATTACHED: break;
     }
   }
-
-//#define DONT_FORCE_DIRECT_SUCCESSORS
-  int makeSphere( // создает сферу, ее прямых наследников и возвращает ее номер
+	
+  template < class PointType, class Metrics>
+  int CoverNet<PointType, Metrics>::makeSphere( // создает сферу, ее прямых наследников и возвращает ее номер
     int iSphereLevel, // уровень создаваемой сферы
     const PointType& pt, // центр сферы
     int parent, // родительская сфера (гарантируется, что центр лежит внутри родительской и не покрыт братьями
@@ -282,9 +367,8 @@ private:
     return iLastSphere;
   }
 
-  int makeRoot( const PointType& pt )  {   return makeSphere( 0, pt, -1, 0 );  }
-
-  int insertPoint( 
+  template < class PointType, class Metrics>
+  int CoverNet<PointType, Metrics>::insertPoint( 
     // возвращает положительный номер сферы на нижнем уровне, к которой прилепилась или которая была создана
     const PointType& pt, // точка внутри сферы iSphere на уровне iSphereLevel
     int iSphere, 
@@ -331,9 +415,9 @@ private:
 
     return isp;
   }
-
-
-  int attachPoint( const PointType& pt, int iSphere, int iSphereLevel, double dist )
+	
+   template < class PointType, class Metrics>	
+   int CoverNet<PointType, Metrics>::attachPoint( const PointType& pt, int iSphere, int iSphereLevel, double dist )
     // лепим непосредственно к данной сфере, не пытаясь свалиться вниз
   {
 #ifdef COVER_NET_VERBOSE_DETAILED
@@ -360,28 +444,27 @@ private:
     notifyParents( pt, iSphere, iSphereLevel, POINT_ATTACHED );
     return iSphere;
   }
-
-  // ---- запросы и навигация ----
-public:  
-  double computeDistance( int iSphere,  const PointType& pt )
+	
+  template < class PointType, class Metrics>		
+  double CoverNet<PointType, Metrics>::computeDistance( int iSphere,  const PointType& pt )
   {
     double dist = ruler->computeDistance( spheres[iSphere].center, pt );
     return dist;
-  }
+  }	
 
-  int getSpheresCount() { return int( spheres.size() ); };
-  const CoverSphere< PointType >& getSphere( int iSphere ) { return spheres[iSphere]; };
-  int countKids( int iSphere ) // подсчитывает количество непосредственных детей у вершины
+  template < class PointType, class Metrics>		
+  int CoverNet<PointType, Metrics>::countKids( int iSphere ) // подсчитывает количество непосредственных детей у вершины
   { 
     int count=0;
     for (int kid = spheres[iSphere].last_kid; kid > 0; kid = spheres[kid].prev_brother)
       count++;
     return count; 
-  };
+  }
+  
 
-public:
+  template < class PointType, class Metrics> 
   const PointType& 
-  findNearestPoint( // ближайший к указанной точке центр сферы из дерева
+  CoverNet<PointType, Metrics>::findNearestPoint( // ближайший к указанной точке центр сферы из дерева
     const PointType& pt, // точка для которой ищем сферу с ближайшим центром
     double &best_distance,// [in/out] рекорд расстояния -- оно же и отсечение (не искать дальше чем указано)
     int iStartSphere = 0// с какой сферы начинать поиск, 0 - корень дерева 
@@ -392,9 +475,9 @@ public:
 		  cerr << "error: distance to root is more then maximal radius" << endl;
 	  return spheres[iNearestSphere].center;
   }
- 
-public:
-  bool checkCoverNetSphere(int iSphere, int iKidSphere) // функция, проверяющая корректность построения дерева -- на данный момент тот факт, что все потомки внутри данной сферы
+  
+  template < class PointType, class Metrics> 
+  bool CoverNet<PointType, Metrics>::checkCoverNetSphere(int iSphere, int iKidSphere) // функция, проверяющая корректность построения дерева -- на данный момент тот факт, что все потомки внутри данной сферы
   { 
       int isp=iSphere; // текущая сфера
 	    int lev = spheres[isp].level; // текущий уровень
@@ -418,17 +501,19 @@ public:
 
       return true;    
   }
-
-  bool checkCoverNet()
+  
+  template < class PointType, class Metrics> 
+  bool CoverNet<PointType, Metrics>::checkCoverNet()
   {
      for (int i = 0; i < spheres.size(); ++i)
          if (!checkCoverNetSphere(i, i))
            return false;
      return true;
   }
-
-  double// возвращает худшее из k расстояний в best_spheres
-  findKNearestSpheres(// результат в best_spheres - если best_spheres.size() < k, то нету сфер лучше, чем k
+  
+  template < class PointType, class Metrics> 
+   double// возвращает худшее из k расстояний в best_spheres
+  CoverNet<PointType, Metrics>::findKNearestSpheres(// результат в best_spheres - если best_spheres.size() < k, то нету сфер лучше, чем k
     const PointType& pt, // точка для которой ищем сферы с ближайшими центрами
     int k,// количество сфер, которые мы хотим найти
     std::priority_queue<std::pair<double, int> > &best_spheres,// куча лучштх сфер (пара - расстояние, радиус), начиная с максимально удаленной
@@ -507,9 +592,9 @@ public:
     return best_kth_distance;
   }
 
-  public:
+  template < class PointType, class Metrics> 
     std::vector<std::pair<PointType, double> >  // а надо ли возвращать расстояния? -- возвращаем пары точка, расстояния -- отсортированы по возрастанию расстояния
-  findKNearestPoints( // ближайшие к указанной точке центры сфер из дерева
+  CoverNet<PointType, Metrics>::findKNearestPoints( // ближайшие к указанной точке центры сфер из дерева
     const PointType& pt,// точка для которой ищем сферу с ближайшим центром
     int k, // количество вершин
     double best_distance// [in/out] рекорд расстояния -- оно же и отсечение (не искать дальше чем указано)
@@ -536,9 +621,10 @@ public:
     reverse(result.begin(), result.end());
     return result;
   }
-
-  int // номер сферы, (-1 если за пределами радиуса стартовой)
-  findNearestSphere(
+  
+   template < class PointType, class Metrics> 
+   int // номер сферы, (-1 если за пределами радиуса стартовой)
+   CoverNet<PointType, Metrics>::findNearestSphere(
     const PointType& pt, // точка для которой ищем сферу с ближайшим центром
     double& best_distance,// [in/out] рекорд расстояния -- оно же и отсечение (не искать дальше чем указано)
 	double distanceToPt = -1, // расстояние до точки, -1 -- если не посчитано
@@ -598,8 +684,9 @@ public:
 
 	  return ans;
   }
-
-  void  uploadSpheresByLevel( 
+  
+  template < class PointType, class Metrics> 
+  void   CoverNet<PointType, Metrics>::uploadSpheresByLevel( 
     int i_level, // requested level
     std::vector< std::pair< int , int > >& proper_spheres, std::vector<int> &trueWeight ///<.points, index>
     )
@@ -617,7 +704,8 @@ public:
     sort( proper_spheres.rbegin(), proper_spheres.rend() );
   }
 
-  int makeClusters( // возвращает число кластеров (=res_clusters.size())
+  template < class PointType, class Metrics> 
+  int CoverNet<PointType, Metrics>::makeClusters( // возвращает число кластеров (=res_clusters.size())
     //vector< PointType >&  points, // есть набор точек
     //???? int sigma, // будем считать что разброс изестен, кластеры круглые
     int   i_level, // использовать сферы указанного уровня
@@ -652,8 +740,8 @@ public:
     return res_clusters.size();
   }
 
-
-  void printNode( int node, int level )
+  template < class PointType, class Metrics> 
+   void CoverNet<PointType, Metrics>::printNode( int node, int level )
   {
     spheres[node].print(level);
     for ( int kid = spheres[node].last_kid; kid > 0; kid = spheres[kid].prev_brother )
@@ -661,8 +749,9 @@ public:
           printNode( kid, level+1 );
     }
   }
-
-  void reportStatistics( int node =0,  int detailsLevel=3 ) 
+  
+   template < class PointType, class Metrics> 
+  void CoverNet<PointType, Metrics>::reportStatistics( int node =0,  int detailsLevel=3 ) 
     // 0-none, 1-overall statistics, 2-by levels, 3-print tree hierarchy, 4-print tree array with links
   {
     if (detailsLevel < 1)
@@ -727,10 +816,7 @@ public:
       spheres[i].print( 0 );
 
   }
-
-};
-
-
-
-
+  
 #endif // __COVER_NET_H
+
+
