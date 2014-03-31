@@ -3,6 +3,7 @@ IF( MSVC )
   
   SET( SOURCES
     ../cover_net.h
+    ../Hcoords.h
     src/explore.cpp 
     src/imagerecord.h 
     src/main.cpp 
