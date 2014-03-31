@@ -1,4 +1,5 @@
 #include <conio.h> // _getch()
+#include <iostream>
 
 #include <opencv/cv.h>
 #include <opencv/highgui.h>
