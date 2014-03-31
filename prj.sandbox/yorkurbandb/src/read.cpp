@@ -119,6 +119,7 @@ bool read_image_records( std::string& root, std::vector< ImageRecord >& image_re
       for (int i = 0; i < 3; ++i) {
         ifile >> cur.truth[i].x >> cur.truth[i].y >> cur.truth[i].z;
       }
+      ifile >> cur.sigma[0] >> cur.sigma[1] >> cur.sigma[2];
       ifile.close();
     }
 
