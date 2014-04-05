@@ -3,7 +3,7 @@ IF( MSVC )
   
   SET( SOURCES
     ../cover_net.h
-    ../ticker.h
+    ${CMAKE_SOURCE_DIR}/prj.core/ocvutils/ticker.h
     src/bukvoed.h
     src/pagedata.h
     src/pagedata.cpp
