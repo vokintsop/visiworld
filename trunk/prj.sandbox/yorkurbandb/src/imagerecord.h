@@ -10,13 +10,16 @@
 
 #include "ocvutils/hcoords.h"
 
+typedef std::pair< cv::Point, cv::Point > Segment; // отрезок в координатах изображения
+typedef cv::Point3d HLine3d; // линия в однородных координатах
+
+
 class ImageRecord // результаты по картинке 
 {
 public:
   ImageRecord(): hcoords(640, 480), how_to_use(0) {};
   // входные данные 
   std::string name; // полное (от корня) имя картинки, без расширения, например, "//testdata/yorkurbandb/P1020171/P1020171"
-  /// ???? int camera_foo; // что то про камеру
   HCoords hcoords; // конвертер координат камеры
 
   // ground truth
@@ -25,8 +28,8 @@ public:
   double sigma[3];
 
   // рабочие данные по текущей картинке: 
-  std::vector< std::pair< cv::Point, cv::Point > > segments; // отрезки, выделенные на текущем изображении
-  std::vector< cv::Point3d > lines; // отрезки, преобразованные к линиям (с учетом параметров камеры)
+  std::vector< Segment > segments; // отрезки, выделенные на текущем изображении
+  std::vector< HLine3d > hlines; // отрезки, преобразованные к линиям (с учетом параметров камеры)
   std::vector< cv::Point3d > vanish_points; // точки схода (с учетом параметров камеры)
   void explore();
   
