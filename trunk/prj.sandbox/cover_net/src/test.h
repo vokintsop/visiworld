@@ -11,7 +11,7 @@
 #include <cmath>
 
 #include "cover_net2.h"
-#include "cover_net.h"
+#include "cover_net/cover_net.h"
 
 
 using namespace std;

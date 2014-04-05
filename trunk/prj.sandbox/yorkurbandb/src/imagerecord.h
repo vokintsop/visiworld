@@ -8,7 +8,7 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
-#include "../../Hcoords.h"
+#include "ocvutils/hcoords.h"
 
 class ImageRecord // результаты по картинке 
 {

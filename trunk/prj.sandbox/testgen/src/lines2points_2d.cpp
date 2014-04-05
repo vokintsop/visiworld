@@ -1,7 +1,7 @@
 // 2d lines with vanish points clusters generator
 #include "precomp.h"
 #include "gen.h"
-#include "Hcoords.h"
+#include "ocvutils/hcoords.h"
 
 
 const int countLines = 10;
