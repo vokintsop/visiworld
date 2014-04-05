@@ -5,7 +5,7 @@
 // “Efficient Edge-Based Methods for Estimating Manhattan Frames in Urban Imagery”, 
 // European Conference on Computer Vision, part II, pp. 197-210, 2008
 // downloaded from
-// http://http://elderlab.yorku.ca/YorkUrbanDB/
+// http://elderlab.yorku.ca/YorkUrbanDB/
 
 #include <opencv/cv.h>
 #include <opencv/highgui.h>
@@ -21,12 +21,22 @@
 
 #include <cassert>
 
+#ifdef _DEBUG
+#include <conio.h>
+#endif
 
 #include "imagerecord.h"
 
 using namespace std;
 using namespace cv;
 
+inline void dbgPressAnyKey()
+{
+#ifdef _DEBUG
+  printf("\n\nPress any key...");
+  _getch();
+#endif
+}
 
 int main( int argc, char* argv[] )
 {
