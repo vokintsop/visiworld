@@ -2,6 +2,7 @@
 #include <fstream>
 
 #include "imagerecord.h"
+#include "ocvutils/precomp.h"
 
 using namespace std;
 using namespace cv;
@@ -25,7 +26,7 @@ bool read_image_records( std::string& root, std::vector< ImageRecord >& image_re
     ifstream ifile;
     ifile.open(fnames_file.c_str());
     if (!ifile.good())
-      return false;
+      return __false( format("\nCan't read '%s'\n", fnames_file.c_str() ) );;
     while (ifile) {
       string cur_dir;
       ifile >> cur_dir;
@@ -76,7 +77,7 @@ bool read_image_records( std::string& root, std::vector< ImageRecord >& image_re
   {
     ifstream ifile(cam_param_file.c_str());
     if (!ifile.good())
-      return false;
+      return __false( format("\nCan't read '%s'\n", cam_param_file.c_str() ) );
     string flen, psize, tmp0, tmp1;
     ifile >> tmp0 >> flen >> tmp1 >> psize;
     flen_mm = atof(flen.c_str());
@@ -101,7 +102,7 @@ bool read_image_records( std::string& root, std::vector< ImageRecord >& image_re
     {
       ifstream ifile(vplname.c_str());
       if (!ifile.good())
-        return false;
+        return __false( format("\nCan't read '%s'", vplname.c_str() ) );
       cur.how_to_use = flags[i];
       cur.hcoords = hcoords;
       while (ifile) {
@@ -117,7 +118,7 @@ bool read_image_records( std::string& root, std::vector< ImageRecord >& image_re
     {
       ifstream ifile(gtvp.c_str());
       if (!ifile.good())
-        return false;
+        return __false( format("\nCan't read '%s'\n", gtvp.c_str() ) );
       for (int i = 0; i < 3; ++i) {
         ifile >> cur.truth[i].x >> cur.truth[i].y >> cur.truth[i].z;
       }
@@ -129,7 +130,7 @@ bool read_image_records( std::string& root, std::vector< ImageRecord >& image_re
     {
       ifstream ifile(gtvp_ort.c_str());
       if (!ifile.good())
-        return false;
+        return __false( format("\nCan't read '%s'\n", gtvp_ort.c_str() ) );
       for (int i = 0; i < 3; ++i) {
         ifile >> cur.truth_ort[i].x >> cur.truth_ort[i].y >> cur.truth_ort[i].z;
       }
@@ -139,6 +140,6 @@ bool read_image_records( std::string& root, std::vector< ImageRecord >& image_re
     image_records.push_back(cur);
   }
 
-    return true;
+  return __true( format( "YorkUrbanDB dataset list files and truth data had been successfully read from \n'%s'\n", root.c_str() ) );
 }
 
