@@ -1,8 +1,8 @@
 // 2d points along Lines clusters generator
 #include "precomp.h"
 
-#include "../../cover_net.h"
-#include "../../hcoords.h"
+#include "cover_net/cover_net.h"
+#include "hcoords.h"
 
 
 struct FoundLine

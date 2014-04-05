@@ -3,7 +3,7 @@
 //#include <iostream>
 //using namespace std;
 
-#include "../../cover_net.h"
+#include "cover_net/cover_net.h"
 
 class MetricsL2ReferredToVectorOfPoints2i  //template it 
 {

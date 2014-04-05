@@ -12,7 +12,7 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
-#include "../../cover_net.h"
+#include "cover_net/cover_net.h"
 //#include "cover_net2.h"
 #include "ticker.h"
 

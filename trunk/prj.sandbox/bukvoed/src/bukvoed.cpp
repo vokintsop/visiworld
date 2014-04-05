@@ -3,7 +3,7 @@
 
 #include "bukvoed.h"
 
-#include "../../cover_net.h"
+#include "cover_net/cover_net.h"
 #include "ocvutils/ticker.h"
 #include "pagedata.h"
 
