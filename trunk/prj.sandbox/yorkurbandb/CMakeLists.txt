@@ -3,7 +3,7 @@ IF( MSVC )
   
   SET( SOURCES
     ${CMAKE_SOURCE_DIR}/prj.core/cover_net/cover_net.h
-    ../Hcoords.h
+    ${CMAKE_SOURCE_DIR}/prj.core/ocvutils/hcoords.h
     src/explore.cpp 
     src/imagerecord.h 
     src/main.cpp 
