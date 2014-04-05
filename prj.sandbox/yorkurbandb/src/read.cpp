@@ -75,6 +75,8 @@ bool read_image_records( std::string& root, std::vector< ImageRecord >& image_re
 
   {
     ifstream ifile(cam_param_file.c_str());
+    if (!ifile.good())
+      return false;
     string flen, psize, tmp0, tmp1;
     ifile >> tmp0 >> flen >> tmp1 >> psize;
     flen_mm = atof(flen.c_str());
