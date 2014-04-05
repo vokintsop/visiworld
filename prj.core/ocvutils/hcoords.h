@@ -14,6 +14,8 @@ inline cv::Point3d& normalize( cv::Point3d& v ) // set length == 1
   return v;
 }
 
+typedef cv::Point3d HPoint3d; // точка на единичной сфере (as double)
+typedef cv::Point3d HLine3d; // линия, как ее вектор нормали на единичной сфере (as double)
 
 struct HCoords
 {
@@ -62,5 +64,25 @@ struct HCoords
     pt2.x = (int)(h2.x + width/2); 
     pt1.y = (int)(h1.y + height/2); 
     pt2.y = (int)(h2.y + height/2); 
+  }
+
+  HPoint3d point2hpoint( cv::Point& pt ) // проекция точки на сферу радиуса 1. //// <radius>
+  { // <x,y,depth> --> sphere
+    pt.x -= width/2;
+    pt.y -= height/2;
+    double denom = sqrt( double( pt.x*pt.x + pt.y*pt.y + depth*depth ) ); //// / radius == 1.;
+    return cv::Point3d( pt.x / denom, pt.y / denom, depth / denom );
+  }
+
+  bool segment2hline( cv::Point& pt1, cv::Point& pt2, HLine3d& res_hline, double delta = 0.000001 ) // отрезок на картинке --> однородная линия
+  {
+    HPoint3d hp1 = point2hpoint( pt1 );
+    HPoint3d hp2 = point2hpoint( pt2 );
+    res_hline = hp1.cross( hp2 );
+    double len = length(res_hline);
+    if ( len < delta )
+      return false; // ответ -- вранье, слишком близкие точки
+    res_hline = (1./len) * res_hline;
+    return true;
   }
 };

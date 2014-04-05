@@ -49,7 +49,8 @@ int main( int argc, char* argv[] )
   if (!read_image_records( folder, image_records ) || image_records.size() < 1 )
     return -1;
 
-  for (int i=0; i<int( image_records.size() ); i++)
+  for (int i=0; i< 1; // debug // int( image_records.size() ); 
+    i++)
     image_records[i].explore();
 
   make_report( image_records );
