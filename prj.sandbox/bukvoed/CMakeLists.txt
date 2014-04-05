@@ -2,7 +2,7 @@ IF( MSVC )
   PROJECT( bukvoed )
   
   SET( SOURCES
-    ../cover_net.h
+    ${CMAKE_SOURCE_DIR}/prj.core/cover_net/cover_net.h
     ${CMAKE_SOURCE_DIR}/prj.core/ocvutils/ticker.h
     src/bukvoed.h
     src/pagedata.h

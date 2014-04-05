@@ -2,8 +2,8 @@ IF( MSVC )
   PROJECT( cover_net )
   
   SET( SOURCES
-    ../cover_net.h
-    src/ticker.h
+    ${CMAKE_SOURCE_DIR}/prj.core/cover_net/cover_net.h
+    ${CMAKE_SOURCE_DIR}/prj.core/ocvutils/ticker.h
     src/main.cpp 
     src/mnist.cpp 
     src/words.cpp 

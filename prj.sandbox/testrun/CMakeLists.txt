@@ -2,9 +2,9 @@ IF( MSVC )
   PROJECT( testrun )
   
   SET( SOURCES
-    ../cover_net.h
+    ${CMAKE_SOURCE_DIR}/prj.core/cover_net/cover_net.h
     ../Hcoords.h
-    ../ticker.h
+    ${CMAKE_SOURCE_DIR}/prj.core/ocvutils/ticker.h
     src/lines2points_2d.cpp
     src/points2lines_2d.cpp
     src/points2points_2d.cpp

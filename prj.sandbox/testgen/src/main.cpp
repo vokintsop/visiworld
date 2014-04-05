@@ -39,10 +39,10 @@ int main( int argc, char* argv[] )
 {
   //testGauss();
   string exe = argv[0];
-  testgen_points2points_2d( exe +  "/../../../testdata/points2points_2d/" );
-  testgen_points2lines_2d( exe +  "/../../../testdata/points2lines_2d/" );
+  //testgen_points2points_2d( exe +  "/../../../testdata/points2points_2d/" );
+  //testgen_points2lines_2d( exe +  "/../../../testdata/points2lines_2d/" );
   testgen_lines2points_2d( exe +  "/../../../testdata/lines2points_2d/" );
-  testgen_points3d_line_vconst( exe +  "/../../../testdata/points3d_line_vconst/" );
+  //testgen_points3d_line_vconst( exe +  "/../../../testdata/points3d_line_vconst/" );
  
 	return 0;
 }

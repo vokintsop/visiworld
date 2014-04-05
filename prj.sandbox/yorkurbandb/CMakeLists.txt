@@ -2,7 +2,7 @@ IF( MSVC )
   PROJECT( yorkurbandb )
   
   SET( SOURCES
-    ../cover_net.h
+    ${CMAKE_SOURCE_DIR}/prj.core/cover_net/cover_net.h
     ../Hcoords.h
     src/explore.cpp 
     src/imagerecord.h 
