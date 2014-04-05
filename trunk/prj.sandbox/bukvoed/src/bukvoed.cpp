@@ -4,7 +4,7 @@
 #include "bukvoed.h"
 
 #include "../../cover_net.h"
-#include "../../ticker.h"
+#include "ocvutils/ticker.h"
 #include "pagedata.h"
 
 using namespace std;

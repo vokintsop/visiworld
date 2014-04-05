@@ -3,7 +3,7 @@
 
 #include "niblack.h"
 #include "pagedata.h"
-#include "ticker.h"
+#include "ocvutils/ticker.h"
 
 
 static void dilate1( Mat& in, Mat& ou, bool inverted = false )
