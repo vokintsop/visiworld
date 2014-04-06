@@ -31,7 +31,7 @@ public:
 
 void ImageRecord::explore()
 {
-
+#if 0
   {//////////// show segments
     string imagename = name + ".jpg";
     Mat mat = imread( imagename );
@@ -43,6 +43,7 @@ void ImageRecord::explore()
     imshow( "segments", mat );
     waitKey(0);
   }
+#endif //0
 
   for (int i=0; i< int(segments.size()); i++)
   {
@@ -50,7 +51,7 @@ void ImageRecord::explore()
     if (hcoords.segment2hline( segments[i].first, segments[i].second, hline )) // отрезок не вырожден?
       hlines.push_back( hline );
   }
-
+#if 0
   {//////////// show & print hlines
     string imagename = name + ".jpg";
     Mat mat = imread( imagename );
@@ -66,6 +67,7 @@ void ImageRecord::explore()
     imshow( "hlines", mat );
     waitKey(0);
   }
+#endif //0
 
   vector< Point3d > hlines_intersections; 
   for (int i=0; i< int( hlines.size() ); i++)
@@ -107,15 +109,26 @@ void ImageRecord::explore()
   for (int i=0; i<cover_net.getCountOfLevels(); i++)
   { // из любопытства выведем первые 10 точек -- сколько накрывают
     if (print_next_level)
-      printf( "\nlevel= %2.d ", i );
+      printf( "\n\n********level= %2.d ", i );
     print_next_level = false;
     for ( int j=0; j < min( 10, int( density[i].size() ) ); j ++)
     {
-      printf( "%5.d (%5.d) ", density[i][j].first, density[i][j].second );
+      printf( "\n%5.d (%5.d) ", density[i][j].first, density[i][j].second );
+      const CoverSphere<int>& sph = cover_net.getSphere( density[i][j].second );
+      Point3d& vp = hlines_intersections[ sph.center ];
+      printf( "\t%1.5f \t%1.5f \t%1.5f", vp.x, vp.y, vp.z );
       print_next_level = true;
     }
   }
 
+  //vector< vector< pair< double, int > > cluster_chains( nlevels );
+  //for (int level =0; level< nlevels; level++ )
+  //{
+  //  for (int i=0; i< density[level].size(); i++)
+  //  {
+
+  //  }
+  //}
   
 
   dbgPressAnyKey();
