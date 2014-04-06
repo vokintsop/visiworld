@@ -17,6 +17,16 @@ inline cv::Point3d& normalize( cv::Point3d& v ) // set length == 1
 typedef cv::Point3d HPoint3d; // точка на единичной сфере (as double)
 typedef cv::Point3d HLine3d; // линия, как ее вектор нормали на единичной сфере (as double)
 
+inline 
+cv::Point3d force_positive_direction( cv::Point3d& p )
+{
+  if (p.z < 0)
+    p *= -1.;
+  // ?????????????????????????????????
+  return p;
+}
+
+
 struct HCoords
 {
   int width, height, depth; // image bitmap size and camera angle
