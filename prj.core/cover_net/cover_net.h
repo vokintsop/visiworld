@@ -107,6 +107,8 @@ class CoverNet
 
   std::vector< double > levelsRadii;
 public:
+  int getCountOfLevels() { return levelsRadii.size(); }
+  int getSphereLevel( int i_sphere ) { return spheres[i_sphere].level; }
   double getRadius( int level ) { return levelsRadii[level]; }
   double getMinRadius( int level ) { return minRadius; }
   //std::vector< double > levelsMinRadii;
