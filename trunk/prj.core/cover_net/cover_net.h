@@ -792,15 +792,29 @@ int CoverNet<PointType, Metrics>::insert(
 
     for (int i=0; i<=maxLevel; i++)
     {
-      std::cout 
-        //<< fixed 
-        << setprecision(5)
-        << "tree level=" << i << "\t" 
-        << "\tradius=" << getRadius(i) 
-        << "\tspheres=" << spheresByLevel[i] 
-        << "\tpoints="  << pointsByLevel[i]  << "\tave=" << double( pointsByLevel[i])/ spheresByLevel[i]
-        << "\tsum kids="    << kidsByLevel[i]    << "\tave=" << double( kidsByLevel[i])/ spheresByLevel[i]
-        << std::endl;
+      printf("\ntree level=%.2d radius=%8.4f spheres=%6.d points=%6.d ave_points=%10.3f kids=%5.d ave_kids=%8.3f",
+        i // level
+        ,getRadius(i)
+        ,spheresByLevel[i] 
+        ,pointsByLevel[i]  
+        ,double( pointsByLevel[i])/ spheresByLevel[i]
+        ,kidsByLevel[i]
+        ,double( kidsByLevel[i])/ spheresByLevel[i]
+        );
+      //std::cout 
+      //  //<< fixed 
+      //  << setprecision(10)
+      //  << "tree level=" << i << "\t" 
+      //  << "\tradius=" << getRadius(i) 
+      //  << "\tspheres=" << spheresByLevel[i] 
+      //  << "\tpoints="  << pointsByLevel[i]  
+      //  << "\tave=" 
+      //  << setprecision(10)
+      //  << double( pointsByLevel[i])/ spheresByLevel[i]
+      //  << setprecision(10)
+      //  << "\tsum kids="    << kidsByLevel[i]    
+      //  << "\tave=" << double( kidsByLevel[i])/ spheresByLevel[i]
+      //  << std::endl;
     }
 
     if (detailsLevel < 4)
