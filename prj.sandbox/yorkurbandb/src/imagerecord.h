@@ -9,10 +9,41 @@
 #include <opencv2/highgui/highgui.hpp>
 
 #include "ocvutils/hcoords.h"
+#include "cover_net/cover_net.h"
 
 typedef std::pair< cv::Point, cv::Point > Segment; // отрезок в координатах изображения
 typedef cv::Point3d HLine3d; // линия в однородных координатах
 
+inline double degree( double radian )
+{
+  return (radian * 180) / CV_PI;
+}
+inline
+double hlines_angle( const cv::Point3d& p1, const cv::Point3d& p2 )
+{
+#if 1
+    assert( length(p1) < 1.001 );    assert( length(p1) > 0.999 );
+    assert( length(p2) < 1.001 );    assert( length(p2) > 0.999 );
+    double cos = p1.ddot( p2 );
+    double phi = acos( std::max( -1., std::min( 1., cos ) ) );
+    //return phi;
+    return std::min( CV_PI-phi, phi );
+#else
+    return upoints[cp1].ddot( upoints[cp2] );
+#endif
+}
+
+class UnionSpereAnglesRuler {
+public:
+  std::vector< cv::Point3d >& upoints; // ссылка на внешний массив -- мн-во точек на единичной сфере
+  UnionSpereAnglesRuler( std::vector< cv::Point3d >& upoints): upoints(upoints){};
+  double computeDistance(  int cp1,  int cp2 )
+  {
+    cv::Point3d& p1 = upoints[cp1];
+    cv::Point3d& p2 = upoints[cp2];
+    return hlines_angle( p1, p2 );
+  }
+};
 
 class ImageRecord // результаты по картинке 
 {
@@ -30,9 +61,19 @@ public:
   // рабочие данные по текущей картинке: 
   std::vector< Segment > segments; // отрезки, выделенные на текущем изображении
   std::vector< HLine3d > hlines; // отрезки, преобразованные к линиям (с учетом параметров камеры)
+  std::vector< cv::Point3d > hlines_intersections; // пересечения hlines[] на единичной сфере
   std::vector< cv::Point3d > vanish_points; // точки схода (с учетом параметров камеры)
+
   void explore();
-  
+  void show_segments();
+  void show_hlines();
+  void select_cluster_candidates_to_clusters(
+    CoverNet< int, UnionSpereAnglesRuler >  cover_net, // каберне, в котором утоплены пересечения линий
+    std::vector< std::vector< std::pair< int, int > > >& // in: по каждому уровню [<кол-во покрываемых точек, номер сферы>]
+      cluster_candidates, // отсортирован  на каждом уровне по кол-ву покрываемых точек
+      std::vector< std::vector< std::pair< int, int > > > // по каждому уровню [<кол-во покрываемых точек, номер сферы>]
+      clusters // подмножество cluster_candidates[][] с ограничением на близость и приоритетом более сильных
+  );
   int how_to_use; // 0 - test, 1 - train, 2+ - reserved 
 
   // на выход
