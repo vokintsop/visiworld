@@ -48,18 +48,25 @@ public:
 class ImageRecord // результаты по картинке 
 {
 public:
-  ImageRecord(): hcoords(640, 480), how_to_use(0) {};
+  ImageRecord(): hcoords(640, 480), how_to_use(0) 
+  {
+    colors[0] = cv::Scalar( 100, 0, 200 );
+    colors[1] = cv::Scalar( 200, 0, 100 );
+    colors[2] = cv::Scalar( 0, 200, 0 );
+  };
   // входные данные 
   std::string name; // полное (от корня) имя картинки, без расширения, например, "//testdata/yorkurbandb/P1020171/P1020171"
   HCoords hcoords; // конвертер координат камеры
 
   // ground truth
+  cv::Scalar colors[3]; // цвета, назначенные точкам схода для отрисовки
   cv::Point3d truth[3]; // правильные значения точек схода
   cv::Point3d truth_ort[3]; // ортогонализированные правильные значения точек схода
   double sigma[3];
 
   // рабочие данные по текущей картинке: 
   std::vector< Segment > segments; // отрезки, выделенные на текущем изображении
+  std::vector< int > segments2vp_truth; // номера точек схода, размеченные как ground_truth
   std::vector< HLine3d > hlines; // отрезки, преобразованные к линиям (с учетом параметров камеры)
   std::vector< cv::Point3d > hlines_intersections; // пересечения hlines[] на единичной сфере
   std::vector< cv::Point3d > vanish_points; // точки схода (с учетом параметров камеры)

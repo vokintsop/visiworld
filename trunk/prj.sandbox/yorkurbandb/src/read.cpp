@@ -109,7 +109,11 @@ bool read_image_records( std::string& root, std::vector< ImageRecord >& image_re
         int x1 = 0, y1 = 0, x2 = 0, y2 = 0, vp = 0;
         ifile >> x1 >> y1 >> x2 >> y2 >> vp;
         cur.name = __name;
-        cur.segments.push_back(make_pair(cv::Point(x1, y1), cv::Point(x2, y2)));
+        if (ifile)
+        {
+          cur.segments.push_back(make_pair(cv::Point(x1, y1), cv::Point(x2, y2)));
+          cur.segments2vp_truth.push_back( vp-1 );
+        }
       }
       ifile.close();
     }
