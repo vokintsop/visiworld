@@ -88,15 +88,16 @@ void ImageRecord::show_segments()
     Mat mat = imread( imagename );
     for (int i=0; i< int(segments.size()); i++)
     {
-      line( mat, segments[i].first, segments[i].second, Scalar( 100, 0, 200 ) );
+      line( mat, segments[i].first, segments[i].second, colors[segments2vp_truth[i]] );
     }
 
     imshow( "segments", mat );
-    waitKey(0);
+    waitKey(10);
 }
 
 void ImageRecord::show_hlines()
 { //////////// show & print hlines
+
   string imagename = name + ".jpg";
   Mat mat = imread( imagename );
   for (int i=0; i< int(hlines.size()); i++)
@@ -105,11 +106,11 @@ void ImageRecord::show_hlines()
     //cout << "hline: " << hlines[i] << endl;
     //cout << "length: " << length( hlines[i] ) << endl;
     hcoords.hline2points( hlines[i], p1, p2 );
-    line( mat, p1, p2, Scalar( 200, 0, 200 ) );
+    line( mat, p1, p2, colors[segments2vp_truth[i]] );
   }
 
   imshow( "hlines", mat );
-  waitKey(0);
+  waitKey(10);
 }
 
 
@@ -122,6 +123,9 @@ void ImageRecord::explore()
     HLine3d hline;
     if (hcoords.segment2hline( segments[i].first, segments[i].second, hline )) // отрезок не вырожден?
       hlines.push_back( hline );
+    else
+      assert(0); //убедимся что все отрезки не вырожденные
+      //hlines.push_back( HLine3d() );
   }
 
   show_hlines();
@@ -178,7 +182,8 @@ void ImageRecord::explore()
   //}
   
 
-  dbgPressAnyKey();
+  waitKey(0);
+  //dbgPressAnyKey();
 
 
 
