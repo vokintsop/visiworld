@@ -4,6 +4,9 @@ IF( MSVC )
   SET( SOURCES
     ${CMAKE_SOURCE_DIR}/prj.core/cover_net/cover_net.h
     ${CMAKE_SOURCE_DIR}/prj.core/ocvutils/hcoords.h
+    ${CMAKE_SOURCE_DIR}/prj.core/ocvutils/ocvkeys.h
+    ${CMAKE_SOURCE_DIR}/prj.core/ocvutils/ocvgui.h
+    ${CMAKE_SOURCE_DIR}/prj.core/ocvutils/ocvgui.cpp
     ${CMAKE_SOURCE_DIR}/prj.core/ocvutils/ticker.h
     src/explore.cpp 
     src/imagerecord.h 

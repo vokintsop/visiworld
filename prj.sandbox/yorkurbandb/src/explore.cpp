@@ -1,6 +1,8 @@
 // explore.cpp
 
 #include "ocvutils/precomp.h"
+#include "ocvutils/keys.h"
+#include "ocvutils/ocvgui.h"
 #include "imagerecord.h"
 
 
@@ -113,6 +115,82 @@ void ImageRecord::show_hlines()
   waitKey(10);
 }
 
+void ImageRecord::show_clusters(
+  CoverNet< int, UnionSpereAnglesRuler >  cover_net, // каберне, в котором утоплены пересечения линий
+  std::vector< std::vector< std::pair< int, int > > >& // in: по каждому уровню [<кол-во покрываемых точек, номер сферы>]
+      clusters // отсортирован  на каждом уровне по кол-ву покрываемых точек)
+      )
+{ //////////// show & print hlines
+
+  if (clusters.size() <=0)
+    return;
+  string imagename = name + ".jpg";
+  Mat mat1 = imread( imagename );
+  int level = 3;///clusters.size()/2;
+  int key = -1;
+  int iclust =0;
+  if (clusters[level].size() >= 0)
+  do {
+    Mat mat = mat1.clone();
+
+    int counter=0;
+    vector< double > angles;
+    const CoverSphere<int>& sph = cover_net.getSphere( clusters[level][iclust].second );
+    Point3d& vp = hlines_intersections[ sph.center ]; 
+    double radius = cover_net.getRadius(level);
+
+    for (int i=0; i< int(hlines.size()); i++)
+    {
+      Point p1,p2; 
+      //cout << "hline: " << hlines[i] << endl;
+      //cout << "length: " << length( hlines[i] ) << endl;
+      hcoords.hline2points( hlines[i], p1, p2 );
+      Scalar color2( 255,0,0 ); // blue
+      Scalar color1( 0,0,255 );
+
+      double angle = hline_hpoint_angle( vp, hlines[i] );
+      angles.push_back(angle);
+      if ( angle <= radius  )
+        line( mat, p1, p2, color1 ), counter++;
+      else
+        line( mat, p1, p2, color2 );
+    }
+    imshow( "clusters", mat );
+    setWindowText( "clusters", format("clusters: level=%d #%d intersections=%d lines=%d { %.4f %.4f %.4f } r=%.4f", 
+      level, iclust, clusters[level][iclust].first, counter, vp.x, vp.y, vp.z, radius ).c_str()  );
+
+    key = waitKey(10);
+    if (key == 27)
+      return;
+    if (key == kPageUp && level > 0)
+    {
+      level--;
+      iclust = 0;
+      continue;
+    }
+    if ( key == kPageDown && level < clusters.size()-1 )
+    {
+      level++;
+      iclust = 0;
+      continue;
+    }
+
+    if ( key == kLeftArrow && iclust > 0  )
+    {
+      iclust--;
+      continue;
+    }
+    if ( key == kRightArrow && iclust < clusters[level].size()-1  )
+    {
+      iclust++;
+      continue;
+    }
+
+  } while (1);
+
+
+}
+
 
 void ImageRecord::explore()
 {
@@ -170,6 +248,10 @@ void ImageRecord::explore()
     clusters( nlevels ); ///, vector< pair< int, int > > ); << подмножество cluster_candidates[][] с ограничением на близость и приоритетом более сильных
 
   select_cluster_candidates_to_clusters( cover_net, cluster_candidates, clusters );
+
+  show_clusters( cover_net, cluster_candidates );
+
+  //make_vp_triple();
 
 
   //vector< vector< pair< double, int > > cluster_chains( nlevels );
