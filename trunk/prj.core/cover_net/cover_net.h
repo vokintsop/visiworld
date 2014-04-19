@@ -126,8 +126,10 @@ public:
     double rad = rootRadius;
     for (int i=0; i<256; i++)
     {
-     levelsRadii.push_back( rad );
-     rad *= squeezeRatio;
+      levelsRadii.push_back( rad );
+      if (rad < minRadius)
+        break;
+      rad *= squeezeRatio;
     }
 
     attemptsToInsert=0; // счетчик числа попыток вставки

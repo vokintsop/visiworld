@@ -33,6 +33,21 @@ double hlines_angle( const cv::Point3d& p1, const cv::Point3d& p2 )
 #endif
 }
 
+inline
+double hline_hpoint_angle( const cv::Point3d& hline, const cv::Point3d& hpoint )
+{
+#if 1
+    assert( length(hline) < 1.001 );    assert( length(hline) > 0.999 );
+    assert( length(hpoint) < 1.001 );    assert( length(hpoint) > 0.999 );
+    double cos = hpoint.ddot( hline );
+    double phi = acos( std::max( -1., std::min( 1., cos ) ) );
+    //return phi;
+    return std::abs( CV_PI/2 - phi );
+#else
+    return upoints[cp1].ddot( upoints[cp2] );
+#endif
+}
+
 class UnionSpereAnglesRuler {
 public:
   std::vector< cv::Point3d >& upoints; // ссылка на внешний массив -- мн-во точек на единичной сфере
@@ -81,6 +96,11 @@ public:
       std::vector< std::vector< std::pair< int, int > > > // по каждому уровню [<кол-во покрываемых точек, номер сферы>]
       clusters // подмножество cluster_candidates[][] с ограничением на близость и приоритетом более сильных
   );
+  void show_clusters(
+  CoverNet< int, UnionSpereAnglesRuler >  cover_net, // каберне, в котором утоплены пересечения линий
+  std::vector< std::vector< std::pair< int, int > > >& // in: по каждому уровню [<кол-во покрываемых точек, номер сферы>]
+      clusters // отсортирован  на каждом уровне по кол-ву покрываемых точек)
+      );
   int how_to_use; // 0 - test, 1 - train, 2+ - reserved 
 
   // на выход
