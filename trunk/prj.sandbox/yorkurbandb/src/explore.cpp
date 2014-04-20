@@ -9,8 +9,9 @@
 using namespace std;
 using namespace cv;
 
+
 void ImageRecord::select_cluster_candidates_to_clusters(
-    CoverNet< int, UnionSpereAnglesRuler >  cover_net, // каберне, в котором утоплены пересечения линий
+    CoverNet< int, UnionSpereAnglesRuler >&  cover_net, // каберне, в котором утоплены пересечения линий
     vector< vector< pair< int, int > > >& // in: по каждому уровню [<кол-во покрываемых точек, номер сферы>]
       cluster_candidates, // отсортирован  на каждом уровне по кол-ву покрываемых точек
     vector< vector< pair< int, int > > > // по каждому уровню [<кол-во покрываемых точек, номер сферы>]
@@ -116,7 +117,7 @@ void ImageRecord::show_hlines()
 }
 
 void ImageRecord::show_clusters(
-  CoverNet< int, UnionSpereAnglesRuler >  cover_net, // каберне, в котором утоплены пересечения линий
+  CoverNet< int, UnionSpereAnglesRuler >&  cover_net, // каберне, в котором утоплены пересечения линий
   std::vector< std::vector< std::pair< int, int > > >& // in: по каждому уровню [<кол-во покрываемых точек, номер сферы>]
       clusters // отсортирован  на каждом уровне по кол-ву покрываемых точек)
       )
@@ -126,7 +127,11 @@ void ImageRecord::show_clusters(
     return;
   string imagename = name + ".jpg";
   Mat mat1 = imread( imagename );
-  int level = 3;///clusters.size()/2;
+  int level = -1;
+  for ( ; level+1 < int(clusters.size()) && clusters[level+1].size() > 0; level++ ){};
+  if (level == -1)
+    return;
+
   int key = -1;
   int iclust =0;
   if (clusters[level].size() >= 0)
@@ -145,10 +150,10 @@ void ImageRecord::show_clusters(
       //cout << "hline: " << hlines[i] << endl;
       //cout << "length: " << length( hlines[i] ) << endl;
       hcoords.hline2points( hlines[i], p1, p2 );
-      Scalar color2( 255,0,0 ); // blue
-      Scalar color1( 0,0,255 );
+      Scalar color1( 0,0,255 );// red
+      Scalar color2( 128, 200, 128 ); 
 
-      double angle = hline_hpoint_angle( vp, hlines[i] );
+      double angle = hline_hpoint_angle(hlines[i], vp);
       angles.push_back(angle);
       if ( angle <= radius  )
         line( mat, p1, p2, color1 ), counter++;
@@ -159,7 +164,7 @@ void ImageRecord::show_clusters(
     setWindowText( "clusters", format("clusters: level=%d #%d intersections=%d lines=%d { %.4f %.4f %.4f } r=%.4f", 
       level, iclust, clusters[level][iclust].first, counter, vp.x, vp.y, vp.z, radius ).c_str()  );
 
-    key = waitKey(10);
+    key = waitKey(0);
     if (key == 27)
       return;
     if (key == kPageUp && level > 0)
@@ -168,7 +173,7 @@ void ImageRecord::show_clusters(
       iclust = 0;
       continue;
     }
-    if ( key == kPageDown && level < clusters.size()-1 )
+    if ( key == kPageDown && level < int(clusters.size())-1 )
     {
       level++;
       iclust = 0;
@@ -180,7 +185,7 @@ void ImageRecord::show_clusters(
       iclust--;
       continue;
     }
-    if ( key == kRightArrow && iclust < clusters[level].size()-1  )
+    if ( key == kRightArrow && iclust < int(clusters[level].size())-1  )
     {
       iclust++;
       continue;
@@ -191,6 +196,155 @@ void ImageRecord::show_clusters(
 
 }
 
+void ImageRecord::make_vp_couples( 
+  CoverNet< int, UnionSpereAnglesRuler >&  cover_net, // каберне, в котором утоплены пересечения линий
+  std::vector< std::vector< std::pair< int, int > > >& // in: по каждому уровню [<кол-во покрываемых точек, номер сферы>]
+    clusters, // отсортирован  на каждом уровне по кол-ву покрываемых точек
+  vector< vector< pair< double, pair< Point3d,  Point3d > > > >& // по каждому уровню [< качество пары, < пара ортогональных точек схода> >]
+    couples // отсортирован  на каждом уровне по убывающему качеству пар
+      )
+{
+  couples.resize(clusters.size());
+  for (int level = 0; level < int(clusters.size()); level++)
+  {
+    couples[level].clear();
+    double radius = cover_net.getRadius(level);
+    for (int iclust=0; iclust< int(clusters[level].size()); iclust++)
+    {
+      const CoverSphere<int>& isph = cover_net.getSphere( clusters[level][iclust].second );
+      Point3d& ivp = hlines_intersections[ isph.center ]; 
+      for (int jclust=0; jclust<iclust; jclust++)
+      {
+        const CoverSphere<int>& jsph = cover_net.getSphere( clusters[level][jclust].second );
+        Point3d& jvp = hlines_intersections[ jsph.center ]; 
+        
+        double angle = hlines_angle( ivp, jvp );
+        if ( CV_PI/2. - angle > radius )
+          continue;
+
+        // ок, точки схода примерно перпендикулярны
+        bool doubtful = false;
+        int i_count=0;
+        int j_count=0;
+        for (int iline = 0; iline < int( hlines.size() ); iline++)
+        {
+          Point3d& hline = hlines[iline];
+          double i_angle = hline_hpoint_angle( hline, ivp );
+          double j_angle = hline_hpoint_angle( hline, jvp );
+          if ( i_angle > radius && j_angle > radius  )
+            continue;
+          if ( i_angle <= radius && j_angle <= radius  )
+          { // прямая лежит на обеих точках схода... оочень подозрительно. Скорее всего одна из точек схода ложная. Либо это линия горизонта...
+            doubtful = true;
+            continue;
+          }
+          if ( i_angle <= radius )
+            i_count++;
+          if ( j_angle <= radius )
+            j_count++;
+        }
+#if 1
+        double quality = i_count + j_count; 
+#else
+        double quality = sqrt( i_count*i_count + j_count*j_count ) // ... alchemy to investigate
+#endif
+          couples[level].push_back( make_pair( quality, make_pair( ivp, jvp ) ) );
+      } // for jclust
+    } // for iclust
+    sort( couples[level].rbegin(), couples[level].rend() ); 
+  } // for level
+}
+
+void ImageRecord::show_couples(//////////// show couples of ortohonal vanish points
+  CoverNet< int, UnionSpereAnglesRuler >&  cover_net, // каберне, в котором утоплены пересечения линий
+  std::vector< std::vector< std::pair< double, std::pair< cv::Point3d,  cv::Point3d > > > >& // по каждому уровню [< качество пары, < пара ортогональных точек схода> >]
+    couples // отсортирован  на каждом уровне по убывающему качеству пар
+      )
+{ 
+
+  if (couples.size() <=0)
+    return;
+  string imagename = name + ".jpg";
+  Mat mat1 = imread( imagename );
+  int level = int( couples.size() )-1;
+  for ( ; level >=0; level-- )
+  {
+    if (couples[level].size() > 0)
+      break;
+  };
+  if (level >= int( couples.size() ))
+    return;
+
+  int key = -1;
+  int icouple =0;
+  if (couples[level].size() >= 0)
+  do {
+    Mat mat = mat1.clone();
+    Scalar color_doubtful( 255,0,255 );// magenta -- line on both vps
+    Scalar color1( 0,0,255 );// red -- first vp
+    Scalar color2( 0,255,0 );// green -- second vp
+    Scalar color_others( 255, 255, 0 ); // others
+    int i_counter=0, j_counter=0;
+    Point3d& ivp = couples[level][icouple].second.first;
+    Point3d& jvp = couples[level][icouple].second.second;
+    double radius = cover_net.getRadius(level);
+
+    for (int i=0; i< int(hlines.size()); i++)
+    {
+      Point p1,p2; 
+      hcoords.hline2points( hlines[i], p1, p2 );
+      double ivp_angle = hline_hpoint_angle(hlines[i], ivp);
+      double jvp_angle = hline_hpoint_angle(hlines[i], jvp);
+
+      if ( ivp_angle <= radius && jvp_angle <= radius  )
+      {
+        line( mat, p1, p2, color_doubtful ); 
+        continue;
+      }
+
+      if        ( ivp_angle <= radius  )
+        line( mat, p1, p2, color1 ), i_counter++;
+      else  if  ( jvp_angle <= radius  )
+         line( mat, p1, p2, color2 ), j_counter++;
+      else
+       line( mat, p1, p2, color_others );
+    }
+    imshow( "couples", mat );
+    setWindowText( "couples", format("couples: level=%d #%d/%d qua=%f i_count=%d j_count=%d r=%.4f", 
+      level, icouple, couples[level].size(),
+      couples[level][icouple].first, i_counter, j_counter, radius ).c_str()  );
+
+    key = waitKey(0);
+    if (key == 27)
+      return;
+    if (key == kPageUp && level > 0)
+    {
+      level--;
+      icouple = 0;
+      continue;
+    }
+    if ( key == kPageDown && level+1 < int(couples.size()) )
+    {
+      level++;
+      icouple = 0;
+      continue;
+    }
+
+    if ( key == kLeftArrow && icouple > 0  )
+    {
+      icouple--;
+      continue;
+    }
+    if ( key == kRightArrow && icouple+1 < int(couples[level].size())  )
+    {
+      icouple++;
+      continue;
+    }
+
+  } while (1);
+
+
+}
 
 void ImageRecord::explore()
 {
@@ -244,14 +398,18 @@ void ImageRecord::explore()
   for (int i=0; i<cover_net.getCountOfLevels(); i++)
     std::sort( cluster_candidates[i].rbegin(), cluster_candidates[i].rend() ); // на каждом уровне сортируем по числу покрываемых точек
 
-  vector< vector< pair< int, int > > > // по каждому уровню [<кол-во покрываемых точек, номер сферы>]
-    clusters( nlevels ); ///, vector< pair< int, int > > ); << подмножество cluster_candidates[][] с ограничением на близость и приоритетом более сильных
+  ////////////////
+  //vector< vector< pair< int, int > > > // по каждому уровню [<кол-во покрываемых точек, номер сферы>]
+  //  clusters( nlevels ); ///, vector< pair< int, int > > ); << подмножество cluster_candidates[][] с ограничением на близость и приоритетом более сильных
+  //select_cluster_candidates_to_clusters( cover_net, cluster_candidates, clusters );
 
-  select_cluster_candidates_to_clusters( cover_net, cluster_candidates, clusters );
+  /////////////////
+  //show_clusters( cover_net, cluster_candidates );
 
-  show_clusters( cover_net, cluster_candidates );
-
-  //make_vp_triple();
+  vector< vector< pair< double, pair< Point3d,  Point3d > > > >// по каждому уровню [< качество пары, < пара ортогональных точек схода> >]
+    couples( nlevels );
+  make_vp_couples( cover_net, cluster_candidates, couples );
+  show_couples( cover_net, couples );
 
 
   //vector< vector< pair< double, int > > cluster_chains( nlevels );
@@ -267,14 +425,5 @@ void ImageRecord::explore()
   waitKey(0);
   //dbgPressAnyKey();
 
-
-
-  ////Metr1 ruler;  CoverTree< int, Metr1 > tree( &ruler, 1000, 1 );
-  //Metr2 ruler;  CoverTree< int, Metr2 > tree( &ruler, 1000, 1 );
-
-  //for (int i=0; i< int( samples.size() ); i++)
-  //  tree.insert( i );
-
-  //tree.reportStatistics( 0, 3 ); 
 
 }

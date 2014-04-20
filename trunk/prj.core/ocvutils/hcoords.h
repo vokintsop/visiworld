@@ -7,6 +7,22 @@
 
 inline double length( const cv::Point3d& v ){  return sqrt(v.ddot(v)); }
 
+//template<class T> 
+namespace cv {
+bool operator <( const cv::Point3d& _Left,  const cv::Point3d& _Right);
+}
+
+inline
+bool cv::operator <( const cv::Point3d& _Left,  const cv::Point3d& _Right)
+	{	
+    //return (   _Left.x < _Right.x ||
+		  //    !(_Right.x < _Left.x) && _Left.y < _Right.y ) ||
+		  //    !(_Right.y < _Left.y) && _Left.z < _Right.z
+    //      ;
+    return _Left.x < _Right.x;
+	}
+
+
 inline cv::Point3d& normalize( cv::Point3d& v ) // set length == 1
 {
   double len = length(v);
