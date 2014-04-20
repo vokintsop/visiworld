@@ -19,7 +19,7 @@ inline double degree( double radian )
   return (radian * 180) / CV_PI;
 }
 inline
-double hlines_angle( const cv::Point3d& p1, const cv::Point3d& p2 )
+double hlines_angle( const cv::Point3d& p1, const cv::Point3d& p2 ) // угол между пересекающимися прямыми, заданными векторами на единичной сфере
 {
 #if 1
     assert( length(p1) < 1.001 );    assert( length(p1) > 0.999 );
@@ -27,14 +27,14 @@ double hlines_angle( const cv::Point3d& p1, const cv::Point3d& p2 )
     double cos = p1.ddot( p2 );
     double phi = acos( std::max( -1., std::min( 1., cos ) ) );
     //return phi;
-    return std::min( CV_PI-phi, phi );
+    return std::min( CV_PI-phi, phi ); // не больше пипополам
 #else
     return upoints[cp1].ddot( upoints[cp2] );
 #endif
 }
 
 inline
-double hline_hpoint_angle( const cv::Point3d& hline, const cv::Point3d& hpoint )
+double hline_hpoint_angle( const cv::Point3d& hline, const cv::Point3d& hpoint ) // отклонение точки от прямой при проекции на единичную сферу
 {
 #if 1
     assert( length(hline) < 1.001 );    assert( length(hline) > 0.999 );
@@ -60,6 +60,11 @@ public:
   }
 };
 
+class HX : public cv::Point3d // пересечение двух линий на сфере
+{
+  double some_data;
+};
+
 class ImageRecord // результаты по картинке 
 {
 public:
@@ -83,24 +88,42 @@ public:
   std::vector< Segment > segments; // отрезки, выделенные на текущем изображении
   std::vector< int > segments2vp_truth; // номера точек схода, размеченные как ground_truth
   std::vector< HLine3d > hlines; // отрезки, преобразованные к линиям (с учетом параметров камеры)
+#if 0
+  std::vector< std::vector< HX > > hx; // пересечение [ihline][jhline]=> ?
+#else
   std::vector< cv::Point3d > hlines_intersections; // пересечения hlines[] на единичной сфере
+#endif
   std::vector< cv::Point3d > vanish_points; // точки схода (с учетом параметров камеры)
 
   void explore();
   void show_segments();
   void show_hlines();
   void select_cluster_candidates_to_clusters(
-    CoverNet< int, UnionSpereAnglesRuler >  cover_net, // каберне, в котором утоплены пересечения линий
+    CoverNet< int, UnionSpereAnglesRuler >&  cover_net, // каберне, в котором утоплены пересечения линий
     std::vector< std::vector< std::pair< int, int > > >& // in: по каждому уровню [<кол-во покрываемых точек, номер сферы>]
       cluster_candidates, // отсортирован  на каждом уровне по кол-ву покрываемых точек
       std::vector< std::vector< std::pair< int, int > > > // по каждому уровню [<кол-во покрываемых точек, номер сферы>]
       clusters // подмножество cluster_candidates[][] с ограничением на близость и приоритетом более сильных
   );
   void show_clusters(
-  CoverNet< int, UnionSpereAnglesRuler >  cover_net, // каберне, в котором утоплены пересечения линий
+  CoverNet< int, UnionSpereAnglesRuler >&  cover_net, // каберне, в котором утоплены пересечения линий
   std::vector< std::vector< std::pair< int, int > > >& // in: по каждому уровню [<кол-во покрываемых точек, номер сферы>]
       clusters // отсортирован  на каждом уровне по кол-ву покрываемых точек)
       );
+
+
+  void make_vp_couples( 
+    CoverNet< int, UnionSpereAnglesRuler >&  cover_net, // каберне, в котором утоплены пересечения линий
+    std::vector< std::vector< std::pair< int, int > > >& // in: по каждому уровню [<кол-во покрываемых точек, номер сферы>]
+      cluster_candidates, // отсортирован  на каждом уровне по кол-ву покрываемых точек
+    std::vector< std::vector< std::pair< double, std::pair< cv::Point3d,  cv::Point3d > > > >& // по каждому уровню [< качество пары, < пара ортогональных точек схода> >]
+      couples // отсортирован  на каждом уровне по убывающему качеству пар
+        );
+  void show_couples(//////////// show couples of ortohonal vanish points
+    CoverNet< int, UnionSpereAnglesRuler >&  cover_net, // каберне, в котором утоплены пересечения линий
+    std::vector< std::vector< std::pair< double, std::pair< cv::Point3d,  cv::Point3d > > > >& // по каждому уровню [< качество пары, < пара ортогональных точек схода> >]
+      couples // отсортирован  на каждом уровне по убывающему качеству пар
+        );
   int how_to_use; // 0 - test, 1 - train, 2+ - reserved 
 
   // на выход
