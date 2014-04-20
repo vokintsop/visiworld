@@ -106,8 +106,6 @@ void ImageRecord::show_hlines()
   for (int i=0; i< int(hlines.size()); i++)
   {
     Point p1,p2; 
-    //cout << "hline: " << hlines[i] << endl;
-    //cout << "length: " << length( hlines[i] ) << endl;
     hcoords.hline2points( hlines[i], p1, p2 );
     line( mat, p1, p2, colors[segments2vp_truth[i]] );
   }
@@ -309,6 +307,14 @@ void ImageRecord::show_couples(//////////// show couples of ortohonal vanish poi
       else
        line( mat, p1, p2, color_others );
     }
+    
+    { // нарисуем "horison" -- линию, проходящую через пару точек схода
+      Point p1,p2; 
+      Point3d hline = jvp.cross(ivp);
+      hcoords.hline2points( hline, p1, p2 );
+      line( mat, p1, p2, Scalar(0,255,255), 3 );
+    }
+
     imshow( "couples", mat );
     setWindowText( "couples", format("couples: level=%d #%d/%d qua=%f i_count=%d j_count=%d r=%.4f", 
       level, icouple, couples[level].size(),
