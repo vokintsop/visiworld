@@ -1,7 +1,7 @@
 // explore.cpp
 
 #include "ocvutils/precomp.h"
-#include "ocvutils/keys.h"
+#include "ocvutils/ocvkeys.h"
 #include "ocvutils/ocvgui.h"
 #include "imagerecord.h"
 
@@ -212,7 +212,7 @@ void ImageRecord::explore()
     for (int j=0; j<i; j++ ) // рассмотрим пары 0 <= j < i < hlines.size() 
     {
       Point3d i_j_intersection = normalize( hlines[i].cross( hlines[j] ) );
-      i_j_intersection = force_positive_direction( i_j_intersection );
+      //i_j_intersection = force_positive_direction( i_j_intersection );
       hlines_intersections.push_back( i_j_intersection );
     }
 
