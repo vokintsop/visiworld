@@ -1,3 +1,6 @@
+#ifndef __HCOORDS_H
+#define __HCOORDS_H
+#pragma once
 
 #include <opencv/cv.h>
 #include <opencv/highgui.h>
@@ -112,3 +115,6 @@ struct HCoords
     return true;
   }
 };
+
+
+#endif //__HCOORDS_H
