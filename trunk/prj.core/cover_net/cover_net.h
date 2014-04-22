@@ -636,8 +636,10 @@ int CoverNet<PointType, Metrics>::insert(
     int iStartSphere = 0// с какой сферы начинать поиск, 0 - корень дерева 
   )
   {
+    if (spheres.empty())
+      return -1;
     int isp=iStartSphere; // текущая сфера
-	int lev = spheres[isp].level; // текущий уровень
+	  int lev = spheres[isp].level; // текущий уровень
     double  rad = getRadius(lev);// радиус текущей сферы (на данном уровне)
     double dist = distanceToPt;
 
