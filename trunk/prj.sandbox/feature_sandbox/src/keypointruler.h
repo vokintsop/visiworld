@@ -2,6 +2,7 @@
 #define __KEYPOINTRULER_H
 #pragma once
 
+#include <math.h>
 #include <opencv2/core/core.hpp>
 #include <opencv2/features2d/features2d.hpp>
 #include <cover_net/cover_net.h>
@@ -37,6 +38,23 @@ private:
     if (res <= 200) //stereo 1280
       return 0;
     return res;
+  }
+};
+
+double hlines_angle( const cv::Point3d& p1, const cv::Point3d& p2 ) // угол между пересекающимися прямыми, заданными векторами на единичной сфере
+{
+    assert( length(p1) < 1.001 );    assert( length(p1) > 0.999 );
+    assert( length(p2) < 1.001 );    assert( length(p2) > 0.999 );
+    double cos = p1.ddot( p2 );
+    double phi = acos( std::max( -1., std::min( 1., cos ) ) );
+    return std::min( CV_PI-phi, phi ); // не больше пипополам
+}
+
+class UnitSphereAnglesRuler{
+public:
+  double computeDistance(const cv::Point3d &pt1, const cv::Point3d &pt2)
+  {
+    return hlines_angle(pt1, pt2);
   }
 };
 
