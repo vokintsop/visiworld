@@ -330,6 +330,11 @@ struct Dumbbell
     HPoint3d Q1 = curFrame->sphere_points[matches[heads.first].first];
     HPoint3d Q2 = curFrame->sphere_points[matches[heads.second].first];
 
+    if (abs(norm(P2 - P1) - norm(Q2 - Q1)) >= .05)
+    {
+      cout << "Pair should be rejected as a dumbbell" << endl;
+    }
+
     Point3d d1 = Q1 - P1;
     Point3d d2 = Q2 - P2;
 
@@ -337,7 +342,7 @@ struct Dumbbell
     Point3d n = (d1).cross(d2);
     if (cosd1d2 >= 0.99)
     {
-      cout << "dumbbell points lie on 1 meridian" << endl;
+     // cout << "dumbbell points lie on 1 meridian" << endl;
       n = P1.cross(P2).cross(Q1.cross(Q2));
     }
     double norm_n = norm(n);
@@ -386,10 +391,10 @@ void DumbbellCorrespond(Ptr<CNType> &coverNet, Ptr<SimpleFrame> &pivotFrame, Ptr
     }
 
   UnitSphereAnglesRuler angRuler;
-  CoverNet<Point3d &, UnitSphereAnglesRuler> angCNet(&angRuler, CV_PI, CV_PI/180);
+  CoverNet<Point3d *, UnitSphereAnglesRuler> angCNet(&angRuler, CV_PI, CV_PI/180);
   for (int i = 0; i < dumbbells.size(); ++i)
   {
-    angCNet.insert(dumbbells[i].ComputeRotationVector());
+    angCNet.insert(&dumbbells[i].ComputeRotationVector());
   }
 
   angCNet.reportStatistics();

@@ -33,7 +33,7 @@ public:
 private:
   static double pointDist(const cv::Point2f &pt1, const cv::Point2f &pt2)
   {
-    double res = sqrt(pow(pt1.x - pt2.x, 2.0) + pow(pt1.y - pt2.y, 2.0));
+    double res = norm(pt1 - pt2);
     //if (res <= 100)//mono 1920
     if (res <= 200) //stereo 1280
       return 0;
@@ -41,18 +41,18 @@ private:
   }
 };
 
-double hlines_angle( const cv::Point3d& p1, const cv::Point3d& p2 ) // угол между пересекающимися прямыми, заданными векторами на единичной сфере
+double hlines_angle( const cv::Point3d *p1, const cv::Point3d *p2 ) // угол между пересекающимися прямыми, заданными векторами на единичной сфере
 {
     assert( length(p1) < 1.001 );    assert( length(p1) > 0.999 );
     assert( length(p2) < 1.001 );    assert( length(p2) > 0.999 );
-    double cos = p1.ddot( p2 );
+    double cos = p1->ddot( *p2 );
     double phi = acos( std::max( -1., std::min( 1., cos ) ) );
     return std::min( CV_PI-phi, phi ); // не больше пипополам
 }
 
 class UnitSphereAnglesRuler{
 public:
-  double computeDistance(const cv::Point3d &pt1, const cv::Point3d &pt2)
+  double computeDistance(const cv::Point3d *pt1, const cv::Point3d *pt2)
   {
     return hlines_angle(pt1, pt2);
   }
