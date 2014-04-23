@@ -93,7 +93,7 @@ int main( int argc, char** argv )
   Init();
  // MonoCorrespondTime();
   MonoCorrespondDumbbells();
- // StereoCorrespond();
+  //StereoCorrespond();
   return 0;
 }
 
@@ -158,9 +158,9 @@ void TryCorrespond(Ptr<CNType> &coverNet, Ptr<SimpleFrame> &curFrame)
   {
     cv::circle(todraw, curFrame->kps[i].pt, 1, cv::Scalar(255,0,0), 2);
     double dist = 0.2;
-    int iSph = coverNet->findNearestSphere(make_pair(curFrame, i), dist);
+    int iSph = coverNet->findNearestSphere(make_pair(curFrame.obj, i), dist);
     if (iSph == -1) //no newarest point found
-      iSph = coverNet->insert(make_pair(curFrame, i)); //creating new coverNet Sphere
+      iSph = coverNet->insert(make_pair(curFrame.obj, i)); //creating new coverNet Sphere
     if (iSph != -1)
     {
       SimpleFrame *tmp = coverNet->getSphere(iSph).center.first;
@@ -235,7 +235,7 @@ void TryCorrespondStereo(Ptr<CNType> &coverNet, Ptr<SimpleFrame> &lFrame, Ptr<Si
     pt.x += lFrame->src.cols;
     cv::circle(todraw, pt, 1, cv::Scalar(255,0,0), 2);
     double dist = 0.2;
-    int iSph = coverNet->findNearestSphere(make_pair(rFrame, i), dist);
+    int iSph = coverNet->findNearestSphere(make_pair(rFrame.obj, i), dist);
     /*
     if (iSph == -1) //no newarest point found
       iSph = coverNet->insert(make_pair(rFrame, i)); //creating new coverNet Sphere
@@ -261,7 +261,7 @@ void InitCoverNet(Ptr<CNType> &coverNet, Ptr<SimpleFrame> &pivotFrame)
     return;
   for (unsigned int i = 0; i < pivotFrame->kps.size(); ++i)
   {
-    coverNet->insert(make_pair(pivotFrame, i));
+    coverNet->insert(make_pair(pivotFrame.obj, i));
   }
 }
 
@@ -323,6 +323,25 @@ struct Dumbbell
   Dumbbell(vector<pair<unsigned int, unsigned int>> &matches_)
     :matches(matches_) {}
 
+  Dumbbell(const Dumbbell &cpy)
+    :matches(cpy.matches)
+    , curFrame(cpy.curFrame)
+    , pivotFrame(cpy.pivotFrame)
+    , heads(cpy.heads)
+    , rotationVector(cpy.rotationVector)
+  {}
+  
+  Dumbbell & operator=(const Dumbbell &rhs)
+  {
+    matches = rhs.matches;
+    curFrame = rhs.curFrame;
+    pivotFrame = rhs.pivotFrame;
+    heads = rhs.heads;
+    rotationVector = rhs.rotationVector;
+    return *this;
+  }
+
+
   Point3d & ComputeRotationVector()
   {
     HPoint3d P1 = pivotFrame->sphere_points[matches[heads.first].second];
@@ -369,7 +388,7 @@ void DumbbellCorrespond(Ptr<CNType> &coverNet, Ptr<SimpleFrame> &pivotFrame, Ptr
   for (unsigned int i = 0; i < curFrame->kps.size(); ++i)
   {
     double dist = 0.2;
-    int iSph = coverNet->findNearestSphere(make_pair(curFrame, i), dist);
+    int iSph = coverNet->findNearestSphere(make_pair(curFrame.obj, i), dist);
     if (iSph != -1)
     {
       int ikp = coverNet->getSphere(iSph).center.second;
