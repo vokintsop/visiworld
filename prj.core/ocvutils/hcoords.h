@@ -55,8 +55,8 @@ struct HCoords
   int depth = 0 // tmp
   ): width(width), height(height), depth(depth)
   {
-    if (depth == 0)
-      depth = width/2; // предположим, что 90 градусов по горизонтали
+    if (this->depth == 0) //!!!!did not update!!!!
+      this->depth = width/2; // предположим, что 90 градусов по горизонтали
   }
 
   cv::Point3d convert( // << результат = нормализованный вектор
