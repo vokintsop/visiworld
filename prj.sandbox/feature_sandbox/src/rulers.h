@@ -41,7 +41,7 @@ private:
   }
 };
 
-double hlines_angle( const cv::Point3d* p1, const cv::Point3d* p2 ) // угол между пересекающимися прямыми, заданными векторами на единичной сфере
+static inline double hlines_angle( const cv::Point3d* p1, const cv::Point3d* p2 ) // угол между пересекающимися прямыми, заданными векторами на единичной сфере
 {
     assert( length(*p1) < 1.001 );    assert( length(*p1) > 0.999 );
     assert( length(*p2) < 1.001 );    assert( length(*p2) > 0.999 );
