@@ -83,7 +83,7 @@ template < class PointType, class Metrics >
 class CoverNet
 {
   std::vector< CoverSphere< PointType > > spheres;
-  std::vector< std::pair< int, int > > ancles; // <ancle sphere, next> списки вершин уровнем выше, которые покрывают данную 
+  std::vector<std::pair< int, int > > ancles; // <ancle sphere, next> списки вершин уровнем выше, которые покрывают данную 
 
   Metrics* ruler;
   double rootRadius;  // при создании рута изначально указываетс€ ожидаемое рассто€ние между наиболее удаленными точками
@@ -190,6 +190,7 @@ public:
 public:
   bool checkCoverNetSphere(int iSphere, int iKidSphere); // функци€, провер€юща€ корректность построени€ дерева -- на данный момент тот факт, что все потомки внутри данной сферы
   
+  void countUncles(int iFrom, int iRoot = 0); // считает всех д€дьев данной сферы
 
   bool checkCoverNet();
 
@@ -238,6 +239,11 @@ public:
   void printNode( int node, int level );
   
   void reportStatistics( int node =0,  int detailsLevel=3 ); 
+
+  public:
+  void CoverNet<PointType, Metrics>::countAncles();// вычисл€ет д€дьев данной сферы
+  private:
+  void countAncles_(int fromNum, int num);// fromNum - номер поддерева. num - номер мферы дл€ которой считаетс€ ответ
 };
 
 template < class PointType, class Metrics>
@@ -838,6 +844,53 @@ int CoverNet<PointType, Metrics>::insert(
 
   }
   
+
+  template < class PointType, class Metrics>
+  void CoverNet<PointType, Metrics>::countAncles() // вычисл€ет д€дьев данной сферы
+  {
+    ancles.resize(0);
+    for (int i = 0; i < (int)spheres.size(); ++i)
+    {
+      spheres[i].ancle = -1;
+      countAncles_(0, i);
+    }
+  }
+
+  template < class PointType, class Metrics>
+  void CoverNet<PointType, Metrics>::countAncles_(int fromNum, int num) // fromNum - номер поддерева. num - номер мферы дл€ которой считаетс€ ответ
+  {
+    int local_result = 0;
+    int level = spheres[fromNum].level;
+    double radius = getRadius(level);
+    double dist = computeDistance(fromNum, spheres[num].center);
+  
+    if (level + 1 == spheres[num].level) // если сфера на уровень выше
+    {
+      if (radius <= dist) // если она накрывает точку
+      {
+        ancles.push_back(make_pair(fromNum, spheres[num].ancle));
+        spheres[num].ancle = ancles.size() - 1;
+      }
+      return;
+    } 
+   
+    double add_radius = getRadius(spheres[Num].level - 1); // радиус д€ди
+    if (radius + add_radius < dist) // если сферы вообще не пересекаютс€ !
+    {
+      return;
+    } 
+
+    
+    int kid = spheres[fromNum].last_kid;// последний ребенок
+    while (kid > 0)// идем по всем дет€м
+    {
+      local_result += countAncles_(kid, num);
+      kid = spheres[kid].prev_brother;
+    }
+
+    return local_result;
+  }
+
 #endif // __COVER_NET_H
 
 
