@@ -14,38 +14,42 @@ using namespace std;
 using namespace cv;
 
 
-  cv::Point3d & Dumbbell::ComputeRotationVector()
+Point3d & Dumbbell::ComputeRotationVector()
+{
+  HPoint3d P1 = pivotFrame->sphere_points[matches[heads.first].second];
+  HPoint3d P2 = pivotFrame->sphere_points[matches[heads.second].second];
+  HPoint3d Q1 = curFrame->sphere_points[matches[heads.first].first];
+  HPoint3d Q2 = curFrame->sphere_points[matches[heads.second].first];
+
+  if (abs(norm(P2 - P1) - norm(Q2 - Q1)) >= .01)
   {
-    HPoint3d P1 = pivotFrame->sphere_points[matches[heads.first].second];
-    HPoint3d P2 = pivotFrame->sphere_points[matches[heads.second].second];
-    HPoint3d Q1 = curFrame->sphere_points[matches[heads.first].first];
-    HPoint3d Q2 = curFrame->sphere_points[matches[heads.second].first];
-
-    if (abs(norm(P2 - P1) - norm(Q2 - Q1)) >= .05)
-    {
-      cout << "Pair should be rejected as a dumbbell" << endl;
-    }
-
-    Point3d d1 = Q1 - P1;
-    Point3d d2 = Q2 - P2;
-
-    double cosd1d2 = d1.dot(d2) / sqrt((d1.dot(d1) * d2.dot(d2)));
-    Point3d n = (d1).cross(d2);
-    if (cosd1d2 >= 0.99)
-    {
-     // cout << "dumbbell points lie on 1 meridian" << endl;
-      n = P1.cross(P2).cross(Q1.cross(Q2));
-    }
-    double norm_n = norm(n);
-    if (norm_n != 0)
-    {
-      n.x /= norm_n;
-      n.y /= norm_n;
-      n.z /= norm_n;
-    }
-    rotationVector = n;
-    return rotationVector;
+   // cout << "Dumbbell is not rigid!" << endl;
+    return rotationVector = Point3d();
   }
+
+  Point3d d1 = Q1 - P1;
+  Point3d d2 = Q2 - P2;
+  if (norm(d1) <= 0.001 || norm(d2) <= 0.001)
+  {
+    //cout << "points did not move" << endl;
+    return rotationVector = Point3d();
+  }
+  double cosd1d2 = d1.dot(d2) / sqrt((d1.dot(d1) * d2.dot(d2)));
+  Point3d n = (d1).cross(d2);
+  if (cosd1d2 >= 0.99)
+  {
+    // cout << "dumbbell points lie on 1 meridian" << endl;
+    n = P1.cross(P2).cross(Q1.cross(Q2));
+  }
+  double norm_n = norm(n);
+  if (norm_n != 0)
+  {
+    n.x /= norm_n;
+    n.y /= norm_n;
+    n.z /= norm_n;
+  }
+  return rotationVector = n;
+}
 
 void DumbbellCorrespond(Ptr<CNType> &coverNet, Ptr<SimpleFrame> &pivotFrame, Ptr<SimpleFrame> &curFrame)
 {  
@@ -77,11 +81,14 @@ void DumbbellCorrespond(Ptr<CNType> &coverNet, Ptr<SimpleFrame> &pivotFrame, Ptr
       dumbbells.push_back(d);
     }
 
+  cout << "\ndumbbells found: " << dumbbells.size() << endl;
   UnitSphereAnglesRuler angRuler;
   CoverNet<Point3d *, UnitSphereAnglesRuler> angCNet(&angRuler, CV_PI, CV_PI/180);
   for (unsigned int i = 0; i < dumbbells.size(); ++i)
   {
-    angCNet.insert(&dumbbells[i].ComputeRotationVector());
+    dumbbells[i].ComputeRotationVector();
+    if (dumbbells[i].rotationVector != Point3d())
+      angCNet.insert(&dumbbells[i].rotationVector);
   }
 
   angCNet.reportStatistics();
