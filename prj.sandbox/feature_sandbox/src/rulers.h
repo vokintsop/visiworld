@@ -43,8 +43,6 @@ private:
 
 static inline double hlines_angle( const cv::Point3d* p1, const cv::Point3d* p2 ) // угол между пересекающимися прямыми, заданными векторами на единичной сфере
 {
-    assert( length(*p1) < 1.001 );    assert( length(*p1) > 0.999 );
-    assert( length(*p2) < 1.001 );    assert( length(*p2) > 0.999 );
     double cos = p1->ddot( *p2 );
     double phi = acos( std::max( -1., std::min( 1., cos ) ) );
     return std::min( CV_PI-phi, phi ); // не больше пипополам
