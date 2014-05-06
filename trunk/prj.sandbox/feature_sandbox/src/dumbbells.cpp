@@ -41,14 +41,59 @@ Point3d & Dumbbell::ComputeRotationVector()
     // cout << "dumbbell points lie on 1 meridian" << endl;
     n = P1.cross(P2).cross(Q1.cross(Q2));
   }
+  /*
   double norm_n = norm(n);
   if (norm_n != 0)
   {
-    n.x /= norm_n;
-    n.y /= norm_n;
-    n.z /= norm_n;
+    n.x /= norm_n; n.y /= norm_n; n.z /= norm_n;
+  }*/
+  if (n.y < 0)
+  {
+    n.x *= -1; n.y *= -1; n.z *= -1;
+  }
+  else if (n.y == 0 && n.x < 0)
+  {
+    n.x *= -1; n.z *= -1;
+  }
+  else if (n.y == 0 && n.x == 0 && n.z < 0)
+  {
+    n.z = 1;
   }
   return rotationVector = n;
+}
+
+template<class PointType, class Metrics>
+void TryClusterise(CoverNet<PointType, Metrics> &cnet)
+{
+  int nlevels = cnet.getCountOfLevels(); // кол-во уровней в дереве
+  vector< int > true_weight;
+  cnet.countTrueWeight( true_weight );
+  vector< vector< pair< int, int > > > // по каждому уровню [<кол-во покрываемых точек, номер сферы>]
+    cluster_candidates( nlevels ); ///, vector< pair< int, int > > ); 
+  for (int i = 0; i < int(true_weight.size()); ++i) // i -- номер сферы
+  {
+    int level = cnet.getSphereLevel(i);
+    int weight = true_weight[i];
+    cluster_candidates[level].push_back( make_pair( weight, i ) );
+  }
+  for (int i = 0; i < cnet.getCountOfLevels(); ++i)
+  {
+    sort(cluster_candidates[i].rbegin(), cluster_candidates[i].rend()); // на каждом уровне сортируем по числу покрываемых точек
+    
+  }
+  ///*
+  for (int level = 1; level < cnet.getCountOfLevels(); ++level)
+  {
+    cout << "level " << level << ": , radius = " << cnet.getRadius(level) << endl;
+    for (int i = 0; i < std::min((unsigned int) 10, cluster_candidates[level].size()); ++i)
+    {
+      Point3d point = *(cnet.getSphere(cluster_candidates[level].at(i).second).center);
+      double tmpnorm = norm(point);
+      point.x /= tmpnorm; point.y /= tmpnorm; point.z /= tmpnorm;
+      cout << point << "\t norm: " << tmpnorm << ";\tweight: " << cluster_candidates[level].at(i).first << endl;
+    }
+    cout << endl;
+  }//*/
 }
 
 void DumbbellCorrespond(Ptr<CNType> &coverNet, Ptr<SimpleFrame> &pivotFrame, Ptr<SimpleFrame> &curFrame)
@@ -92,6 +137,10 @@ void DumbbellCorrespond(Ptr<CNType> &coverNet, Ptr<SimpleFrame> &pivotFrame, Ptr
   }
 
   angCNet.reportStatistics();
+  cout << endl;
+  //поиск кластеров
+  TryClusterise(angCNet);
+
   return;
 }
 
@@ -139,4 +188,3 @@ void MonoCorrespondDumbbells(Ptr<FeatureDetector> featureDetector,
     }
   }
 }
-
