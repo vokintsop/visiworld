@@ -17,7 +17,7 @@ int explore_words( int argc, char* argv[] );
 
 int main( int argc, char* argv[] )
 {
-  //explore_mnist(argc, argv);
-  explore_words(argc, argv);
+  explore_mnist(argc, argv);
+  //explore_words(argc, argv);
   return 0;
 }

@@ -382,6 +382,7 @@ void explore_cover_tree()
 
   Metr1 ruler1;
   Metr2 ruler2;
+
   for (int chr =10; chr<=10; chr++)
   {
     if (chr < 10)
@@ -402,6 +403,8 @@ void explore_cover_tree()
     //CoverNet< int, Metr2 > cvnet2( &ruler2, SAMPLE_HEIGHT*SAMPLE_WIDTH*256, 4 );  // << 8-NN => 2.24
 
 
+    cout << "triangle: " << ruler2.computeDistance(7, 12) << " " << ruler2.computeDistance(12, 27) << " " << ruler2.computeDistance(27, 7) << endl;
+    system ("pause");
     if (test_hamming)
     {
       Ticker t;
@@ -412,6 +415,9 @@ void explore_cover_tree()
           cvnet1.insert( i );
         }
       }
+
+
+      // cout << "triangle: " << ruler1.computeDistance(7, 12) << " " << ruler1.computeDistance(12, 27) << " " << ruler1.computeDistance(27, 7) << endl;
       double ms = (double)t.msecs();
       cout << "\nHamming metrics (simple L1):" << endl;
       cvnet1.reportStatistics( 0, 3 ); 
@@ -421,6 +427,7 @@ void explore_cover_tree()
     if (test_smart)
     {
       Ticker t;
+      //for (int i = 0; i < 100; ++i)// 
       for (int i=0; i< int( trn_samples.size() ); i++)
       {
         if (chr == 10 || trn_samples[i].first == chr)
@@ -428,6 +435,10 @@ void explore_cover_tree()
           cvnet2.insert( i );
         }
       }
+
+      //cvnet2.countAncles();
+     // cvnet2.testAncles();
+
       double ms = (double)t.msecs();
       cout << "\nA vs dilate(B) + B vs dilate(A) metrics (L1):" << endl;
       cvnet2.reportStatistics( 0, 3 ); 
@@ -609,6 +620,8 @@ int explore_mnist( int argc, char* argv[] )
   dilate_samples();
 
   explore_cover_tree();
+
+
 
 
   return 1;
