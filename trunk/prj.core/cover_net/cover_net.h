@@ -241,9 +241,15 @@ public:
   void reportStatistics( int node =0,  int detailsLevel=3 ); 
 
   public:
-  void CoverNet<PointType, Metrics>::countAncles();// вычисляет дядьев данной сферы
+  void countAncles();// вычисляет дядьев данной сферы
   private:
   void countAncles_(int fromNum, int num);// fromNum - номер поддерева. num - номер мферы для которой считается ответ
+
+  public:
+  void testAncles(); // тестирует дядьев
+
+  public:
+  void printKids(int num);
 };
 
 template < class PointType, class Metrics>
@@ -849,7 +855,7 @@ int CoverNet<PointType, Metrics>::insert(
   void CoverNet<PointType, Metrics>::countAncles() // вычисляет дядьев данной сферы
   {
     ancles.resize(0);
-    for (int i = 0; i < (int)spheres.size(); ++i)
+    for (int i = 1; i < (int)spheres.size(); ++i)
     {
       spheres[i].ancle = -1;
       countAncles_(0, i);
@@ -857,39 +863,131 @@ int CoverNet<PointType, Metrics>::insert(
   }
 
   template < class PointType, class Metrics>
-  void CoverNet<PointType, Metrics>::countAncles_(int fromNum, int num) // fromNum - номер поддерева. num - номер мферы для которой считается ответ
+  void CoverNet<PointType, Metrics>::countAncles_(int fromNum, int num) // fromNum - номер поддерева. num - номер сферы для которой считается ответ
   {
-    int local_result = 0;
     int level = spheres[fromNum].level;
     double radius = getRadius(level);
     double dist = computeDistance(fromNum, spheres[num].center);
   
-    if (level + 1 == spheres[num].level) // если сфера на уровень выше
+    if (level + 1 == spheres[num].level) // если сфера на уровень выше - то есть может быть дядей
     {
-      if (radius <= dist) // если она накрывает точку
+      if (radius >= dist) // если она накрывает точку
       {
         ancles.push_back(make_pair(fromNum, spheres[num].ancle));
         spheres[num].ancle = ancles.size() - 1;
       }
-      return;
+      return;// ниже спускаться неинтересно
     } 
    
-    double add_radius = getRadius(spheres[Num].level - 1); // радиус дяди
-    if (radius + add_radius < dist) // если сферы вообще не пересекаются !
+    double add_radius = getRadius(spheres[num].level - 1); // радиус дяди
+    if (radius + add_radius < dist) // если ни одна точка внутри сферы fromNum не может накрыть num
     {
-      return;
+      if (num == 43)
+      {
+        cout << " " << fromNum << " " << spheres[num].level - 1 << " " << radius + add_radius << " " << dist << endl;
+       // cout << "atata" << endl;
+      }
+      return;// то все
     } 
 
     
     int kid = spheres[fromNum].last_kid;// последний ребенок
     while (kid > 0)// идем по всем детям
     {
-      local_result += countAncles_(kid, num);
+      countAncles_(kid, num);
+      //if (radius < computeDistance(fromNum, spheres[kid].center))
+      //    cout << "Oo" << endl;
       kid = spheres[kid].prev_brother;
     }
-
-    return local_result;
   }
+
+  template < class PointType, class Metrics>
+  void CoverNet<PointType, Metrics>::printKids(int num)
+  {
+    cout << "kids of vertex num " << num << ":  ";
+    int kid = spheres[num].last_kid;// последний ребенок
+    while (kid > 0)// идем по всем детям
+    {
+      cerr << kid <<" ";
+      kid = spheres[kid].prev_brother;
+    }
+    cout << endl;
+  }
+
+  template < class PointType, class Metrics>
+  void CoverNet<PointType, Metrics>::testAncles() // тестирует дядьев
+  {
+    std::cerr << "----------------------------" << std::endl;
+    std::cerr << "Begin testing ancles" << std::endl;
+    countAncles();
+
+    printKids(57);
+    cout  << "radius 43 ancle: "<< getRadius(spheres[43].level - 1) << endl; // радиус дяди 42 сферы
+    cout << "radius 57: " << getRadius(spheres[57].level) << endl; //радиус 57 сферы
+    cout << "radius 103: " << getRadius(spheres[103].level) << endl;
+    cout << "distance 43, 57: "<< computeDistance(43, spheres[57].center) << endl;
+    cout << "distance 43, 103: "<< computeDistance(43, spheres[103].center) << endl;
+    cout << "distance 57, 103: " << computeDistance(57, spheres[103].center) << endl;
+
+
+    cout << spheres[43].center << " " << spheres[57].center << " " << spheres[103].center << endl;
+    for (int i = 1; i < spheres.size(); ++i)
+    {
+      std::vector<int> test_ancle;
+      std::vector<int> res_ancle;
+      for (int i1 = 0; i1 < spheres.size(); ++i1)
+      {
+        if (spheres[i].level ==  spheres[i1].level + 1) // если i1 может быть дядей i
+        {
+            double rad1 = getRadius(spheres[i1].level);
+            if (computeDistance(i, spheres[i1].center) <= rad1 + 1e-5)// если i1 накрывает i
+              test_ancle.push_back(i1);// то дядя
+        }
+      }
+      int ancl = spheres[i].ancle;// последний дядя
+      while (ancl >= 0)// идем по всем дядям
+      {  
+        res_ancle.push_back(ancles[ancl].first);
+        ancl = ancles[ancl].second;
+      }
+      
+      std::sort(test_ancle.begin(), test_ancle.end());
+      std::sort(res_ancle.begin(), res_ancle.end());
+      
+      if (test_ancle != res_ancle)
+      {
+         double rad1 = getRadius(spheres[i].level - 1);
+         cout << rad1 << endl;
+        cout << "test_ancle_dist:  ";
+        for (int j = 0; j < test_ancle.size(); ++j)
+        {
+          cout << computeDistance(i, spheres[test_ancle[j]].center) << " ";
+        }
+        cout << endl;
+
+        cout << "test_ancle:  ";
+        for (int j = 0; j < test_ancle.size(); ++j)
+        {
+          cout << test_ancle[j] << " ";
+        }
+        cout << endl;
+
+        cout << "res_ancle:   ";
+        for (int j = 0; j < res_ancle.size(); ++j)
+        {
+          cout << res_ancle[j] << " ";
+        }
+        cout << endl;
+        std::cerr << "Error at sphehere number " << i << std::endl;
+        system ("pause");
+      }
+    }
+
+    std::cerr << "End testing ancles" << std::endl;
+    std::cerr << "----------------------------" << std::endl;
+    
+  }
+
 
 #endif // __COVER_NET_H
 
