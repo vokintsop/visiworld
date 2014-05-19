@@ -38,7 +38,7 @@ Point3d & Dumbbell::ComputeRotationVector()
   Point3d n = (d1).cross(d2);
   if (cosd1d2 >= 0.99)
   {
-    // cout << "dumbbell points lie on 1 meridian" << endl;
+    //cout << "dumbbell points lie on 1 meridian" << endl;
     n = P1.cross(P2).cross(Q1.cross(Q2));
   }
   /*
@@ -47,6 +47,8 @@ Point3d & Dumbbell::ComputeRotationVector()
   {
     n.x /= norm_n; n.y /= norm_n; n.z /= norm_n;
   }*/
+
+  //направояем векторы в одну сторону
   if (n.y < 0)
   {
     n.x *= -1; n.y *= -1; n.z *= -1;
@@ -61,7 +63,7 @@ Point3d & Dumbbell::ComputeRotationVector()
   }
   return rotationVector = n;
 }
-
+  
 template<class PointType, class Metrics>
 void TryClusterise(CoverNet<PointType, Metrics> &cnet)
 {
@@ -147,7 +149,8 @@ void DumbbellCorrespond(Ptr<CNType> &coverNet, Ptr<SimpleFrame> &pivotFrame, Ptr
 void MonoCorrespondDumbbells(Ptr<FeatureDetector> featureDetector,
   Ptr<DescriptorExtractor> descriptorExtractor)
 {
-  string ifilename = "/testdata/roadvideo/input/roadvideo.02/roadvideo.02.0001.avi";
+  //string ifilename = "/testdata/roadvideo/input/roadvideo.02/roadvideo.02.0001.avi";
+  string ifilename = "D:/vic/MIPT/work/visiglass/coding/svn/testdata.upload/cities/arnhem01.mp4";
   VideoCapture cap(ifilename);
   int nFrames = cvRound(cap.get(CV_CAP_PROP_FRAME_COUNT));
   int w = cvRound(cap.get(CV_CAP_PROP_FRAME_WIDTH));
@@ -160,7 +163,9 @@ void MonoCorrespondDumbbells(Ptr<FeatureDetector> featureDetector,
   Ptr<CNType> coverNet = new CNType(&ruler, rootRadius, minRadius);
   Ptr<SimpleFrame> pivotFrame = NULL, curFrame = NULL;
   int coverNetFlush = 0;
-  for (int iFrame = 0; iFrame < nFrames; ++iFrame)
+  int iFrame = 29.0 * 13; //int iFrame = 0;
+  cap.set(CV_CAP_PROP_POS_FRAMES, iFrame);
+  for (; iFrame < nFrames; ++iFrame)
   {
     char c = 0;
     if (!cap.read(bgr))
@@ -177,10 +182,11 @@ void MonoCorrespondDumbbells(Ptr<FeatureDetector> featureDetector,
         coverNetFlush = 0;
       }
       DumbbellCorrespond(coverNet, pivotFrame, curFrame);
-      curFrame->draw();
+      curFrame->draw("curframe");
+      pivotFrame->draw("pivotframe");
       c = cvWaitKey(0);
       ++coverNetFlush;
-      coverNetFlush %= 10;
+      coverNetFlush %= 20;
     }
     if (c == 27)
     {
