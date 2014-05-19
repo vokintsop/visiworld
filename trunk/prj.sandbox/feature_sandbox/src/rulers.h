@@ -55,7 +55,7 @@ class UnitSphereAnglesRuler{
 public:
   double computeDistance(const cv::Point3d *pt1, const cv::Point3d *pt2)
   {
-    return hlines_angle(pt1, pt2) + 1e7 * abs(norm(*pt1) - norm(*pt2));
+    return hlines_angle(pt1, pt2);// + 1e5 * abs(norm(*pt1) - norm(*pt2));
   }
 };
 
