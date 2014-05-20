@@ -210,7 +210,7 @@ public:
   findKNearestPoints( // ближайшие к указанной точке центры сфер из дерева
     const PointType& pt,// точка для которой ищем сферу с ближайшим центром
     int k, // количество вершин
-    double best_distance// [in/out] рекорд расстояния -- оно же и отсечение (не искать дальше чем указано)
+    double best_distance=1e100// [in/out] рекорд расстояния -- оно же и отсечение (не искать дальше чем указано)
   , int iStartSphere = 0// с какой сферы начинать поиск, 0 - корень дерева 
   );
 
@@ -250,6 +250,9 @@ public:
 
   public:
   void printKids(int num);
+
+  public:
+  void testKNearestPoints(PointType p, int k);  // тестирует k ближайших
 };
 
 template < class PointType, class Metrics>
@@ -564,7 +567,7 @@ int CoverNet<PointType, Metrics>::insert(
 
 	  if (min_dist > best_kth_distance)// если минимальное расстояние больше оптимального
 		  return best_kth_distance;
-	  if (dist < best_kth_distance && !is_copy)// если можно улучшить ответ (хотя бы самую плохую сферу)
+	  if (dist < best_kth_distance && !is_copy)// если можно улучшить ответ (хотя бы самую плохую сферу)//!!!!!!!!!!!
 	  {
 		   best_spheres.push(make_pair(dist, isp)); // добавляем новое расстояние
        if (int( best_spheres.size()) > k) // если сфер больше чем k
@@ -614,7 +617,7 @@ int CoverNet<PointType, Metrics>::insert(
   CoverNet<PointType, Metrics>::findKNearestPoints( // ближайшие к указанной точке центры сфер из дерева
     const PointType& pt,// точка для которой ищем сферу с ближайшим центром
     int k, // количество вершин
-    double best_distance// [in/out] рекорд расстояния -- оно же и отсечение (не искать дальше чем указано)
+    double best_distance = 1e100// [in/out] рекорд расстояния -- оно же и отсечение (не искать дальше чем указано)
   , int iStartSphere = 0// с какой сферы начинать поиск, 0 - корень дерева 
   )
   {
@@ -931,6 +934,8 @@ int CoverNet<PointType, Metrics>::insert(
 
 
     cout << spheres[43].center << " " << spheres[57].center << " " << spheres[103].center << endl;
+    int count_error = 0;
+    int sum_count = 0;
     for (int i = 1; i < spheres.size(); ++i)
     {
       std::vector<int> test_ancle;
@@ -954,9 +959,12 @@ int CoverNet<PointType, Metrics>::insert(
       std::sort(test_ancle.begin(), test_ancle.end());
       std::sort(res_ancle.begin(), res_ancle.end());
       
+
+      sum_count += test_ancle.size();
       if (test_ancle != res_ancle)
       {
-         double rad1 = getRadius(spheres[i].level - 1);
+        count_error += test_ancle.size() - res_ancle.size();
+        /* double rad1 = getRadius(spheres[i].level - 1);
          cout << rad1 << endl;
         cout << "test_ancle_dist:  ";
         for (int j = 0; j < test_ancle.size(); ++j)
@@ -979,12 +987,75 @@ int CoverNet<PointType, Metrics>::insert(
         }
         cout << endl;
         std::cerr << "Error at sphehere number " << i << std::endl;
-        system ("pause");
+        system ("pause");*/
+
+
+
       }
     }
 
+    std::cerr << "Sum count of ancles: " << sum_count <<std::endl; 
+    std::cerr << "Errors: " << count_error << std::endl;
+    std::cerr << "Errors %:" << 1.0 * count_error / sum_count << std::endl;
     std::cerr << "End testing ancles" << std::endl;
     std::cerr << "----------------------------" << std::endl;
+    system ("pause");
+    
+  }
+
+  template < class PointType, class Metrics>
+  void CoverNet<PointType, Metrics>::testKNearestPoints(PointType p, int k) // тестирует k ближайших
+  {
+    std::cerr << "----------------------------" << std::endl;
+    std::cerr << "Begin testing k nearest points" << std::endl;
+
+    std::vector<std::pair<PointType, double> > result = findKNearestPoints(p, k);
+    std::vector<std::pair<PointType, double> > test_result;
+   
+    std::vector<std::pair<double, PointType> > dst;
+    vector<bool> used(spheres.size(), false);
+    for (int i = 0; i < spheres.size(); ++i)
+    {
+      if (used[spheres[i].center])
+        continue;
+      used[spheres[i].center] = true;
+      dst.push_back(make_pair(computeDistance(i, p), spheres[i].center));
+    }
+    sort(dst.begin(), dst.end());
+    for (int i = 0; i < min((int)spheres.size(), k); ++i) 
+    {
+      test_result.push_back(make_pair(dst[i].second, dst[i].first));
+    }
+   
+    bool ch = true;
+    for (int i = 0; i < min((int)spheres.size(), k); ++i)
+    {
+      if (fabs(test_result[i].second - result[i].second) > 1e-3)
+        ch = false;
+    }
+    if (!ch)
+    {
+      cout << "result: ";
+      cout.precision(3);
+      for (int i = 0; i < result.size(); ++i)
+      {
+        cout << fixed << result[i].second << " ";
+      }
+      cout << endl;
+      cout << "test  : ";
+      cout.precision(3);
+      for (int i = 0; i < test_result.size(); ++i)
+      {
+        cout << fixed << test_result[i].second << " ";
+      }
+      cout << endl;
+
+      cout << "ERROR" << endl;
+    }
+
+    std::cerr << "End testing k nearest points" << std::endl;
+    std::cerr << "----------------------------" << std::endl;
+    system ("pause");
     
   }
 
