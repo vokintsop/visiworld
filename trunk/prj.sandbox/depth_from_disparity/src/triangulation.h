@@ -15,8 +15,8 @@
 */
 int TriangulatePoint(
   cv::Mat &res,
-  cv::Point2f pixel_1,
-  cv::Point2f pixel_2,
+  cv::Point2d pixel_1,
+  cv::Point2d pixel_2,
   const cv::Mat &camera_matrix_1,
   const cv::Mat &camera_matrix_2);
 
@@ -30,7 +30,7 @@ int TriangulatePoint(
 */
 int GetProjectionLine(
   cv::Mat &line,
-  cv::Point2f pixel, 
+  cv::Point2d pixel, 
   const cv::Mat &camera_matrix);
 
 #endif //TRIANGULATION_H_INCLUDED
