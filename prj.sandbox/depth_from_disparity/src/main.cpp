@@ -86,7 +86,7 @@ int main( int argc, char** argv )
   Init();
 
   string filenameFormat = "/testdata/reika/input/reika.01/%s%04d.avi";
-  int iEpisode = 1;
+  int iEpisode = 25;
   
   VideoCapture lcap(format(filenameFormat.c_str(), "left", iEpisode)), rcap(format(filenameFormat.c_str(), "right", iEpisode));
   int nFrames = cvRound(lcap.get(CV_CAP_PROP_FRAME_COUNT));
@@ -114,6 +114,7 @@ int main( int argc, char** argv )
     coverNet = new CNType(&ruler, rootRadius, minRadius);
     InitCoverNet(coverNet, lFrame);
     CorrespondStereo(coverNet, lFrame, rFrame);
+    //return 0;
     c = cvWaitKey(1);
     if (c == 27)
     {
@@ -123,23 +124,63 @@ int main( int argc, char** argv )
   return 0;
 }
 
-void reproject(Mat todraw, Mat pt3d, Mat cm1, Mat cm2)
+Point2d projectPoint(const Mat &pt3d, const Mat &cm)
 {
-  Mat tmp = cm1 * pt3d;
-  tmp /= tmp.at<double>(0,2);
-  Point pt(tmp.at<double>(0,0), tmp.at<double>(0,1));
+  Mat pt3d_hom = pt3d.clone(); //homogenous 3d point
+  pt3d_hom.push_back(1.0);
+  Mat pt2d_hom = cm * pt3d_hom;
+  if (pt2d_hom.at<double>(2,0) == 0)
+    return Point2d();
+  pt2d_hom /= pt2d_hom.at<double>(2,0);
+  return Point2d(pt2d_hom.at<double>(0,0), pt2d_hom.at<double>(1,0));
+}
+
+void reproject(Mat &todraw, const Mat &pt3d, const Mat &cm1, const Mat &cm2)
+{
+  cout << pt3d << endl;
+    
+  Point pt(projectPoint(pt3d, cm1));
+  //pt.x -= todraw.cols / 2;
   circle(todraw, pt, 3, Scalar(0, 255, 0));
-  tmp = cm2 * pt3d;
-  tmp /= tmp.at<double>(0,2);
-  pt = Point(tmp.at<double>(0,0), tmp.at<double>(0,1));
+
+  pt = projectPoint(pt3d, cm2);
   pt.x += todraw.cols / 2;
-  circle(todraw, pt, 3, Scalar(0, 255, 0));
+  circle(todraw, pt, 3, Scalar(0, 0, 255));
+}   
+
+bool rpoject_reproject_test(Mat &cm1, Mat &cm2)
+{
+  Point3d initialPoint(1.0, 0.2, 20.0); //coordinates in glomal coordinate system in meters
+  Point2d projected_1 = projectPoint(Mat(initialPoint), cm1);
+  Point2d projected_2 = projectPoint(Mat(initialPoint), cm2);
+
+  Mat triPoint;
+  TriangulatePoint(triPoint, projected_1, projected_2, cm1, cm2);
+  Point3d triPt3d(triPoint);
+
+  cout << "initial Point: " << initialPoint << endl;
+  cout << "projected points: " << projected_1 << ", " << projected_2 << endl;
+  cout << "triangulated point: " << triPt3d << endl;
+  cout << "delta: " << norm(triPt3d - initialPoint) << endl << endl;
+
+  if (norm(triPt3d - initialPoint) >= 0.1 * norm(initialPoint))
+    return false;
+  return true;
 }
 
 void CorrespondStereo(Ptr<CNType> &coverNet, Ptr<SimpleFrame> &lFrame, Ptr<SimpleFrame> &rFrame)
 {
-  Mat cm1;//left camera matrix
-  Mat cm2;//right camera matrix
+  Mat cm1 = (Mat_<double>(3,4) << 802.9362, 0,        640.0000, 0.5 * 923.3766, 
+                                  0,        802.9362, 360.0000, 0, 
+                                  0,        0,        1.0000,   0);//left camera matrix
+
+  Mat cm2 = (Mat_<double>(3,4) << 802.9362, 0,        640.0000, -0.5 * 923.3766,//-1200,//
+                                  0,        802.9362, 360.0000, 0,
+                                  0,        0,        1.0000,   0);//right camera matrix 
+  cout << cm1 << endl << cm2 << endl << endl;
+
+ // rpoject_reproject_test(cm1, cm2);
+ // return;
 
   Size sz = lFrame->src.size();
   cv::Mat todraw = Mat::zeros(Size(sz.width * 2, sz.height), CV_8UC3);
@@ -152,22 +193,22 @@ void CorrespondStereo(Ptr<CNType> &coverNet, Ptr<SimpleFrame> &lFrame, Ptr<Simpl
   for (unsigned int i = 0; i < rFrame->kps.size(); ++i)
   {
     Point pt = rFrame->kps[i].pt;
-    pt.x += lFrame->src.cols;
-    cv::circle(todraw, pt, 1, cv::Scalar(255,0,0), 2);
+    cv::circle(todraw, Point(pt.x + lFrame->src.cols, pt.y), 1, cv::Scalar(255,0,0), 2);
     double dist = 0.2;
     int iSph = coverNet->findNearestSphere(make_pair(rFrame.obj, i), dist);
     if (iSph != -1)
     {
       SimpleFrame *tmp = coverNet->getSphere(iSph).center.first;
       int ikp = coverNet->getSphere(iSph).center.second;
-      cv::line(todraw, pt, tmp->kps[ikp].pt, cv::Scalar(0,0,255), 2);
+      //cv::line(todraw, pt, tmp->kps[ikp].pt, cv::Scalar(0,0,255), 2);
 
-      Point left = pt;
-      Point right = tmp->kps[ikp].pt;
 
+      Point right = pt;
+      Point left = tmp->kps[ikp].pt;
       Mat tri_point;
       TriangulatePoint(tri_point, left, right, cm1, cm2);
-      reproject(todraw, tri_point, cm1, cm2);
+      if (!tri_point.empty())
+        reproject(todraw, tri_point, cm1, cm2);
     }
   }
   cv::Mat rsz;
