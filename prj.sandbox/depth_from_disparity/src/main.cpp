@@ -198,15 +198,12 @@ void CorrespondStereo(Ptr<CNType> &coverNet, Ptr<SimpleFrame> &lFrame, Ptr<Simpl
     int iSph = coverNet->findNearestSphere(make_pair(rFrame.obj, i), dist);
     if (iSph != -1)
     {
-      SimpleFrame *tmp = coverNet->getSphere(iSph).center.first;
       int ikp = coverNet->getSphere(iSph).center.second;
       //cv::line(todraw, pt, tmp->kps[ikp].pt, cv::Scalar(0,0,255), 2);
-
-
       Point right = pt;
-      Point left = tmp->kps[ikp].pt;
+      Point left = lFrame->kps[ikp].pt;
       Mat tri_point;
-      TriangulatePoint(tri_point, left, right, cm1, cm2);
+      TriangulatePoint(tri_point, left, right, cm1, cm2, 0.06);
       if (!tri_point.empty())
         reproject(todraw, tri_point, cm1, cm2);
     }
