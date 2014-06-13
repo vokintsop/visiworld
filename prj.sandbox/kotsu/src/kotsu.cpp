@@ -12,6 +12,10 @@ using namespace cv;
 
 class KOtsu // строит множество разрезов на распределении, оптимизиру€ критерий отсу дл€   классов
 {
+public:
+  //int len; // длина распределени€
+  //int k; // число классов
+  vector< int > distr;   // исходное распределение
   vector< long long > sum;   // sum[i] == sum( distr[0]..distr[i-1] )
   vector< long long > ssq; // ssq[i] == sum( sq(distr[0])..sq(distr[i-1]) )
   vector< vector< pair< int, double > > > otsu;  // otsu[cuts][pos] = позици€ последнего отреза и значение критери€ отсу дл€ cuts разрезов
@@ -21,16 +25,16 @@ class KOtsu // строит множество разрезов на распределении, оптимизиру€ критерий 
 
   double _weight( int from, int to ) // дол€ голосов на фрагменте [from, to) взвешенна€ на фрагменте [0..to)
   {
-    double sum_from_to = sum[to]-sum[from];
+    double sum_from_to = double(sum[to]-sum[from]);
     if (sum_from_to > 0)
       return sum_from_to / sum[to];
     return 0;
   }
 
-  double _sigma( int from, int to ) // дисперси€ на фрагменте [from, to) взвешенна€ весом [from..to) на фрагменте [0..to)
+  double _sigma( int from, int to ) // дисперси€ на фрагменте [from, to)
   {
     double cnt = to-from; // число пациентов
-    double sum_from_to = sum[to]-sum[from];
+    double sum_from_to = double(sum[to]-sum[from]);
     double sigma =0;
     if (cnt >0 && sum_from_to > 0)
     {
@@ -43,10 +47,46 @@ class KOtsu // строит множество разрезов на распределении, оптимизиру€ критерий 
 
 public:
   KOtsu( int* distribution, int len, int max_k );
+  //double getMaxK() { return otsu.size(); } // число классов
+  //int getLen() { return sum.size()-1; } // длина распределени€
+  //double getQuality( int k ) { return otsu[k].back().second; } // число классов
+  //double getCut( int k, int pos ) { return otsu[k][pos].first; } // последний отрез справа
+  void print()
+  {
+    
+    for (int k=0; k < int(otsu.size()); k++)
+    {
+      cout << "k =" << k << " minval = " << otsu[k].back().second << " right cut = " << otsu[k].back().first << endl;
+    }
+  }
+
 
 };
 
+void drawKOtsu( KOtsu& kotsu )
+{
+  int distr_len = kotsu.distr.size();
+  if (distr_len <=0)
+    return;
+  int distr_max = *max_element( kotsu.distr.begin(), kotsu.distr.end() );
+  if (distr_max <=0)
+    return;
+  double xratio = 512./distr_len;
+  double yratio = 512./distr_max;
+  int xpix = max( 1, int(xratio) );
+  int view_height = distr_max*yratio + 10;
+  int view_width = distr_len*xratio + 10;
+  Mat view( view_height + 10, view_width + 10,  CV_8UC3 );
+  for (int i=0; i<distr_len; i++)
+  {
+    line( view, Point(i*xratio, view_height), Point( i*xratio, view_height-kotsu.distr[i]*yratio ), Scalar( 128, 128, 128 ), xpix );
+  }
+  imshow( "kotsu-distr", view );
+}
+
 KOtsu::KOtsu( int* distr, int len, int max_k ):
+  //len(len), k(max_k),
+  distr( distr, distr+len),
   sum( len+1, 0 ),
   ssq( len+1, 0 ),
   otsu( max_k, vector< pair< int, double > >( len+1 ) )
@@ -95,6 +135,8 @@ void run_kotsu( const char* path )
   if (img.empty())
     return;
 
+  //resize?if (img.rows())
+
   cout << path << endl;
 
   imshow("kotsu", img);
@@ -107,9 +149,26 @@ void run_kotsu( const char* path )
       hist[ img[y][x] ]++;
     }
   }
-  cout << "--- hor ---\n";
 
-  KOtsu kotsu( hist, sizeof(hist)/sizeof(hist[0]), 5 );
+  KOtsu kotsu( hist, sizeof(hist)/sizeof(hist[0]), 30 );
+
+  kotsu.print();
+
+  Mat1b bin_img;
+  int thr = (int)threshold( img, bin_img, 0, 255, THRESH_OTSU );
+  cout << "threshold( img, bin_img, 0, 255, THRESH_OTSU ) =>" << thr << endl;
+
+  for (int ttt = thr-10; ttt < thr+20; ttt ++)
+  {
+    double ww = kotsu._weight(ttt, 256);
+    double ls = kotsu._sigma(0, ttt );
+    double rs = kotsu._sigma(ttt, 256 );
+    double res_otsu = (1-ww) * ls + ww * rs;
+    cout << "res_otsu(" << ttt << ") =>" << res_otsu << endl;
+  }
+
+  drawKOtsu( kotsu );
+
 
 }
 
@@ -117,9 +176,9 @@ void run_kotsu( const char* path )
 int main( int argc, char* argv[] )
 {
   string exe  = argv[0];
-  string data = exe + "/../../../testdata/overcom/overcom01/IMG_3463_%02d.jpg";
+  string data = exe + "/../../../testdata/card%02d.png";
 
-  for (int i=1; i<100; i++)
+  for (int i=1; i<=2; i++)
   {
     run_kotsu( format( data.c_str(), i ).c_str() );
     if (27==waitKey(0))
