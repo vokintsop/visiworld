@@ -20,7 +20,8 @@ public:
   vector< long long > sum;    // sum[i] == sum( distr[0]..distr[i-1] ) // проинтегрированное распределение
   vector< long long > sum_x;  // sum_x[i] == sum( distr[0]..distr[i-1] ) // проинтегрированное (распределение*x)
   vector< long long > sum_xx;  // sum_xx[i] == sum( distr[0]..distr[i-1] ) // проинтегрированное (распределение*x*x)
-  vector< long long > ssq; // ssq[i] == sum( sq(distr[0])..sq(distr[i-1]) )
+  ////vector< long long > ssq; // ssq[i] == sum( sq(distr[0])..sq(distr[i-1]) )
+
   vector< vector< pair< int, double > > > otsu;  // otsu[cuts][pos] = позиция последнего отреза и значение критерия отсу для cuts разрезов
                                     // на фрагменте распределения [0..pos-1] включительно
   // note: разрезы _не_ могут "схлопываться", иначе решение многозначно и экспоненциально по мощн.
@@ -61,52 +62,17 @@ public:
   void print()
   {
     
-    for (int k=0; k < int(otsu.size()); k++)
+    for (int k=1; k <= int(otsu.size()); k++)
     {
-      cout << "k =" << k << " minval = " << otsu[k].back().second << " right cut = " << otsu[k].back().first << endl;
+      double min_otsu = otsu[k-1].back().second;
+      cout << "k =" << k << " \tmin_otsu = " << min_otsu << " \tk*k*min_otsu=" << k*k*min_otsu 
+          << " \tright cut= " << otsu[k-1].back().first << endl;
     }
   }
 
 
 };
 
-void drawKOtsu( KOtsu& kotsu, int k, int thr )
-{
-  int distr_len = kotsu.distr.size();
-  if (distr_len <=0)
-    return;
-  int distr_max = *max_element( kotsu.distr.begin(), kotsu.distr.end() );
-  if (distr_max <=0)
-    return;
-  double xratio = 512./distr_len;
-  double yratio = 512./distr_max;
-  int xpix = max( 1, int(xratio) );
-  int view_height = int(distr_max*yratio) + 10;
-  int view_width = int(distr_len*xratio) + 10;
-  Mat view( view_height + 10, view_width + 10,  CV_8UC3 );
-  for (int pos=0; pos<distr_len; pos++)
-  {
-    line( view, Point(int(pos*xratio), view_height), Point( int(pos*xratio), int(view_height-kotsu.distr[pos]*yratio) ), 
-      Scalar( 128, 128, 128 ), xpix );
-  }
-
-  // отрисовка опенсивишного порога
-  line( view, Point(int(thr*xratio), view_height), Point( int(thr*xratio), int(view_height-kotsu.distr[thr]*yratio) ), 
-    Scalar( 0, 0, 0 ), 1 );
-
-  int pos = 256;
-  for ( int cuts = k; cuts>=0; cuts-- )
-  {
-    pos = kotsu.otsu[cuts][pos].first;
-    line( view, Point(int(pos*xratio), view_height), Point( int(pos*xratio), int(view_height-kotsu.distr[pos]*yratio) ), 
-      Scalar( 0, 0, 128 ), xpix );
-    line( view, Point(int(pos*xratio), 0), Point( int(pos*xratio), int(view_height-kotsu.distr[pos]*yratio-1) ), 
-      Scalar( 128, 128, 200 ), xpix );
-    cout << pos << endl;
-  }
-
-  imshow( "kotsu-distr", view );
-}
 
 KOtsu::KOtsu( int* distr, int len, int max_k ):
   //len(len), k(max_k),
@@ -155,6 +121,47 @@ KOtsu::KOtsu( int* distr, int len, int max_k ):
 }
 
 
+void drawKOtsu( KOtsu& kotsu, int k, int thr )
+{
+  int distr_len = kotsu.distr.size();
+  if (distr_len <=0)
+    return;
+  int distr_max = *max_element( kotsu.distr.begin(), kotsu.distr.end() );
+  if (distr_max <=0)
+    return;
+  double xratio = 512./distr_len;
+  double yratio = 512./distr_max;
+  int xpix = max( 1, int(xratio) );
+  int view_height = int(distr_max*yratio) + 10;
+  int view_width = int(distr_len*xratio) + 10;
+  Mat view( view_height + 10, view_width + 10,  CV_8UC3 );
+  for (int pos=0; pos<distr_len; pos++)
+  {
+    line( view, Point(int(pos*xratio), view_height), Point( int(pos*xratio), int(view_height-kotsu.distr[pos]*yratio) ), 
+      Scalar( 128, 128, 128 ), xpix );
+  }
+
+  // отрисовка опенсивишного порога
+  line( view, Point(int(thr*xratio), view_height), Point( int(thr*xratio), int(view_height-kotsu.distr[thr]*yratio) ), 
+    Scalar( 0, 0, 0 ), 1 );
+
+  int pos = 256;
+  cout << "k=" << k << " \tquality=" << (k+1)*(k+1)*kotsu.otsu[k][pos].second;
+  for ( int cuts = k; cuts>=0; cuts-- )
+  {
+    pos = kotsu.otsu[cuts][pos].first;
+    line( view, Point(int(pos*xratio), view_height), Point( int(pos*xratio), int(view_height-kotsu.distr[pos]*yratio) ), 
+      Scalar( 0, 0, 128 ), xpix );
+    line( view, Point(int(pos*xratio), 0), Point( int(pos*xratio), int(view_height-kotsu.distr[pos]*yratio-1) ), 
+      Scalar( 128, 128, 200 ), xpix );
+    cout << " \t" << pos;
+  }
+  cout << endl;
+
+  imshow( "kotsu-distr", view );
+}
+
+
 void run_kotsu( const char* path )
 {
   Mat1b img;
@@ -180,7 +187,7 @@ void run_kotsu( const char* path )
     }
   }
 
-  KOtsu kotsu( hist, sizeof(hist)/sizeof(hist[0]), 30 );
+  KOtsu kotsu( hist, sizeof(hist)/sizeof(hist[0]), 255 );
 
   kotsu.print();
 
