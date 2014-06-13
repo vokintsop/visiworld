@@ -17,7 +17,9 @@ public:
   //int len; // длина распределени€
   //int k; // число классов
   vector< int > distr;   // исходное распределение
-  vector< long long > sum;   // sum[i] == sum( distr[0]..distr[i-1] )
+  vector< long long > sum;    // sum[i] == sum( distr[0]..distr[i-1] ) // проинтегрированное распределение
+  vector< long long > sum_x;  // sum_x[i] == sum( distr[0]..distr[i-1] ) // проинтегрированное (распределение*x)
+  vector< long long > sum_xx;  // sum_xx[i] == sum( distr[0]..distr[i-1] ) // проинтегрированное (распределение*x*x)
   vector< long long > ssq; // ssq[i] == sum( sq(distr[0])..sq(distr[i-1]) )
   vector< vector< pair< int, double > > > otsu;  // otsu[cuts][pos] = позици€ последнего отреза и значение критери€ отсу дл€ cuts разрезов
                                     // на фрагменте распределени€ [0..pos-1] включительно
@@ -32,19 +34,20 @@ public:
     return 0;
   }
 
-  double _sigma( int from, int to ) // дисперси€ на фрагменте [from, to)
+  double _sigma_sq( int from, int to ) // дисперси€ на фрагменте [from, to)
   {
-    double cnt = to-from; // число пациентов
-    double sum_from_to = double(sum[to]-sum[from]);
-    double sigma =0;
-    if (cnt >0 && sum_from_to > 0)
+    double sum_from_to = double(sum[to]-sum[from]);// число голосующих пациентов
+    double sigma_sq =0;
+    if (sum_from_to > 0)
     {
-      double ave    = sum_from_to / cnt; // средн€€ температура по больнице на фрагменте [from..to)
-      double avesq  = (ssq[to]-ssq[from]) / cnt; // усредненна€ сумма квадратов "температур" на фрагменте [from..to)
-      ///sigma  = sqrt( avesq - ave*ave ); // среднеквадратичное отклонение на фрагменте [from..to)
-      sigma  = avesq - ave*ave; // среднеквадратичное отклонение на фрагменте [from..to)
+      double ave_x = (sum_x[to]-sum_x[from])/sum_from_to;
+      sigma_sq = (sum_xx[to]-sum_xx[from])/sum_from_to - ave_x*ave_x;
+      //////double ave_sum    = sum_from_to / cnt; // средн€€ температура по больнице на фрагменте [from..to)
+      //////double avesq  = (ssq[to]-ssq[from]) / cnt; // усредненна€ сумма квадратов "температур" на фрагменте [from..to)
+      /////////sigma  = sqrt( avesq - ave*ave ); // среднеквадратичное отклонение на фрагменте [from..to)
+      //////sigma  = avesq - ave*ave; // среднеквадратичное отклонение на фрагменте [from..to)
     }
-    return sigma;
+    return sigma_sq;
   }
 
 public:
@@ -107,15 +110,19 @@ KOtsu::KOtsu( int* distr, int len, int max_k ):
   //len(len), k(max_k),
   distr( distr, distr+len),
   sum( len+1, 0 ),
-  ssq( len+1, 0 ),
+  sum_x( len+1, 0 ),
+  sum_xx( len+1, 0 ),
+  /////ssq( len+1, 0 ),
   otsu( max_k, vector< pair< int, double > >( len+1 ) )
 {
   for (int pos=1; pos<=len; pos++) // pos есмь позици€ в распределении, левее которой (не включительно pos) рассчитываем
   {
     sum[pos] = sum[pos-1] + distr[pos-1];
-    ssq[pos] = ssq[pos-1] + distr[pos-1]*(long long)distr[pos-1];
+    sum_x[pos] = sum_x[pos-1] + pos*distr[pos-1];
+    sum_xx[pos] = sum_x[pos-1] + pos*pos*distr[pos-1];
+    /////ssq[pos] = ssq[pos-1] + distr[pos-1]*(long long)distr[pos-1];
     // заполн€ем табличку дл€ нулевого количества разрезов
-    otsu[0][pos] = make_pair( 0, _weight(0, pos)*_sigma(0, pos) ); // последний отрез [0..pos) и его качество
+    otsu[0][pos] = make_pair( 0, _weight(0, pos)*_sigma_sq(0, pos) ); // последний отрез [0..pos) и его качество
   }
   for (int cuts =1; cuts < max_k; cuts++) // cuts - количество разрезов, их на 1 меньше чем число классов max_k
   { // оценим наилучший вариант дл€ еще одного разреза, сделанного после позиции pos
@@ -129,7 +136,7 @@ KOtsu::KOtsu( int* distr, int len, int max_k ):
         double ww = _weight(last_jump, pos);
         if (ww>0)
         {
-          double res_otsu = (1-ww)*otsu[cuts-1][last_jump].second + ww * _sigma(last_jump, pos);
+          double res_otsu = (1-ww)*otsu[cuts-1][last_jump].second + ww * _sigma_sq(last_jump, pos);
           if (res_otsu < best_cut.second) // или <= ??? вправо надо прижимать
           {
             best_cut.first = last_jump;
@@ -180,8 +187,8 @@ void run_kotsu( const char* path )
   for (int ttt = thr-10; ttt < thr+20; ttt ++)
   {
     double ww = kotsu._weight(ttt, 256);
-    double ls = kotsu._sigma(0, ttt );
-    double rs = kotsu._sigma(ttt, 256 );
+    double ls = kotsu._sigma_sq(0, ttt );
+    double rs = kotsu._sigma_sq(ttt, 256 );
     double res_otsu = (1-ww) * ls + ww * rs;
     cout << "res_otsu(" << ttt << ") =>" << res_otsu << endl;
   }
@@ -192,7 +199,7 @@ void run_kotsu( const char* path )
   int kMinus = 45;
 
   int key=0;
-  int classes = 2;
+  int classes = 6;
   while (key!=kEscape)
   {
     drawKOtsu( kotsu, classes, thr );
