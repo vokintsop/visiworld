@@ -41,7 +41,8 @@ public:
     {
       double ave    = sum_from_to / cnt; // средн€€ температура по больнице на фрагменте [from..to)
       double avesq  = (ssq[to]-ssq[from]) / cnt; // усредненна€ сумма квадратов "температур" на фрагменте [from..to)
-      sigma  = sqrt( avesq - ave*ave ); // среднеквадратичное отклонение на фрагменте [from..to)
+      ///sigma  = sqrt( avesq - ave*ave ); // среднеквадратичное отклонение на фрагменте [from..to)
+      sigma  = avesq - ave*ave; // среднеквадратичное отклонение на фрагменте [from..to)
     }
     return sigma;
   }
@@ -64,7 +65,7 @@ public:
 
 };
 
-void drawKOtsu( KOtsu& kotsu, int k )
+void drawKOtsu( KOtsu& kotsu, int k, int thr )
 {
   int distr_len = kotsu.distr.size();
   if (distr_len <=0)
@@ -84,6 +85,10 @@ void drawKOtsu( KOtsu& kotsu, int k )
       Scalar( 128, 128, 128 ), xpix );
   }
 
+  // отрисовка опенсивишного порога
+  line( view, Point(int(thr*xratio), view_height), Point( int(thr*xratio), int(view_height-kotsu.distr[thr]*yratio) ), 
+    Scalar( 0, 0, 0 ), 1 );
+
   int pos = 256;
   for ( int cuts = k; cuts>=0; cuts-- )
   {
@@ -92,6 +97,7 @@ void drawKOtsu( KOtsu& kotsu, int k )
       Scalar( 0, 0, 128 ), xpix );
     line( view, Point(int(pos*xratio), 0), Point( int(pos*xratio), int(view_height-kotsu.distr[pos]*yratio-1) ), 
       Scalar( 128, 128, 200 ), xpix );
+    cout << pos << endl;
   }
 
   imshow( "kotsu-distr", view );
@@ -189,7 +195,7 @@ void run_kotsu( const char* path )
   int classes = 2;
   while (key!=kEscape)
   {
-    drawKOtsu( kotsu, classes );
+    drawKOtsu( kotsu, classes, thr );
     key = waitKey(0);
     cout << key << endl;
     if (key == kPlus || key == kEquality)
