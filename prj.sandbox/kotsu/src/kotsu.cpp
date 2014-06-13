@@ -10,6 +10,7 @@
 using namespace std;
 using namespace cv;
 
+
 class KOtsu // строит множество разрезов на распределении, оптимизируя критерий отсу для К классов
 {
 public:
@@ -63,7 +64,7 @@ public:
 
 };
 
-void drawKOtsu( KOtsu& kotsu )
+void drawKOtsu( KOtsu& kotsu, int k )
 {
   int distr_len = kotsu.distr.size();
   if (distr_len <=0)
@@ -74,13 +75,25 @@ void drawKOtsu( KOtsu& kotsu )
   double xratio = 512./distr_len;
   double yratio = 512./distr_max;
   int xpix = max( 1, int(xratio) );
-  int view_height = distr_max*yratio + 10;
-  int view_width = distr_len*xratio + 10;
+  int view_height = int(distr_max*yratio) + 10;
+  int view_width = int(distr_len*xratio) + 10;
   Mat view( view_height + 10, view_width + 10,  CV_8UC3 );
-  for (int i=0; i<distr_len; i++)
+  for (int pos=0; pos<distr_len; pos++)
   {
-    line( view, Point(i*xratio, view_height), Point( i*xratio, view_height-kotsu.distr[i]*yratio ), Scalar( 128, 128, 128 ), xpix );
+    line( view, Point(int(pos*xratio), view_height), Point( int(pos*xratio), int(view_height-kotsu.distr[pos]*yratio) ), 
+      Scalar( 128, 128, 128 ), xpix );
   }
+
+  int pos = 256;
+  for ( int cuts = k; cuts>=0; cuts-- )
+  {
+    pos = kotsu.otsu[cuts][pos].first;
+    line( view, Point(int(pos*xratio), view_height), Point( int(pos*xratio), int(view_height-kotsu.distr[pos]*yratio) ), 
+      Scalar( 0, 0, 128 ), xpix );
+    line( view, Point(int(pos*xratio), 0), Point( int(pos*xratio), int(view_height-kotsu.distr[pos]*yratio-1) ), 
+      Scalar( 128, 128, 200 ), xpix );
+  }
+
   imshow( "kotsu-distr", view );
 }
 
@@ -167,7 +180,23 @@ void run_kotsu( const char* path )
     cout << "res_otsu(" << ttt << ") =>" << res_otsu << endl;
   }
 
-  drawKOtsu( kotsu );
+  int kEscape = 27;
+  int kPlus = 43;
+  int kEquality = 61; // "=" has same button with "+"
+  int kMinus = 45;
+
+  int key=0;
+  int classes = 2;
+  while (key!=kEscape)
+  {
+    drawKOtsu( kotsu, classes );
+    key = waitKey(0);
+    cout << key << endl;
+    if (key == kPlus || key == kEquality)
+      classes = std::min( classes+1, int(kotsu.otsu.size())-1 );
+    if (key == kMinus)
+      classes = std::max( classes-1, 1 );
+  }
 
 
 }
