@@ -29,6 +29,7 @@ public:
   double _weight( int from, int to ) // дол€ голосов на фрагменте [from, to) взвешенна€ на фрагменте [0..to)
   {
     double sum_from_to = double(sum[to]-sum[from]);
+    assert(sum_from_to >=0);
     if (sum_from_to > 0)
       return sum_from_to / sum[to];
     return 0;
@@ -42,6 +43,7 @@ public:
     {
       double ave_x = (sum_x[to]-sum_x[from])/sum_from_to;
       sigma_sq = (sum_xx[to]-sum_xx[from])/sum_from_to - ave_x*ave_x;
+      assert(sigma_sq >=0);
       //////double ave_sum    = sum_from_to / cnt; // средн€€ температура по больнице на фрагменте [from..to)
       //////double avesq  = (ssq[to]-ssq[from]) / cnt; // усредненна€ сумма квадратов "температур" на фрагменте [from..to)
       /////////sigma  = sqrt( avesq - ave*ave ); // среднеквадратичное отклонение на фрагменте [from..to)
@@ -119,7 +121,7 @@ KOtsu::KOtsu( int* distr, int len, int max_k ):
   {
     sum[pos] = sum[pos-1] + distr[pos-1];
     sum_x[pos] = sum_x[pos-1] + pos*distr[pos-1];
-    sum_xx[pos] = sum_x[pos-1] + pos*pos*distr[pos-1];
+    sum_xx[pos] = sum_xx[pos-1] + pos*pos*distr[pos-1];
     /////ssq[pos] = ssq[pos-1] + distr[pos-1]*(long long)distr[pos-1];
     // заполн€ем табличку дл€ нулевого количества разрезов
     otsu[0][pos] = make_pair( 0, _weight(0, pos)*_sigma_sq(0, pos) ); // последний отрез [0..pos) и его качество
@@ -136,7 +138,9 @@ KOtsu::KOtsu( int* distr, int len, int max_k ):
         double ww = _weight(last_jump, pos);
         if (ww>0)
         {
-          double res_otsu = (1-ww)*otsu[cuts-1][last_jump].second + ww * _sigma_sq(last_jump, pos);
+          double _sigsq  = _sigma_sq(last_jump, pos);
+          assert(_sigsq >=0);
+          double res_otsu = (1-ww)*otsu[cuts-1][last_jump].second + ww * _sigsq; 
           if (res_otsu < best_cut.second) // или <= ??? вправо надо прижимать
           {
             best_cut.first = last_jump;
