@@ -10,6 +10,7 @@
 using namespace std;
 using namespace cv;
 
+/////////////////////////////////////////////////////////////// move to kotsu.h
 
 class KOtsu // строит множество разрезов на распределении, оптимизируя критерий отсу для К классов
 {
@@ -18,8 +19,8 @@ public:
   //int k; // число классов
   vector< int > distr;   // исходное распределение
   vector< long long > sum;    // sum[i] == sum( distr[0]..distr[i-1] ) // проинтегрированное распределение
-  vector< long long > sum_x;  // sum_x[i] == sum( distr[0]..distr[i-1] ) // проинтегрированное (распределение*x)
-  vector< long long > sum_xx;  // sum_xx[i] == sum( distr[0]..distr[i-1] ) // проинтегрированное (распределение*x*x)
+  vector< long long > sum_x;  // sum_x[i] == sum( distr[0]*1..distr[i-1]*(i) ) // проинтегрированное (распределение*x)
+  vector< long long > sum_xx;  // sum_xx[i] == sum( distr[0]..distr[i-1]*(i*i) ) // проинтегрированное (распределение*x*x)
   ////vector< long long > ssq; // ssq[i] == sum( sq(distr[0])..sq(distr[i-1]) )
 
   vector< vector< pair< int, double > > > otsu;  // otsu[cuts][pos] = позиция последнего отреза и значение критерия отсу для cuts разрезов
@@ -69,10 +70,7 @@ public:
           << " \tright cut= " << otsu[k-1].back().first << endl;
     }
   }
-
-
-};
-
+}; // class KOtsu
 
 KOtsu::KOtsu( int* distr, int len, int max_k ):
   //len(len), k(max_k),
@@ -120,6 +118,69 @@ KOtsu::KOtsu( int* distr, int len, int max_k ):
 
 }
 
+///////////////////////////////////////////////////////////////
+struct Palette
+{
+  vector< Vec3b > colors;
+  Palette( int len=256 ):
+  colors(len)
+  {
+    if (len>0)
+    {
+      colors[0]=Vec3b(255,255,255);
+      for (int i=1; i<len; i++) // идут от светлого к рандомному
+      {
+        Vec3b& c = colors[i];
+        c[0]= rand()%220;  
+        c[1]= rand()%220;
+        c[2]= rand()%220;
+      }
+    }
+  }
+};
+
+Palette thePalette;
+
+Mat3b colorize( Mat1b& src, vector< int >& index )
+{
+  Mat3b res( src.rows, src.cols );
+  for (int y=0; y<src.rows; y++)
+    for( int x=0; x<src.cols; x++)
+    {
+      int ind = index[ src[y][x] ];
+      res[y][x] = thePalette.colors[ind];
+    }
+  return res;
+}
+
+
+
+void makePaletteIndex( KOtsu& kotsu, int k, vector< int >& index )
+{
+  int len = kotsu.distr.size(); 
+  index.resize( len );
+  int class_num=0;
+  int pos = kotsu.otsu[k][len].first; // последний кого надо включить в текущий класс 
+
+  for (int i=index.size()-1; i>=0; i--)
+  {
+    if (i<pos)
+    {
+      if (k>0)
+        pos = kotsu.otsu[--k][pos].first;
+      class_num++;
+    }
+    index[i] = class_num;
+  }
+}
+
+void drawBinarized( KOtsu& kotsu, int classes, Mat1b& img )
+{
+  vector< int > index;
+  makePaletteIndex( kotsu, classes, index );
+  Mat3b view_colorized = colorize( img, index );
+  imshow( "binary colorized", view_colorized );
+}
 
 void drawKOtsu( KOtsu& kotsu, int k, int thr )
 {
@@ -176,9 +237,14 @@ void run_kotsu( const char* path )
 
   cout << path << endl;
 
+#if 0
+  blur( img, img, Size(3,3) );
+#endif
+
   imshow("kotsu", img);
 
   int hist[256]={0};
+#if 1
   for (int y=0; y<img.rows; y++)
   {
     for (int x=0; x<img.cols; x++)
@@ -186,6 +252,44 @@ void run_kotsu( const char* path )
       hist[ img[y][x] ]++;
     }
   }
+#endif
+
+#if 0
+  for (int y=1; y<img.rows-1; y++)
+  {
+    for (int x=1; x<img.cols-1; x++)
+    {
+      if (    img[y][x] >= img[y][x-1] && img[y][x] >= img[y][x+1]   // soft local maximum by x OR
+      ||      img[y][x] >= img[y-1][x] && img[y][x] >= img[y+1][x]   // soft local maximum by y
+      )
+        hist[ img[y][x] ]++;
+      else
+      if (    img[y][x] <= img[y][x-1] && img[y][x] <= img[y][x+1]   // soft local maximum by x OR
+      ||      img[y][x] <= img[y-1][x] && img[y][x] <= img[y+1][x]   // soft local maximum by y
+      )
+        hist[ img[y][x] ]++;
+    }
+  }
+#endif
+
+#if 0
+  for (int y=1; y<img.rows-1; y++)
+  {
+    for (int x=1; x<img.cols-1; x++)
+    {
+      int eps = 0;
+      if (    img[y][x] >= img[y][x-1]-eps && img[y][x] >= img[y][x+1]-eps   // soft local maximum by x AND
+      &&      img[y][x] >= img[y-1][x]-eps && img[y][x] >= img[y+1][x]-eps   // soft local maximum by y
+      )
+        hist[ img[y][x] ]++;
+      else
+      if (    img[y][x] <= img[y][x-1]+eps && img[y][x] <= img[y][x+1]+eps   // soft local minimum by x AND
+      &&      img[y][x] <= img[y-1][x]+eps && img[y][x] <= img[y+1][x]+eps   // soft local minimum by y
+      )
+        hist[ img[y][x] ]++;
+    }
+  }
+#endif
 
   KOtsu kotsu( hist, sizeof(hist)/sizeof(hist[0]), 255 );
 
@@ -214,6 +318,7 @@ void run_kotsu( const char* path )
   while (key!=kEscape)
   {
     drawKOtsu( kotsu, classes, thr );
+    drawBinarized( kotsu, classes, img );
     key = waitKey(0);
     cout << key << endl;
     if (key == kPlus || key == kEquality)
@@ -229,7 +334,10 @@ void run_kotsu( const char* path )
 int main( int argc, char* argv[] )
 {
   string exe  = argv[0];
-  string data = exe + "/../../../testdata/card%02d.png";
+  //string data = exe + "/../../../testdata/card%02d.png";
+  string data = exe + "/../../../testdata/lena.png";
+  //string data = exe + "/../../../testdata/house.png";
+  //string data = exe + "/../../../testdata/3096.jpg";
 
   for (int i=1; i<=2; i++)
   {
