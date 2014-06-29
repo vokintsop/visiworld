@@ -7,6 +7,8 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
+#include <fstream>
+
 using namespace std;
 using namespace cv;
 
@@ -220,6 +222,7 @@ void drawKOtsu( KOtsu& kotsu, int k, int thr )
   cout << endl;
 
   imshow( "kotsu-distr", view );
+  
 }
 
 
@@ -331,26 +334,152 @@ void run_kotsu( const char* path )
 }
 
 
+void test_wcv( const char* path, const char *txt_path )
+{
+  Mat1b img;
+  try { 
+    img = imread( path, IMREAD_GRAYSCALE ); }
+  catch (...) {
+    return; }
+  if (img.empty())
+    return;
+
+  //resize?if (img.rows())
+
+  cout << path << endl;
+
+#if 0
+  blur( img, img, Size(3,3) );
+#endif
+
+//  imshow("kotsu", img);
+
+  int hist[256]={0};
+#if 1
+  for (int y=0; y<img.rows; y++)
+  {
+    for (int x=0; x<img.cols; x++)
+    {
+      hist[ img[y][x] ]++;
+    }
+  }
+#endif
+
+  KOtsu kotsu( hist, sizeof(hist)/sizeof(hist[0]), 255 );
+
+  ifstream cin(txt_path);
+  int n;
+  cin >> n;
+  vector<int> arr(n + 1);
+  for (int i = 0; i < n; ++i)
+    cin >> arr[i];
+  arr[n] = 256;
+  int beg = 0;
+  double ans = 0;
+  for (int i = 0; i < n + 1; ++i)
+  {
+    int last_jump = beg;
+    int pos = arr[i];
+    
+    double _sigsq  = kotsu._sigma_sq(last_jump, pos);
+    ans +=  (kotsu.sum[pos] - kotsu.sum[last_jump])* _sigsq;
+    beg = arr[i];
+  }
+  
+  cout << "Kotsu wcv for input file with " << n << "cuts  result = " << (n + 1) * (n + 1) * ans / (img.cols * img.rows) << endl; 
+
+
+}
+
+void test_bcv( const char* path, const char *txt_path )
+{
+  Mat1b img;
+  try { 
+    img = imread( path, IMREAD_GRAYSCALE ); }
+  catch (...) {
+    return; }
+  if (img.empty())
+    return;
+
+  //resize?if (img.rows())
+
+  cout << path << endl;
+
+#if 0
+  blur( img, img, Size(3,3) );
+#endif
+
+//  imshow("kotsu", img);
+
+  int hist[256]={0};
+#if 1
+  for (int y=0; y<img.rows; y++)
+  {
+    for (int x=0; x<img.cols; x++)
+    {
+      hist[ img[y][x] ]++;
+    }
+  }
+#endif
+
+  KOtsu kotsu( hist, sizeof(hist)/sizeof(hist[0]), 255 );
+
+  ifstream cin(txt_path);
+  int n;
+  cin >> n;
+  vector<int> arr(n + 1);
+  for (int i = 0; i < n; ++i)
+    cin >> arr[i];
+  arr[n] = 256;
+  int beg = 0;
+
+  double mu = 0;
+  double ans = 0;
+
+  for (int i = 0; i < n + 1; ++i)
+  {
+    int a = beg;
+    int b = arr[i];
+    
+    double w = 1.0 *(kotsu.sum[b] - kotsu.sum[a]) / (img.cols * img.rows);
+    if (w == 0)
+      continue;
+    double mu_ = (kotsu.sum_x[b] - kotsu.sum_x[a]) / (w * img.cols * img.rows);
+    mu += mu_ * w;
+    ans += w * mu_ * mu_;
+    beg = arr[i];
+  }
+  
+  cout << "Kotsu bcv for input file with " << n << "cuts  result = " << ans - mu * mu << endl; 
+
+
+}
+
+
 int main( int argc, char* argv[] )
 {
   string exe  = argv[0];
-  //string data = exe + "/../../../testdata/card%02d.png";
+  string data = exe + "/../../../testdata/card01.png";
+  string txt = exe + "/../../../testdata/input.txt";
   //string data = exe + "/../../../testdata/lena.png";
   //string data = exe + "/../../../testdata/peppers256.png";
   //string data = exe + "/../../../testdata/house.png";
   //string data = exe + "/../../../testdata/3096.jpg";
   //string data = exe + "/../../../testdata/372047.jpg"; // soldier
-  string data = exe + "/../../../testdata/35010.jpg"; // butterfly
+  //string data = exe + "/../../../testdata/35010.jpg"; // butterfly
   //string data = exe + "/../../../testdata/butterfly.png";
   //string data = exe + "/../../../testdata/f-16.png";
   //string data = exe + "/../../../testdata/barbara.png";
+  test_bcv(data.c_str(), txt.c_str());
+  test_wcv(data.c_str(), txt.c_str());
 
-  for (int i=1; i<=2; i++)
+  /*for (int i=1; i<=2; i++)
   {
     run_kotsu( format( data.c_str(), i ).c_str() );
     if (27==waitKey(0))
       break;
-  }
+  }*/
+
 
 	return 0;
 }
