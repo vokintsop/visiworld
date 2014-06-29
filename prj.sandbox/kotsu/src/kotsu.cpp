@@ -335,9 +335,15 @@ int main( int argc, char* argv[] )
 {
   string exe  = argv[0];
   //string data = exe + "/../../../testdata/card%02d.png";
-  string data = exe + "/../../../testdata/lena.png";
+  //string data = exe + "/../../../testdata/lena.png";
+  //string data = exe + "/../../../testdata/peppers256.png";
   //string data = exe + "/../../../testdata/house.png";
   //string data = exe + "/../../../testdata/3096.jpg";
+  //string data = exe + "/../../../testdata/372047.jpg"; // soldier
+  string data = exe + "/../../../testdata/35010.jpg"; // butterfly
+  //string data = exe + "/../../../testdata/butterfly.png";
+  //string data = exe + "/../../../testdata/f-16.png";
+  //string data = exe + "/../../../testdata/barbara.png";
 
   for (int i=1; i<=2; i++)
   {
