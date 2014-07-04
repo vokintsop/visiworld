@@ -19,7 +19,7 @@ class KOtsu // строит множество разрезов на распределении, оптимизируя критерий 
 public:
   //int len; // длина распределения
   //int k; // число классов
-  vector< int > distr;   // исходное распределение
+  vector< long long > distr;   // исходное распределение
   vector< long long > sum;    // sum[i] == sum( distr[0]..distr[i-1] ) // проинтегрированное распределение
   vector< long long > sum_x;  // sum_x[i] == sum( distr[0]*1..distr[i-1]*(i) ) // проинтегрированное (распределение*x)
   vector< long long > sum_xx;  // sum_xx[i] == sum( distr[0]..distr[i-1]*(i*i) ) // проинтегрированное (распределение*x*x)
@@ -74,9 +74,9 @@ public:
   }
 }; // class KOtsu
 
-KOtsu::KOtsu( int* distr, int len, int max_k ):
+KOtsu::KOtsu( int* _distr, int len, int max_k ):
   //len(len), k(max_k),
-  distr( distr, distr+len),
+  distr( _distr, _distr+len),
   sum( len+1, 0 ),
   sum_x( len+1, 0 ),
   sum_xx( len+1, 0 ),
@@ -459,8 +459,13 @@ void test_bcv( const char* path, const char *txt_path )
 int main( int argc, char* argv[] )
 {
   string exe  = argv[0];
-  string data = exe + "/../../../testdata/card01.png";
+  //string data = exe + "/../../../testdata/card01.png";
   string txt = exe + "/../../../testdata/input.txt";
+  
+  //string data = exe + "/../../../testdata/kotsu/greytext.png";
+  string data = exe + "/../../../testdata/kotsu/greytext2.png";
+  
+  
   //string data = exe + "/../../../testdata/lena.png";
   //string data = exe + "/../../../testdata/peppers256.png";
   //string data = exe + "/../../../testdata/house.png";
@@ -470,15 +475,16 @@ int main( int argc, char* argv[] )
   //string data = exe + "/../../../testdata/butterfly.png";
   //string data = exe + "/../../../testdata/f-16.png";
   //string data = exe + "/../../../testdata/barbara.png";
-  test_bcv(data.c_str(), txt.c_str());
-  test_wcv(data.c_str(), txt.c_str());
 
-  /*for (int i=1; i<=2; i++)
+  //test_bcv(data.c_str(), txt.c_str());
+  //test_wcv(data.c_str(), txt.c_str());
+
+  for (int i=1; i<=2; i++)
   {
     run_kotsu( format( data.c_str(), i ).c_str() );
     if (27==waitKey(0))
       break;
-  }*/
+  }
 
 
 	return 0;
