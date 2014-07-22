@@ -1,8 +1,7 @@
 ###
 add_subdirectory(bukvoed)
-add_subdirectory(calib_with_correspondence)
+add_subdirectory(correspond_keypoints)
 add_subdirectory(cover_net)
-add_subdirectory(depth_from_disparity)
 add_subdirectory(feature_sandbox)
 add_subdirectory(letters)
 add_subdirectory(kotsu)
