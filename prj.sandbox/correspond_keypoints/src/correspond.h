@@ -6,33 +6,34 @@
 
 #include "rulers.h"
 #include "simpleframe.h"
+#include "pointmatch.h"
 
 
 void CorrespondStereo(
   KeyPointDescriptorRuler *ruler, 
   cv::Ptr<SimpleFrame> &lFrame, 
   cv::Ptr<SimpleFrame> &rFrame, 
-  cv::FileStorage &outFS);
+  PointMatches &pm);
 
 void CorrespondStereoWithCNet(
   KeyPointDescriptorRuler *ruler,
   cv::Ptr<SimpleFrame> &lFrame, 
   cv::Ptr<SimpleFrame> &rFrame, 
-  cv::FileStorage &outFS, 
+  PointMatches &pm, 
   cv::Mat &todraw = cv::Mat());
 
 void CorrespondStereoWithMinimalDist(
   KeyPointDescriptorRuler *ruler,
   cv::Ptr<SimpleFrame> &lFrame, 
   cv::Ptr<SimpleFrame> &rFrame, 
-  cv::FileStorage &outFS,
+  PointMatches &pm,
   cv::Mat &todraw = cv::Mat());
 
 void CorrespondStereoWithFlann(
   KeyPointDescriptorRuler *ruler,
   cv::Ptr<SimpleFrame> &lFrame,
   cv::Ptr<SimpleFrame> &rFrame, 
-  cv::FileStorage &outFS, 
+  PointMatches &pm, 
   cv::Mat &todraw = cv::Mat());
 
 #endif //__CORRESPOND_H
