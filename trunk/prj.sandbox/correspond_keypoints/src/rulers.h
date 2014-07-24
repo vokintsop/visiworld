@@ -22,7 +22,7 @@ public:
   double computeDistance(  const std::pair<SimpleFrame *, unsigned int> &pt1, const std::pair<SimpleFrame *, unsigned int> &pt2 )
   {
     //double alpha = 2.0 / 2202.0; //mono 1920
-    double alpha = 0;//2.0 / 1470.0; //stereo 1280
+    double alpha = 1.0;//2.0 / 1470.0; //stereo 1280
     cv::Mat desc1 = pt1.first->descriptors.row(pt1.second);
     cv::Mat desc2 = pt2.first->descriptors.row(pt2.second);
     cv::Point2f kp1 = pt1.first->kps[pt1.second].pt;

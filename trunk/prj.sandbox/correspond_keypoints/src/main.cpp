@@ -8,6 +8,7 @@
 
 #include "simpleframe.h"
 #include "correspond.h"
+#include "pointmatch.h"
 #include <cover_net/cover_net.h>
 
 
@@ -39,7 +40,7 @@ void FillStandartFeatureDetectorParameters()
 void FillStandartFeatureDetectorParameters()  
 {
   featureType = "SIFT";
-  featureDetectorInts["nFeatures"] = 200;
+  featureDetectorInts["nFeatures"] = 400;
   featureDetectorDoubles["contrastThreshold"] = 0.04; //default 0.04
   featureDetectorDoubles["edgeThreshold"] = 10.0; // default 10.0
   featureDetectorDoubles["sigma"] = 1.6; // default 1.6
@@ -103,13 +104,10 @@ int main( int argc, char** argv )
   Mat rbgr;
   KeyPointDescriptorRuler ruler;
   Ptr<SimpleFrame> lFrame = NULL, rFrame = NULL;
-
-  fs << "frameNum" << nFrames;
-  fs << "frames" << "[";
+  PointMatchStorage pms;
 
   for (int iFrame = 0; iFrame < nFrames; ++iFrame)
   {
-    fs << "{";
     char c = 0;
     if (!lcap.read(lbgr) || !rcap.read(rbgr))
       return 0;
@@ -118,22 +116,20 @@ int main( int argc, char** argv )
     lFrame->preprocess(featureDetector, descriptorExtractor);
     rFrame->preprocess(featureDetector, descriptorExtractor);
     //keypoints detected
-    fs << "frameNumber" << iFrame;
-
-    CorrespondStereo(&ruler, lFrame, rFrame, fs);
-    
-    fs << "}";
+    PointMatches pm;
+    CorrespondStereo(&ruler, lFrame, rFrame, pm);
+    pms.push_back(pm);
     //return 0;
     c = cvWaitKey(1);
     if (c == 27)
     {
-      fs << "]";
+      WritePointMatchStorage(fs, pms);
       //fs.release();
       return 0;
     }
     c = 0;
   }
-  fs << "]";
+  WritePointMatchStorage(fs, pms);
   fs.release();
   cout << "Ended Succesfully!!" << endl;
   return 0;

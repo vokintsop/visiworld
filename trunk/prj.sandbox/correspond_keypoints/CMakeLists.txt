@@ -1,22 +1,21 @@
-IF( MSVC )
-  PROJECT( correspond_keypoints )
-  
-  SET( SOURCES
-    src/main.cpp 
-    src/simpleframe.cpp
-    src/correspond.cpp
-  )
+PROJECT( correspond_keypoints )
 
-  SET( HEADERS
-  	src/simpleframe.h
-    src/init.h
-    src/correspond.h
-    src/rulers.h
-  )
+SET( SOURCES
+  src/main.cpp 
+  src/simpleframe.cpp
+  src/correspond.cpp
+  src/pointmatch.cpp
+)
 
-  ADD_EXECUTABLE( correspond_keypoints ${HEADERS} ${SOURCES} )
-  TARGET_LINK_LIBRARIES( correspond_keypoints
-    ${OpenCV_LIBS}
-  )
+SET( HEADERS
+	src/simpleframe.h
+  src/init.h
+  src/correspond.h
+  src/rulers.h
+  src/pointmatch.h
+)
 
-ENDIF()
+ADD_EXECUTABLE( correspond_keypoints ${HEADERS} ${SOURCES} )
+TARGET_LINK_LIBRARIES( correspond_keypoints
+  ${OpenCV_LIBS}
+)
