@@ -15,8 +15,7 @@ using namespace cv;
 
 void skyline_single_level( Mat1b& grey, Mat& draw )
 {
-  Mat1i sum;
-  integral( grey, sum );
+  Mat1i sum;  integral( grey, sum );
   double tot = sum[sum.rows-1][sum.cols-1];
   double mots = -1;  int my = -1; // record max
   for (int y=0;y<sum.rows;y++)
@@ -28,24 +27,20 @@ void skyline_single_level( Mat1b& grey, Mat& draw )
     double ots = ots_u + ots_d;
     
     if (ots > mots)
-    {
-      mots = ots;
-      my = y;
-    }
+      mots = ots,  my = y;
   }
   line( draw, Point(0, my), Point( grey.cols-1, my ), Scalar( 255, 255, 255 ), 3 );
   line( draw, Point(0, my), Point( grey.cols-1, my ), Scalar( 0, 0, 0 ), 1 );
+  imshow( "single_level", draw );
 }
 
 void skyline_tiled( Mat1b& grey, Mat& draw )
 {
-  Mat1i sum;
-  integral( grey, sum );
+  Mat1i sum;  integral( grey, sum );
   int xx = sum.cols/10;
   for (int x=0; x<sum.cols-xx; x++)
   {
-    double mots = -1;
-    int my = -1;
+    double mots = -1;  int my = -1;
     double tot = sum[0][x] + sum[sum.rows-1][x+xx] - sum[sum.rows-1][x] - sum[0][x+xx];
     for (int y=0;y<sum.rows;y++)
     {
@@ -56,10 +51,7 @@ void skyline_tiled( Mat1b& grey, Mat& draw )
       double ots = ots_u + ots_d;
       
       if (ots > mots)
-      {
-        mots = ots;
-        my = y;
-      }
+        mots = ots, my = y;
     }
     line( draw, Point(x, my), Point( x+xx, my ), Scalar( 255, 255, 255 ), 3 );
     line( draw, Point(x, my), Point( x+xx, my ), Scalar( 0, 0, 0 ), 1 );
@@ -68,14 +60,85 @@ void skyline_tiled( Mat1b& grey, Mat& draw )
 
 }
 
+void skyline_dp( Mat1b& grey, Mat& draw )
+{
+  Mat1i sum;  integral( grey, sum );
+
+  // NOTE:
+  // разрезы идут между пиксел€ми. разрез из точки (1 1) отрезает единственный левый верхний пиксель с координатами (0 0)
+  // соответственно, матрицы динамического программировани€ имеют размеры на 1 больше исходной картинки
+  // аналогично матрице сумм
+  // левый столбец и верхн€€ строка -- нулевые. избыточна€ пам€ть, упрощение кода.
+
+  Mat1i sum_up( sum.rows, sum.cols, 0 ); // сумма интенсивностей над разрезом
+  Mat1i cnt_up( sum.rows, sum.cols, 0 ); // количество пикселей над разрезом
+  Mat1i y_prev( sum.rows, sum.cols, 0 ); // переход к предыдущему столбцу
+
+  double mots = -1;  int my = -1; // рекорд по столбцу
+  for (int x=1; x<sum.cols; x++) // расчет очередного столбца
+  {
+    double sum_tot = sum[sum.rows-1][x]; // обща€ сумма слева, включа€ рассчитываемый столбец
+    double cnt_tot = sum.rows*x; // общее количество слева, включа€ рассчитываемый столбец
+    mots = -1;  my = -1; // рекорд по столбцу
+    for (int y=0;y<sum.rows;y++) // оцениваем разрез из (x,y)
+    {
+      const int k = 2;
+      int y1 = max( 0, y-k ); int y2 = min( sum.rows-1, y+k );
+      double _mots = -1;  int _my = -1; // рекорд по ребрам из (x,y)
+      for ( int yy = y1; yy <= y2; yy++)
+      { // расчитываем путь с ребром (x,y)--(x-1,yy)
+        double u =  sum_up[yy][x-1]; // сумма по пути над лучшим разрезом из (x-1, yy)
+        u += sum[y][x] - sum[y][x-1]; // сумма над столбцом слева от (x,y)
+        int nu = cnt_up[yy][x-1];
+        nu += y; // число пикселей
+        double d = sum_tot - u; int nd = cnt_tot-nu;
+        double ots_u = nu ? u*u/nu : 0;
+        double ots_d = nd ? d*d/nd : 0;
+        double ots = ots_u + ots_d;
+        
+        if (ots > _mots)
+          _mots = ots, _my = yy; 
+      }
+      assert( _my >=0 );
+      assert( _my < sum.rows );
+
+      y_prev[y][x] = _my;
+      sum_up[y][x] = sum_up[_my][x-1] // сумма по пути над разрезом
+                  + sum[y][x] - sum[y][x-1]; // сумма над столбцом
+      cnt_up[y][x] = cnt_up[_my][x-1] + y; // число пикселей
+
+      if (_mots > mots) // ищем уже глобальный максимум по столбцу
+        mots = _mots, my = y;
+    }
+  }
+
+  for (int x=sum.cols-1; x>=0; x--)
+  {
+    circle( draw, Point(x, my), 5, Scalar( 255, 255, 255 ), 3 );
+    circle( draw, Point(x, my), 3, Scalar( 0, 0, 0 ), 3 );
+    my = y_prev[my][x];
+  }
+
+  imshow( "dp", draw );
+
+}
+
 bool process_image_file( const string& image_file_name )
 {
-  cout << image_file_name;
-  Mat1b grey = imread( image_file_name, IMREAD_GRAYSCALE );
-  Mat1b draw = grey.clone();
+  cout << image_file_name << endl;
+  Mat3b bgr = imread( image_file_name );
+  vector<Mat1b> channels;
+  split( bgr, channels );
 
-  //skyline_single_level( grey );
-  skyline_tiled( grey, draw );
+  Mat1b grey = channels[0]; ///imread( image_file_name, IMREAD_GRAYSCALE );
+  imshow("blu", channels[0]);
+  imshow("gre", channels[1]);
+  imshow("red", channels[2]);
+  Mat draw = bgr.clone();
+
+  //skyline_single_level( grey, draw );
+  //skyline_tiled( grey, draw );
+  skyline_dp( grey, draw );
 
   if (27==waitKey(0))
     return false;
