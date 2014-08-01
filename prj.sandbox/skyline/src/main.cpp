@@ -147,19 +147,9 @@ void skyline_dp( Mat1b& grey, Mat& draw )
 
 }
 
-bool process_image_file( const string& image_file_name )
+void preprocess_grey_image(Mat1b& grey)
 {
-  cout << image_file_name << endl;
-  Mat3b bgr = imread( image_file_name );
-  vector<Mat1b> channels;
-  split( bgr, channels );
-
-  Mat1b grey = channels[0]; ///imread( image_file_name, IMREAD_GRAYSCALE );
-  imshow("blue", channels[0]);
-  //imshow("gre", channels[1]);
-  //imshow("red", channels[2]);
-  Mat draw = bgr.clone();
-
+  return;
   blur( grey, grey, Size( 5, 3 ) );
   int lev = grey.rows/10; // осветляем заведомо небо, 10% вверх -- накапливаем минимум
   for (int x=0; x<grey.cols; x++)
@@ -169,12 +159,35 @@ bool process_image_file( const string& image_file_name )
   for (int x=0; x<grey.cols; x++) // затемняем вниз, чтобы избавиться от белых домов и тп
     for (int y=lev-1; y>=0; y--)
       grey[y][x] = max( grey[y][x], grey[y+1][x] );
+}
 
+bool process_image_file( const string& input_folder, const string& file_name, const string& output_folder )
+{
+  bool ok = true;
+  string image_file_name = input_folder + file_name;
+  cout << image_file_name << endl;
+  Mat3b bgr = imread( image_file_name );
+  vector<Mat1b> channels;
+  split( bgr, channels );
+
+  Mat1b grey = channels[0]; ///imread( image_file_name, IMREAD_GRAYSCALE );
+  ok = imwrite( output_folder + file_name + ".grey.jpg", grey );
+  imshow("blue", channels[0]);
+  //imshow("gre", channels[1]);
+  //imshow("red", channels[2]);
+  Mat draw = bgr.clone();
+
+#if 1 // preprocess image
+  preprocess_grey_image(grey);
+#endif
   imshow( "preprocessed", grey );
 
   skyline_single_level( grey, draw );
   //skyline_tiled( grey, draw );
   skyline_dp( grey, draw );
+
+  ok = imwrite( output_folder + file_name + ".preproc.jpg", grey );
+  ok = imwrite( output_folder + file_name + ".res.jpg", draw );
 
   if (27==waitKey(0))
     return false;
@@ -184,7 +197,8 @@ bool process_image_file( const string& image_file_name )
 int main( int argc, char* argv[] )
 {
   string exe  = argv[0];
-  string foldername = exe + "/../../../testdata/skyline/";
+  string input_folder = exe + "/../../../testdata/skyline/";
+  string output_folder = exe + "/../../../testdata/skyline/out01/  ";
   string lst = exe + "/../../../testdata/skyline/skyline.lst";
 
   ifstream inn( lst.c_str() );
@@ -194,12 +208,11 @@ int main( int argc, char* argv[] )
   {
     while ( inn.good() )
     {
-      string filename;
-      inn >> filename;
-      if (filename.empty())
+      string file_name;
+      inn >> file_name;
+      if (file_name.empty())
         break;
-      string pathname = foldername+filename;
-      if (!process_image_file( pathname ))
+      if (!process_image_file( input_folder, file_name, output_folder ))
         break;
     }
   }
