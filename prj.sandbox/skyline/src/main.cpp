@@ -149,7 +149,7 @@ void skyline_dp( Mat1b& grey, Mat& draw )
 
 void preprocess_grey_image(Mat1b& grey)
 {
-  return;
+  //  return;
   blur( grey, grey, Size( 5, 3 ) );
   int lev = grey.rows/10; // осветляем заведомо небо, 10% вверх -- накапливаем минимум
   for (int x=0; x<grey.cols; x++)
