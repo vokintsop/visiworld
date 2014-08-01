@@ -114,8 +114,7 @@ void skyline_dp( Mat1b& grey, Mat& draw )
 
   for (int x=sum.cols-1; x>=0; x--)
   {
-    circle( draw, Point(x, my), 5, Scalar( 255, 255, 255 ), 3 );
-    circle( draw, Point(x, my), 3, Scalar( 0, 0, 0 ), 3 );
+    circle( draw, Point(x, my), 5, Scalar( 0, 255, 255 ), 3 );
     my = y_prev[my][x];
   }
 
@@ -131,10 +130,21 @@ bool process_image_file( const string& image_file_name )
   split( bgr, channels );
 
   Mat1b grey = channels[0]; ///imread( image_file_name, IMREAD_GRAYSCALE );
-  imshow("blu", channels[0]);
-  imshow("gre", channels[1]);
-  imshow("red", channels[2]);
+  imshow("blue", channels[0]);
+  //imshow("gre", channels[1]);
+  //imshow("red", channels[2]);
   Mat draw = bgr.clone();
+
+  int lev = grey.rows/10; // осветляем заведомо небо, 10% вверх -- накапливаем минимум
+  for (int x=0; x<grey.cols; x++)
+    for (int y=lev+1; y<grey.rows; y++)
+      grey[y][x] = min( grey[y][x], grey[y-1][x] );
+
+  for (int x=0; x<grey.cols; x++) // затемняем вниз, чтобы избавиться от белых домов и тп
+    for (int y=lev-1; y>=0; y--)
+      grey[y][x] = max( grey[y][x], grey[y+1][x] );
+
+  imshow( "preprocessed", grey );
 
   //skyline_single_level( grey, draw );
   //skyline_tiled( grey, draw );
