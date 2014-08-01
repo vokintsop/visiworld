@@ -18,6 +18,8 @@ void skyline_single_level( Mat1b& grey, Mat& draw )
   Mat1i sum;  integral( grey, sum );
   double tot = sum[sum.rows-1][sum.cols-1];
   double mots = -1;  int my = -1; // record max
+  vector< double > q_otsu(sum.rows, 0);
+
   for (int y=0;y<sum.rows;y++)
   {
     double u = sum[y][sum.cols-1]; int nu = y;
@@ -28,9 +30,22 @@ void skyline_single_level( Mat1b& grey, Mat& draw )
     
     if (ots > mots)
       mots = ots,  my = y;
+
+    q_otsu[y] = ots;
   }
-  line( draw, Point(0, my), Point( grey.cols-1, my ), Scalar( 255, 255, 255 ), 3 );
-  line( draw, Point(0, my), Point( grey.cols-1, my ), Scalar( 0, 0, 0 ), 1 );
+  line( draw, Point(0, my), Point( grey.cols-1, my ), Scalar( 0, 255, 255 ), 3 );
+
+#if 1
+  double minq = mots;
+  for (int y=0; y<sum.rows; y++)
+    minq= min( minq, q_otsu[y] );
+
+  for (int y=0; y<sum.rows; y++)
+  {
+    circle( draw, Point(draw.cols-(1+q_otsu[y]-minq)*100./(1+mots-minq), y), 3, Scalar( 100, 0, 255 ), 1 );
+  }
+#endif
+
   imshow( "single_level", draw );
 }
 
@@ -53,8 +68,7 @@ void skyline_tiled( Mat1b& grey, Mat& draw )
       if (ots > mots)
         mots = ots, my = y;
     }
-    line( draw, Point(x, my), Point( x+xx, my ), Scalar( 255, 255, 255 ), 3 );
-    line( draw, Point(x, my), Point( x+xx, my ), Scalar( 0, 0, 0 ), 1 );
+    line( draw, Point(x, my), Point( x+xx, my ), Scalar( 0, 255, 255 ), 3 );
   }
   imshow( "tiled", draw );
 
@@ -73,6 +87,7 @@ void skyline_dp( Mat1b& grey, Mat& draw )
   Mat1i sum_up( sum.rows, sum.cols, 0 ); // сумма интенсивностей над разрезом
   Mat1i cnt_up( sum.rows, sum.cols, 0 ); // количество пикселей над разрезом
   Mat1i y_prev( sum.rows, sum.cols, 0 ); // переход к предыдущему столбцу
+  Mat1d q_otsu( sum.rows, sum.cols, 0. ); // переход к предыдущему столбцу
 
   double mots = -1;  int my = -1; // рекорд по столбцу
   for (int x=1; x<sum.cols; x++) // расчет очередного столбца
@@ -106,15 +121,25 @@ void skyline_dp( Mat1b& grey, Mat& draw )
       sum_up[y][x] = sum_up[_my][x-1] // сумма по пути над разрезом
                   + sum[y][x] - sum[y][x-1]; // сумма над столбцом
       cnt_up[y][x] = cnt_up[_my][x-1] + y; // число пикселей
+      q_otsu[y][x] = _mots;
 
       if (_mots > mots) // ищем уже глобальный максимум по столбцу
         mots = _mots, my = y;
     }
   }
 
+  double minq = mots;
+  for (int y=0; y<sum.rows; y++)
+    minq= min( minq, q_otsu[y][sum.cols-1] );
+
+  for (int y=0; y<sum.rows; y++)
+  {
+    circle( draw, Point(draw.cols-(1+q_otsu[y][sum.cols-1]-minq)*100./(1+mots-minq), y), 2, Scalar( 255, 0, 255 ), 1 );
+  }
+
   for (int x=sum.cols-1; x>=0; x--)
   {
-    circle( draw, Point(x, my), 5, Scalar( 0, 255, 255 ), 3 );
+    circle( draw, Point(x, my), 2, Scalar( 255, 255, 0 ), 1 );
     my = y_prev[my][x];
   }
 
@@ -135,6 +160,7 @@ bool process_image_file( const string& image_file_name )
   //imshow("red", channels[2]);
   Mat draw = bgr.clone();
 
+  blur( grey, grey, Size( 5, 3 ) );
   int lev = grey.rows/10; // осветляем заведомо небо, 10% вверх -- накапливаем минимум
   for (int x=0; x<grey.cols; x++)
     for (int y=lev+1; y<grey.rows; y++)
@@ -146,7 +172,7 @@ bool process_image_file( const string& image_file_name )
 
   imshow( "preprocessed", grey );
 
-  //skyline_single_level( grey, draw );
+  skyline_single_level( grey, draw );
   //skyline_tiled( grey, draw );
   skyline_dp( grey, draw );
 
