@@ -14,6 +14,8 @@ using namespace cv;
 
 /////////////////////////////////////////////////////////////// move to kotsu.h
 
+#define DRAW_AVERAGE_GRAY
+
 class KOtsu // строит множество разрезов на распределении, оптимизируя критерий отсу для К классов
 {
 public:
@@ -145,6 +147,18 @@ Palette thePalette;
 
 Mat3b colorize( Mat1b& src, vector< int >& index )
 {
+#ifdef DRAW_AVERAGE_GRAY
+  int ind_prev = 0;
+  while (ind_prev < index.size())
+  {
+    int ind = ind_prev;
+    while (ind < index.size() && index[ind] == index[ind_prev])
+      ++ind;
+    int c = (ind_prev + ind) / 2;
+    thePalette.colors[index[ind_prev]] = Vec3b(c, c, c);
+    ind_prev = ind;
+  }
+#endif
   Mat3b res( src.rows, src.cols );
   for (int y=0; y<src.rows; y++)
     for( int x=0; x<src.cols; x++)
@@ -184,6 +198,7 @@ void drawBinarized( KOtsu& kotsu, int classes, Mat1b& img )
   imshow( "binary colorized", view_colorized );
 }
 
+string output_path;
 void drawKOtsu( KOtsu& kotsu, int k, int thr )
 {
   int distr_len = kotsu.distr.size();
@@ -210,6 +225,10 @@ void drawKOtsu( KOtsu& kotsu, int k, int thr )
 
   int pos = 256;
   cout << "k=" << k << " \tquality=" << (k+1)*(k+1)*kotsu.otsu[k][pos].second;
+  char p[100];
+  sprintf(p, output_path.c_str(), k);
+  ofstream out (p);
+
   for ( int cuts = k; cuts>=0; cuts-- )
   {
     pos = kotsu.otsu[cuts][pos].first;
@@ -218,11 +237,14 @@ void drawKOtsu( KOtsu& kotsu, int k, int thr )
     line( view, Point(int(pos*xratio), 0), Point( int(pos*xratio), int(view_height-kotsu.distr[pos]*yratio-1) ), 
       Scalar( 128, 128, 200 ), xpix );
     cout << " \t" << pos;
+    out << pos << " ";
   }
+  out << endl;
   cout << endl;
 
   imshow( "kotsu-distr", view );
-  
+
+  out.close();
 }
 
 
@@ -459,11 +481,12 @@ void test_bcv( const char* path, const char *txt_path )
 int main( int argc, char* argv[] )
 {
   string exe  = argv[0];
-  //string data = exe + "/../../../testdata/card01.png";
+  string data = exe + "/../../../testdata/card01.png";
   string txt = exe + "/../../../testdata/input.txt";
+  output_path = exe + "/../../../output/output%02d.txt";
   
   //string data = exe + "/../../../testdata/kotsu/greytext.png";
-  string data = exe + "/../../../testdata/kotsu/greytext2.png";
+  //string data = exe + "/../../../testdata/kotsu/greytext2.png";
   
   
   //string data = exe + "/../../../testdata/lena.png";
