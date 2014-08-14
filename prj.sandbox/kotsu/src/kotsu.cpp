@@ -189,16 +189,21 @@ void makePaletteIndex( KOtsu& kotsu, int k, vector< int >& index )
     index[i] = class_num;
   }
 }
-
+string output_png;
 void drawBinarized( KOtsu& kotsu, int classes, Mat1b& img )
 {
   vector< int > index;
   makePaletteIndex( kotsu, classes, index );
   Mat3b view_colorized = colorize( img, index );
   imshow( "binary colorized", view_colorized );
+
+   char p1[100];
+  sprintf(p1, output_png.c_str(), classes);
+  imwrite(p1, view_colorized);
 }
 
 string output_path;
+
 void drawKOtsu( KOtsu& kotsu, int k, int thr )
 {
   int distr_len = kotsu.distr.size();
@@ -228,6 +233,7 @@ void drawKOtsu( KOtsu& kotsu, int k, int thr )
   char p[100];
   sprintf(p, output_path.c_str(), k);
   ofstream out (p);
+ 
 
   for ( int cuts = k; cuts>=0; cuts-- )
   {
@@ -243,6 +249,7 @@ void drawKOtsu( KOtsu& kotsu, int k, int thr )
   cout << endl;
 
   imshow( "kotsu-distr", view );
+  
 
   out.close();
 }
@@ -484,6 +491,7 @@ int main( int argc, char* argv[] )
   string data = exe + "/../../../testdata/card01.png";
   string txt = exe + "/../../../testdata/input.txt";
   output_path = exe + "/../../../output/output%02d.txt";
+  output_png = exe + "/../../../output/kotsu%02d.png";
   
   //string data = exe + "/../../../testdata/kotsu/greytext.png";
   //string data = exe + "/../../../testdata/kotsu/greytext2.png";
