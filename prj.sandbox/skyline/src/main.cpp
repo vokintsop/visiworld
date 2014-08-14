@@ -35,7 +35,7 @@ void skyline_single_level( Mat1b& grey, Mat& draw )
   }
   line( draw, Point(0, my), Point( grey.cols-1, my ), Scalar( 0, 255, 255 ), 3 );
 
-#if 1
+#if 0
   double minq = mots;
   for (int y=0; y<sum.rows; y++)
     minq= min( minq, q_otsu[y] );
@@ -97,7 +97,7 @@ void skyline_dp( Mat1b& grey, Mat& draw )
     mots = -1;  my = -1; // рекорд по столбцу
     for (int y=0;y<sum.rows;y++) // оцениваем разрез из (x,y)
     {
-      const int k = 2;
+      const int k = 10;
       int y1 = max( 0, y-k ); int y2 = min( sum.rows-1, y+k );
       double _mots = -1;  int _my = -1; // рекорд по ребрам из (x,y)
       for ( int yy = y1; yy <= y2; yy++)
@@ -132,10 +132,10 @@ void skyline_dp( Mat1b& grey, Mat& draw )
   for (int y=0; y<sum.rows; y++)
     minq= min( minq, q_otsu[y][sum.cols-1] );
 
-  for (int y=0; y<sum.rows; y++)
+  /*for (int y=0; y<sum.rows; y++)
   {
     circle( draw, Point(draw.cols-(1+q_otsu[y][sum.cols-1]-minq)*100./(1+mots-minq), y), 2, Scalar( 255, 0, 255 ), 1 );
-  }
+  }*/
 
   for (int x=sum.cols-1; x>=0; x--)
   {
@@ -189,8 +189,8 @@ bool process_image_file( const string& input_folder, const string& file_name, co
   ok = imwrite( output_folder + file_name + ".preproc.jpg", grey );
   ok = imwrite( output_folder + file_name + ".res.jpg", draw );
 
-  if (27==waitKey(0))
-    return false;
+ // if (27==waitKey(0))
+  //  return false;
   return true;
 }
 
