@@ -14,7 +14,7 @@ using namespace cv;
 
 /////////////////////////////////////////////////////////////// move to kotsu.h
 
-#define DRAW_AVERAGE_GRAY
+//#define DRAW_AVERAGE_GRAY
 
 class KOtsu // строит множество разрезов на распределении, оптимизируя критерий отсу для К классов
 {
@@ -141,6 +141,29 @@ struct Palette
       }
     }
   }
+  Palette(vector<int> &cuts, vector<long long> &hist, int len = 256):
+  colors(len)
+  {
+    int ind = len  - 1;
+    for (int i = 0; i < cuts.size(); ++i)
+    {
+      long long sum = 0;
+      long long w = 0;
+      int ind1 = ind;
+      for (;ind >= cuts[i]; --ind)
+      {
+        w += ind * hist[ind];
+        sum += hist[ind];
+      }
+      long long c1 = w / sum;
+     // cout << c1 << endl;
+      for (;ind1 >= cuts[i]; --ind1)
+      {
+        Vec3b& c = colors[i];
+        c[0]= c[1] = c[2] = c1;
+      }
+    }
+  }
 };
 
 Palette thePalette;
@@ -190,6 +213,7 @@ void makePaletteIndex( KOtsu& kotsu, int k, vector< int >& index )
   }
 }
 string output_png;
+string output_hist;
 void drawBinarized( KOtsu& kotsu, int classes, Mat1b& img )
 {
   vector< int > index;
@@ -234,6 +258,8 @@ void drawKOtsu( KOtsu& kotsu, int k, int thr )
   sprintf(p, output_path.c_str(), k);
   ofstream out (p);
  
+  vector<int> cuts_;
+   
 
   for ( int cuts = k; cuts>=0; cuts-- )
   {
@@ -244,10 +270,14 @@ void drawKOtsu( KOtsu& kotsu, int k, int thr )
       Scalar( 128, 128, 200 ), xpix );
     cout << " \t" << pos;
     out << pos << " ";
+    cuts_.push_back(pos);
   }
   out << endl;
   cout << endl;
-
+  thePalette = Palette(cuts_, kotsu.distr);
+  char p1[100];
+  sprintf(p1, output_hist.c_str(), k);
+  imwrite(p1, view);
   imshow( "kotsu-distr", view );
   
 
@@ -492,6 +522,7 @@ int main( int argc, char* argv[] )
   string txt = exe + "/../../../testdata/input.txt";
   output_path = exe + "/../../../output/output%02d.txt";
   output_png = exe + "/../../../output/kotsu%02d.png";
+  output_hist = exe + "/../../../output/hist%02d.png";
   
   //string data = exe + "/../../../testdata/kotsu/greytext.png";
   //string data = exe + "/../../../testdata/kotsu/greytext2.png";
