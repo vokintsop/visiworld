@@ -4,6 +4,7 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
+#include <conio.h>
 
 #include <iostream>
 #include <fstream>
@@ -30,7 +31,11 @@ char* files[]=
   "/../../../testdata/colors_matcher/quelle5.png",
   "/../../../testdata/colors_matcher/quelle6.png",
   "/../../../testdata/colors_matcher/quelle7.png",
-  "/../../../testdata/colors_matcher/quelle8-2.png"
+  "/../../../testdata/colors_matcher/quelle8.png",
+  "/../../../testdata/colors_matcher/quelle8-1.png",
+  "/../../../testdata/colors_matcher/quelle8-2.png",
+  "/../../../testdata/colors_matcher/quelle9.png",
+  "/../../../testdata/colors_matcher/quelle9-1.png"
 };
 
 
@@ -40,6 +45,12 @@ int proc_file( string& exe, int i_file )
   cout << data << endl;
 
   Mat3b bgr =  imread( data );
+  if (bgr.empty())
+  {
+    cout << "Can't read image" << endl;
+    return waitKey(0);
+  }
+
   imshow( "bgr", bgr );
 
   Mat3b hsv;
@@ -84,18 +95,27 @@ int proc_file( string& exe, int i_file )
   return waitKey(0);
 }
 
+const int kEscape = 27;
+const int kPlus = 43;
+const int kEquality = 61; // "=" has same button with "+"
+const int kMinus = 45;
+
 int main( int argc, char* argv[] )
 {
   string exe  = argv[0];
 
   int key=-1;
+  int nfiles = sizeof(files)/sizeof(files[0]);
   for ( int i_file = 0; key != 27; )
   {
     switch (key=proc_file( exe, i_file))
     {
     case 27: break;
+    case kMinus:
+      i_file = (i_file+nfiles-1) % nfiles; break;
+    case kPlus:
     default:
-      i_file = (i_file+1) % (sizeof(files)/sizeof(files[0]));
+      i_file = (i_file+1) % nfiles;
     }
   }
 
