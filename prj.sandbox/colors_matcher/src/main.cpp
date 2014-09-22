@@ -21,13 +21,18 @@ char* files[]=
 {
   //"/../../../testdata/colors_matcher/color-scheme-303-main.png",
   //"/../../../testdata/colors_matcher/color-scheme-400-main.png",
-  "/../../../testdata/colors_matcher/apple.png",
-  "/../../../testdata/colors_matcher/apple2.png",
+  "/../../../testdata/colors_matcher/levis.png",
+  "/../../../testdata/colors_matcher/levis1.png",
+  "/../../../testdata/colors_matcher/levis2.png",
+  "/../../../testdata/colors_matcher/VTB.png",
+  "/../../../testdata/colors_matcher/beeline.png",
+  "/../../../testdata/colors_matcher/megafon.png",
   "/../../../testdata/colors_matcher/quelle1.png",
   "/../../../testdata/colors_matcher/quelle2.png",
   "/../../../testdata/colors_matcher/quelle3.png",
   "/../../../testdata/colors_matcher/quelle4.png",
   "/../../../testdata/colors_matcher/quelle5.png",
+  "/../../../testdata/colors_matcher/quelle5-1.png",
   "/../../../testdata/colors_matcher/quelle6.png",
   "/../../../testdata/colors_matcher/quelle6-1.png",
   "/../../../testdata/colors_matcher/quelle7.png",
@@ -35,7 +40,10 @@ char* files[]=
   "/../../../testdata/colors_matcher/quelle8-1.png",
   "/../../../testdata/colors_matcher/quelle8-2.png",
   "/../../../testdata/colors_matcher/quelle9.png",
-  "/../../../testdata/colors_matcher/quelle9-1.png"
+  "/../../../testdata/colors_matcher/quelle10.png",
+  "/../../../testdata/colors_matcher/quelle10-1.png",
+  "/../../../testdata/colors_matcher/quelle10-2.png"
+  "/../../../testdata/colors_matcher/intervals.png",
 };
 
 
@@ -150,12 +158,15 @@ void rotate_hue( int delta )
   imshow( "bgr_rotated", bgr_rotated );
 }
 
-const int kEscape = 27;
-const int kPlus = 43;
+const int kEscape = 27; // выход
+const int kF5 = 7602176; // перезапустить текущую картинку без обработки
+const int kPlus = 43; // перейти к следующей картинке
 const int kEquality = 61; // "=" has same button with "+"
-const int kMinus = 45;
-const int kLeftArrow =2424832; // отрицательный поворот hue
-const int kRightArrow =2555904; // положительный поворот hue
+const int kMinus = 45; // перейти к предыдущей картинке
+const int kRightArrow =2555904; //  поворот hue на +1
+const int kLeftArrow =2424832; //  поворот hue -1
+const int kPageUp =2162688; //  поворот hue +180/12 = +15
+const int kPageDown =2228224;//  поворот hue -180/12 = -15
 
 int main( int argc, char* argv[] )
 {
@@ -177,8 +188,11 @@ int main( int argc, char* argv[] )
     switch (key)
     {
     case 27: break;
+
+    case kEquality:      
     case kPlus:      i_file = (i_file+2) % nfiles; // +2 -1 = +1
     case kMinus:     i_file = (i_file+nfiles-1) % nfiles; 
+    case kF5:        //////i_file = (i_file+nfiles-1) % nfiles; 
 
       if (!load_file(exe, i_file))
       {
@@ -188,11 +202,16 @@ int main( int argc, char* argv[] )
       break;
 
     case kLeftArrow:
-      i_file = (i_file+nfiles-1) % nfiles;
       rotate_hue(-1);
       break;
     case kRightArrow:
       rotate_hue(+1);
+      break;
+    case kPageDown:
+      rotate_hue(-15);
+      break;
+    case kPageUp:
+      rotate_hue(+15);
       break;
 
     default:
