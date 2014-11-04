@@ -1,0 +1,31 @@
+cmake_minimum_required(VERSION 2.8)
+find_package( OpenCV REQUIRED )
+
+IF( MSVC )
+  PROJECT( markup )
+  
+  SET( SOURCES
+    ${CMAKE_SOURCE_DIR}/prj.core/binarize/niblack.h 
+    ${CMAKE_SOURCE_DIR}/prj.core/binarize/niblack.cpp 
+    ${CMAKE_SOURCE_DIR}/prj.core/conncomp/ccdata.h 
+    ${CMAKE_SOURCE_DIR}/prj.core/conncomp/ccmap.h 
+    ${CMAKE_SOURCE_DIR}/prj.core/conncomp/ccmap.cpp 
+    ${CMAKE_SOURCE_DIR}/prj.core/ocvutils/precomp.h
+    ${CMAKE_SOURCE_DIR}/prj.core/ocvutils/ticker.h
+    ${CMAKE_SOURCE_DIR}/prj.core/streetglass/framedata.h 
+    ${CMAKE_SOURCE_DIR}/prj.core/streetglass/frameproc.h
+    ${CMAKE_SOURCE_DIR}/prj.core/streetglass/frameproc.cpp
+    ${CMAKE_SOURCE_DIR}/prj.core/streetglass/sticks.h
+    ${CMAKE_SOURCE_DIR}/prj.core/streetglass/sticks.cpp
+    src/main.cpp
+    src/markup.h
+    src/markup.cpp
+    src/markup_addobject.cpp
+    src/markup_mouse.cpp
+    src/track.cpp
+    )
+
+  ADD_EXECUTABLE( markup  ${SOURCES} )
+  TARGET_LINK_LIBRARIES( markup  ${OpenCV_LIBS}  )
+
+ENDIF()
