@@ -10,6 +10,8 @@ IF( MSVC )
     ${CMAKE_SOURCE_DIR}/prj.core/conncomp/ccdata.h 
     ${CMAKE_SOURCE_DIR}/prj.core/conncomp/ccmap.h 
     ${CMAKE_SOURCE_DIR}/prj.core/conncomp/ccmap.cpp 
+    ${CMAKE_SOURCE_DIR}/prj.core/detect/detect_segment.h 
+    ${CMAKE_SOURCE_DIR}/prj.core/detect/detect_segment.cpp
     ${CMAKE_SOURCE_DIR}/prj.core/ocvutils/precomp.h
     ${CMAKE_SOURCE_DIR}/prj.core/ocvutils/ticker.h
     ${CMAKE_SOURCE_DIR}/prj.core/streetglass/framedata.h 

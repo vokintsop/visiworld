@@ -21,9 +21,25 @@ using namespace std;
 using namespace cv;
 
 
-inline bool __false( string message = "" )
+inline void dbgPressAnyKey()
+{
+#ifdef _DEBUG
+  printf("\n\nPress any key...");
+  _getch();
+#endif
+}
+
+inline bool __false( std::string message = "" )
 {
   cout << message;
+  dbgPressAnyKey();
   return false;
 }
+
+inline bool __true( std::string message = "" )
+{
+  cout << message;
+  return true;
+}
+
 

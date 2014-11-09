@@ -34,6 +34,8 @@ enum Key {
   kRightArrow =2555904, // навигация: на кадр назад
   kPageUp =2162688,
   kPageDown =2228224,
+  kHome =2359296,
+  kEnd = 2293760,
   kSpace =32, // nonstop/pause
   kTab =9, // select object type
   kGreyPlus =43,
