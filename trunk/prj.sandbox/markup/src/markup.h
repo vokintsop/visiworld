@@ -139,7 +139,8 @@ public:
 
 private: // video properties, initialized by loadVideo()
   VideoCapture video;
-  string video_file_name;
+  string video_file_path; // full path+name
+  string video_file_name; // name+extension
   // video properties
   double fps; // = video.get( CV_CAP_PROP_FPS );
   int frames; // = int( video.get( CV_CAP_PROP_FRAME_COUNT ) );

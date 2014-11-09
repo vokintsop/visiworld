@@ -41,7 +41,9 @@ void MarkupWindow::drawObjects()
 {
   FrameData& frame_data = marked_frames[iframe];
   int numobj = frame_data.objects.size();
-  string _title = format("[Markup: [#%d of %d, %d msec]; type=%s objects=%d", iframe, frames, frame_time, objType().c_str(), numobj );
+  string _title = format("Markup: %s [#%d of %d, %d msec]; type=%s objects=%d tracking=%s", 
+    video_file_name.c_str(),
+    iframe, frames, frame_time, objType().c_str(), numobj, tracking_object? "ON" : "OFF" );
   //putText( draw_image, title, Point(30, 30), FONT_HERSHEY_SIMPLEX, 1, Scalar(0,255,0), 2 );
   setWindowText( _title.c_str() );
 
@@ -211,39 +213,6 @@ bool __false( string message = "" )
   return false;
 }
 
-bool MarkupWindow::loadVideo( string& _video_file_name, int& start_frame )
-{
-  if (!video.open( _video_file_name ))
-    return __false( format( "\nCan't open %s\n", _video_file_name.c_str() ) );
-
-  video_file_name = _video_file_name; 
-
-  fps = video.get( CV_CAP_PROP_FPS );
-  frames = int( video.get( CV_CAP_PROP_FRAME_COUNT ) );
-  frame_width = int( video.get( CV_CAP_PROP_FRAME_WIDTH ) );
-  frame_height = int( video.get( CV_CAP_PROP_FRAME_HEIGHT ) );
-  cout << "Loaded video: " << video_file_name << endl;
-  cout << "fps=" << fps << "\tframes=" << frames << endl;
-  cout << "frame_width=" << frame_width << "\tframe_height=" << frame_height << endl;
-  
-  loadMarkupData( start_frame );
-
-  // go to start_frame position
-  if (start_frame < 0)
-    start_frame = 0;
-  if (start_frame >= frames || frames <=0)
-  {
-    cout << "Requested start frame " << start_frame << " is out of range" << endl;
-    return false;
-  }
-  if (!video.set( CV_CAP_PROP_POS_FRAMES,  start_frame ))
-  {
-    cout << "Can't start from requested frame " << start_frame << endl;
-    return false;
-  }
-
-  return true;
-}
 
 bool MarkupWindow::readFrame( int pos )
 {
@@ -262,10 +231,10 @@ bool MarkupWindow::readFrame( int pos )
   return true;
 }
 
-int MarkupWindow::process( string& _video_file_name, int start_frame )
+int MarkupWindow::process( string& _video_file_path, int start_frame )
 {
-  video_file_name = _video_file_name;
-  if (!loadVideo(_video_file_name, start_frame))
+  video_file_path = _video_file_path;
+  if (!loadVideo(_video_file_path, start_frame))
     return -1;
 
   // мы уже встали на нужный кадр start_frame:
@@ -374,6 +343,9 @@ int MarkupWindow::process( string& _video_file_name, int start_frame )
     ////////////////////////////////////////
     // no key.. where to move?
 
+    if (key != kNoKeyPressed)
+      cout << "Key " << key << " skipped" << endl;
+
     if (non_stop_mode)
     {
       if (iframe < last_frame)
@@ -412,15 +384,51 @@ static string name_and_extension( string filename )
 
 static bool ensure_folder( string folder );
 
+bool MarkupWindow::loadVideo( string& _video_file_path, int& start_frame )
+{
+  if (!video.open( _video_file_path ))
+    return __false( format( "\nCan't open %s\n", _video_file_path.c_str() ) );
+
+  video_file_path = _video_file_path;
+  video_file_name = name_and_extension(video_file_path);
+
+  ///video_short_name = 
+
+  fps = video.get( CV_CAP_PROP_FPS );
+  frames = int( video.get( CV_CAP_PROP_FRAME_COUNT ) );
+  frame_width = int( video.get( CV_CAP_PROP_FRAME_WIDTH ) );
+  frame_height = int( video.get( CV_CAP_PROP_FRAME_HEIGHT ) );
+  cout << "Loaded video: " << video_file_path << endl;
+  cout << "fps=" << fps << "\tframes=" << frames << endl;
+  cout << "frame_width=" << frame_width << "\tframe_height=" << frame_height << endl;
+  
+  loadMarkupData( start_frame );
+
+  // go to start_frame position
+  if (start_frame < 0)
+    start_frame = 0;
+  if (start_frame >= frames || frames <=0)
+  {
+    cout << "Requested start frame " << start_frame << " is out of range" << endl;
+    return false;
+  }
+  if (!video.set( CV_CAP_PROP_POS_FRAMES,  start_frame ))
+  {
+    cout << "Can't start from requested frame " << start_frame << endl;
+    return false;
+  }
+
+  return true;
+}
 
 
 bool MarkupWindow::loadMarkupData( int& start_frame )
 {
-  ensure_folder( format( "%s.dat", video_file_name.c_str() ) );
+  ensure_folder( format( "%s.dat", video_file_path.c_str() ) );
 
   markup_filename = format( "%s.dat/%s.markup.xml",  
-    video_file_name.c_str(),
-    name_and_extension(video_file_name).c_str() );
+    video_file_path.c_str(),
+    name_and_extension(video_file_path).c_str() );
 
   if (!readVideoData( markup_filename, marked_frames, start_frame ))
     marked_frames.resize( frames );
@@ -430,11 +438,11 @@ bool MarkupWindow::loadMarkupData( int& start_frame )
 
 bool MarkupWindow::saveMarkup()  // F2
 {
-  ensure_folder( format( "%s.dat", video_file_name.c_str() ) );
+  ensure_folder( format( "%s.dat", video_file_path.c_str() ) );
 
   markup_filename = format( "%s.dat/%s.markup.xml",  
-    video_file_name.c_str(),
-    name_and_extension(video_file_name).c_str());
+    video_file_path.c_str(),
+    name_and_extension(video_file_path).c_str());
 
   writeVideoData( markup_filename, marked_frames, iframe );
   cout << "Markup saved to: " << markup_filename << endl;
@@ -443,7 +451,7 @@ bool MarkupWindow::saveMarkup()  // F2
 
 bool MarkupWindow::saveFrameImage() // F3
 {
-  string frame_name = format( "%s.%04d.jpg", video_file_name.c_str(), iframe );
+  string frame_name = format( "%s.%04d.jpg", video_file_path.c_str(), iframe );
   if (!imwrite( frame_name, frameProc.bgr720 )) // try catch?
     return __false( format("Write frame '%s' failed\n", frame_name.c_str() ) );
   cout << "Frame " << iframe << " saved to: " << frame_name << endl;
@@ -456,14 +464,14 @@ bool MarkupWindow::saveFrameImage() // F3
 std::string MarkupWindow::makeFrameObjectImageName( int iframe, const Rect& objRoi, int iobj, 
                                                    const char* szObjType, bool ensureFolder )
 {
-  ensure_folder( format("%s.dat", video_file_name.c_str() ) );
-  ensure_folder( format("%s.dat/objects", video_file_name.c_str() ) );
-  ensure_folder( format("%s.dat/objects/%s", video_file_name.c_str(), szObjType ) );
+  ensure_folder( format("%s.dat", video_file_path.c_str() ) );
+  ensure_folder( format("%s.dat/objects", video_file_path.c_str() ) );
+  ensure_folder( format("%s.dat/objects/%s", video_file_path.c_str(), szObjType ) );
 
   string frame_obj_name = format( 
     "%s.dat/objects/%s/%s.frame%04d.x%04d.y%04d.w%04d.h%04d.obj%02d.png", 
-    video_file_name.c_str(), szObjType, // videoname.dat/objects/objtype/, 
-    name_and_extension(video_file_name).c_str(),
+    video_file_path.c_str(), szObjType, // videoname.dat/objects/objtype/, 
+    name_and_extension(video_file_path).c_str(),
     iframe, objRoi.x, objRoi.y, objRoi.width, objRoi.height, iobj // videoname, frame, roi, index
      
     );
@@ -480,7 +488,7 @@ bool MarkupWindow::deleteFrameObjectImage( int iobj )
   rc.height *=2;
   string frame_obj_name = makeFrameObjectImageName( iframe, rc, iobj, fd.objects[iobj]->type.c_str(), false );
     //format( "%s.frame%04d.x%04d.y%04d.w%04d.h%04d.obj%02d.%s.png", 
-    //video_file_name.c_str(), iframe, rc.x, rc.y, rc.width, rc.height, iobj, 
+    //video_file_path.c_str(), iframe, rc.x, rc.y, rc.width, rc.height, iobj, 
     //fd.objects[iobj]->type.c_str() 
     //);
   _unlink( frame_obj_name.c_str() );
@@ -499,7 +507,7 @@ bool MarkupWindow::saveFrameObjectImage( int iobj )
   rc.height *=2;
   string frame_obj_name = makeFrameObjectImageName( iframe, rc, iobj, fd.objects[iobj]->type.c_str(), true );
     //format( "%s.frame%04d.x%04d.y%04d.w%04d.h%04d.obj%02d.%s.png", 
-    //video_file_name.c_str(), iframe, rc.x, rc.y, rc.width, rc.height, iobj, 
+    //video_file_path.c_str(), iframe, rc.x, rc.y, rc.width, rc.height, iobj, 
     //fd.objects[iobj]->type.c_str() 
     //);
   try {
