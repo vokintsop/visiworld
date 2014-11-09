@@ -346,6 +346,18 @@ int MarkupWindow::process( string& _video_file_name, int start_frame )
       next_frame = max(0, iframe - 30);
       continue;
     }
+    if (key == kHome)
+    {
+      non_stop_mode = false;
+      next_frame = 0;
+      continue;
+    }
+    if (key == kEnd)
+    {
+      non_stop_mode = false;
+      next_frame = frames-1;
+      continue;
+    }
 
     if (key == kLeftArrow) // one frame back, paused
     {
