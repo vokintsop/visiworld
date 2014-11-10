@@ -62,12 +62,23 @@ bool MarkupWindow::trackObject( // пытаемся добавить новый объект протащив стары
   // correct rect:
 
   Rect target = rect;
-  target |= 15;
+  ////target |= 15;
 
   if (!adjustObjectRectangle( target, flags ))
   {
-    if (tracking_object)
-      cout << "tracking object lost" << endl;
+    assert(tracking_object);
+    cout << "tracking object lost" << endl;
+    return false;
+  }
+  cv::Point target_center = target.tl() + target.br(); // новый
+  cv::Point rect_center = rect.tl() + rect.br(); // старый
+  cv::Point shift = target_center - rect_center; // смещение центра
+  cv::Point resize( target.width-rect.width, target.height-rect.height ); // изменение размера
+  cout << "Tracking shift: " << shift << " resize:" << resize << endl;
+  if (rect.width*0.3 + 5 < abs(resize.x) || rect.height*0.3 + 5 < abs(resize.y))  // изменение размера на 30%
+  {
+    assert(tracking_object);
+    cout << "tracking object changed size" << endl;
     return false;
   }
   rect = target;
@@ -102,7 +113,7 @@ bool find_center( // ищем компоненту, ??? ближайшую к центру указанного прямоуго
                  )
 {
   //Rect target = rect - Point(15,15) + Size(30,30);
-  int delta = 25;
+  int delta = 10;
   Rect target = rect - Point(delta,delta) + Size(2*delta,2*delta);
   Point center = (rect.tl() + rect.br()) * 0.5;
 
@@ -144,7 +155,7 @@ bool find_center( // ищем компоненту, ??? ближайшую к центру указанного прямоуго
         ccd.flags |= CC_HIDDEN;
       }
     }
-    return true;
+     return true;
   }
 
 

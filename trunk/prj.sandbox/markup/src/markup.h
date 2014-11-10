@@ -22,7 +22,9 @@
 #include "streetglass/frameproc.h" // обработка кадра
 
 using namespace cv;
+#include "ocvutils/ocvkeys.h"
 
+/****
 enum Key {
   kEscape =27,  // выход
   kEnter =13, // трекинг последнего добавленного на кадре объекта (вперед)
@@ -59,6 +61,7 @@ enum Key {
 
   kNoKeyPressed =-1  // after positive delay no key pressed -- process next image
 };
+*/
 
 class AFOTypes // supported derived AFrameObject types
 {
@@ -168,8 +171,11 @@ public:
       imshow( title, draw_image );
       draw_image_dirty = false;
     }
+    updateTitle();
 
-    int key = waitKey( (non_stop_mode || quickly) ? 1 : 0);
+    int key = kNoKeyPressed;
+    if (pressed_keys.size() == 0)      
+      key = waitKey( (non_stop_mode || quickly) ? 1 : 0);
     if (key != kNoKeyPressed)
       cout << "Key pressed " << key << endl;
     if (key != kNoKeyPressed && pressed_keys.size() < 1000)
@@ -182,6 +188,7 @@ public:
     draw_image = base_image.clone(); 
     drawObjects();
     drawRubbering();
+    updateTitle();
     draw_image_dirty = true;
   }
   void setBaseImage( Mat& base )
@@ -189,7 +196,7 @@ public:
     base_image = base; 
     update_image_to_draw();
   }
-
+  void updateTitle(); // обновляет информационную строку в заголовке
   // mouse
   int processMouseEvent(int event, int x, int y, int flags);
   int finishMouseEvent(); // евент обработан, надо отрисовать и закончить его обработку

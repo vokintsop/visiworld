@@ -37,16 +37,19 @@ void MarkupWindow::drawRubbering()
 
 }
 
-void MarkupWindow::drawObjects()
+void MarkupWindow::updateTitle()
 {
   FrameData& frame_data = marked_frames[iframe];
   int numobj = frame_data.objects.size();
   string _title = format("Markup: %s [#%d of %d, %d msec]; type=%s objects=%d tracking=%s", 
     video_file_name.c_str(),
     iframe, frames, frame_time, objType().c_str(), numobj, tracking_object? "ON" : "OFF" );
-  //putText( draw_image, title, Point(30, 30), FONT_HERSHEY_SIMPLEX, 1, Scalar(0,255,0), 2 );
   setWindowText( _title.c_str() );
+}
 
+void MarkupWindow::drawObjects()
+{
+  FrameData& frame_data = marked_frames[iframe];
   frameProc.draw( draw_image, objType() );
   for (int i=0; i< int( frame_data.objects.size() ); i++)
     frame_data.objects[i]->draw( draw_image );
@@ -155,7 +158,9 @@ int MarkupWindow::processKeys() // здесь обработка клавиш до выхода из цикла обр
       continue;
     }
 
-    if (key == kEnter || key == kCtrlEnter) // start-stop tracking
+    if (key == kEnter || key == kCtrlEnter 
+      || (key == kSpace && tracking_object) 
+      ) // start-stop tracking
     {
       pressed_keys.pop_front();
       if (tracking_object) // stop tracking
@@ -163,7 +168,7 @@ int MarkupWindow::processKeys() // здесь обработка клавиш до выхода из цикла обр
         tracking_object = false;
         non_stop_mode = false;
         update_image_to_draw();
-        //??update_window();
+        update_window();
         continue;
       }
 
@@ -248,7 +253,7 @@ int MarkupWindow::process( string& _video_file_path, int start_frame )
 
   while(1) // main loop
   {
-    if (next_frame != iframe)
+    if (next_frame != iframe || frame_image.empty())
     {
       if (!readFrame(next_frame))
         break;
@@ -269,6 +274,7 @@ int MarkupWindow::process( string& _video_file_path, int start_frame )
         {
           tracking_object = false;
           non_stop_mode = false;
+          update_window();
         }
         //////////if (!track_forward)
         //////////  iframe -= 2;
@@ -283,9 +289,7 @@ int MarkupWindow::process( string& _video_file_path, int start_frame )
       for (int i=0; i<int(pressed_keys.size()); i++ )
         cout << " " << pressed_keys[i];
       cout << endl;
-    }
-    else
-      cout << "Pressed keys queue empty" << endl;
+    };//    else    cout << "Pressed keys queue empty" << endl;
 
     key = kNoKeyPressed;
     if (pressed_keys.size() > 0)
@@ -301,6 +305,14 @@ int MarkupWindow::process( string& _video_file_path, int start_frame )
     if (key == kSpace) // frame by frame -- or nonstop
     {
       non_stop_mode = !non_stop_mode;
+      continue;
+    }
+    if (key == kMultiply || key == kDivide)
+    {
+      frameProc.sensitivity = (key == kMultiply) ? frameProc.sensitivity * 1.1 : frameProc.sensitivity / 1.1;
+      cout << "Sensitivity " << frameProc.sensitivity << endl;
+      frame_image = cv::Mat(); // hmm
+      assert( frame_image.empty() );
       continue;
     }
     if (key == kPageDown)
