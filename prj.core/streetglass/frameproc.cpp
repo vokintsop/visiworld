@@ -153,7 +153,7 @@ bool FrameProc::compute_binmask( int scheme )
     Mat1b rb2 = r2 - b2;
     redmask = rg2 + rb2;
     //imshow("redmask_before_threshold", redmask);
-    double thresh = threshold( redmask, redmask, 64, 255., THRESH_BINARY  /*| CV_THRESH_OTSU*/ );
+    double thresh = threshold( redmask, redmask, 64 * sensitivity, 255., THRESH_BINARY  /*| CV_THRESH_OTSU*/ );
     //imshow("redmask_before_morf", redmask);
     open_vertical( redmask, redmask, 1, 2 );
   }
@@ -162,7 +162,7 @@ bool FrameProc::compute_binmask( int scheme )
     Mat1b bg2 = b2 - g2;
     Mat1b br2 = b2 - r2;
     blumask = bg2 + br2;
-    double thresh = threshold( blumask, blumask, 128, 255., THRESH_BINARY /*| CV_THRESH_OTSU*/ );
+    double thresh = threshold( blumask, blumask, 128 * sensitivity, 255., THRESH_BINARY /*| CV_THRESH_OTSU*/ );
     open_vertical( blumask, blumask, 5, 5 );
   }
   if (scheme & FP_GRECC)
@@ -179,7 +179,7 @@ bool FrameProc::compute_binmask( int scheme )
     //imshow("gremask",gremask);
 
     open_vertical( gremask, gremask, 4, 4 );
-    double thresh = threshold( gremask, gremask, 128, 255., THRESH_BINARY  /*| CV_THRESH_OTSU*/  );
+    double thresh = threshold( gremask, gremask, 128 * sensitivity, 255., THRESH_BINARY  /*| CV_THRESH_OTSU*/  );
     //imshow("gremask_bin",gremask);
 
   }
