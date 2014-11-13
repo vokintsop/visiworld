@@ -19,7 +19,7 @@ enum Key {
   kGreyPlus =43,
   kGreyMinus =45,
   kMultiply = 42, // asterick, "increase"
-  kDivide = 47, // back slash, "decrease"
+  kDivide = 47, //  slash, "decrease"
   kW =119,
   kA =97,
   kS =115,
@@ -30,6 +30,9 @@ enum Key {
   kDrus =226,
   kPlus =61,
   kMinus =45,
+
+
+  kCtrl_D = 4, // toggle detailed visualization on-off
 
   kF1 = 7340032, // help
   kF2 = 7405568, // save markup

@@ -118,12 +118,31 @@ bool FrameProc::process( cv::Mat& input_bgr720, int scheme )// подготовка основн
 
 bool FrameProc::draw( cv::Mat& display, const string& objType )// визуализация
 {
+  static bool binmaskwindow = false;
   if      (objType.find( "AFO_Red" ) == 0)
-    redcc.draw( display, Scalar( 128, 128, 0 ), 3, 1 );
+  {
+    redcc.draw( display, Scalar( 128, 128, 0 ), 2, 1 );
+    if (detailed_visualization)
+      imshow("FrameProc::binmask", FrameProc::redmask), binmaskwindow=true;
+    else if (binmaskwindow)
+      cv::destroyWindow("FrameProc::binmask"), binmaskwindow=false;
+  }
   else if (objType.find( "AFO_Gre" ) == 0)
-    grecc.draw( display, Scalar( 128, 0, 128 ), 3, 1 );
+  {
+    grecc.draw( display, Scalar( 128, 0, 128 ), 2, 1 );
+    if (detailed_visualization)
+      imshow("FrameProc::binmask", FrameProc::gremask), binmaskwindow=true;
+    else if (binmaskwindow)
+      cv::destroyWindow("FrameProc::binmask"), binmaskwindow=false;
+  }
   else  if (objType.find( "AFO_Blu" ) == 0)
-    blucc.draw( display, Scalar( 0, 128, 128 ), 3, 1 );
+  {
+    blucc.draw( display, Scalar( 0, 128, 128 ), 2, 1 );
+    if (detailed_visualization)
+      imshow("FrameProc::binmask", FrameProc::blumask), binmaskwindow=true;
+    else if (binmaskwindow)
+      cv::destroyWindow("FrameProc::binmask"), binmaskwindow=false;
+  }
   return true;
 }
 
@@ -155,7 +174,7 @@ bool FrameProc::compute_binmask( int scheme )
     //imshow("redmask_before_threshold", redmask);
     double thresh = threshold( redmask, redmask, 64 * sensitivity, 255., THRESH_BINARY  /*| CV_THRESH_OTSU*/ );
     //imshow("redmask_before_morf", redmask);
-    open_vertical( redmask, redmask, 1, 2 );
+    //open_vertical( redmask, redmask, 1, 2 );
   }
   if (scheme & FP_BLUCC)
   {
@@ -163,7 +182,7 @@ bool FrameProc::compute_binmask( int scheme )
     Mat1b br2 = b2 - r2;
     blumask = bg2 + br2;
     double thresh = threshold( blumask, blumask, 128 * sensitivity, 255., THRESH_BINARY /*| CV_THRESH_OTSU*/ );
-    open_vertical( blumask, blumask, 5, 5 );
+    //open_vertical( blumask, blumask, 5, 5 );
   }
   if (scheme & FP_GRECC)
   {
@@ -178,7 +197,7 @@ bool FrameProc::compute_binmask( int scheme )
     gremask = g2*0.6 + b2*0.4;
     //imshow("gremask",gremask);
 
-    open_vertical( gremask, gremask, 4, 4 );
+    //open_vertical( gremask, gremask, 4, 4 );
     double thresh = threshold( gremask, gremask, 128 * sensitivity, 255., THRESH_BINARY  /*| CV_THRESH_OTSU*/  );
     //imshow("gremask_bin",gremask);
 

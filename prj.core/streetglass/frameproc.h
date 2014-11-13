@@ -7,8 +7,12 @@
 class FrameProc  // промежуточные данные, накапливаемые в процессе распознавани€ кадра
 {
 public:
-  double sensitivity;
-  FrameProc(): sensitivity(1.){}
+  double sensitivity; // в зависимости от уровн€ разменивает ошибки первого рода на ошибки второго рода
+  bool detailed_visualization; // режим подробного показа
+
+
+  FrameProc(): sensitivity(1.), detailed_visualization(false) 
+  {}
 
   cv::Mat3b bgr720; // исходный битмап 1280х720 (если входной другого формата, например FullHD -- приводитс€ к такому размеру)
   cv::Mat3b bgr360; // bgr1024 сжатый в 2 раза
