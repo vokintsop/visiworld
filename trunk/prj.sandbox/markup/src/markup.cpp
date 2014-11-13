@@ -41,9 +41,9 @@ void MarkupWindow::updateTitle()
 {
   FrameData& frame_data = marked_frames[iframe];
   int numobj = frame_data.objects.size();
-  string _title = format("Markup: %s [#%d of %d, %d msec]; type=%s objects=%d tracking=%s", 
+  string _title = format("Markup: %s [#%d of %d, %d msec]; type=%s objects on frame=%d sensitivity=%f tracking=%s", 
     video_file_name.c_str(),
-    iframe, frames, frame_time, objType().c_str(), numobj, tracking_object? "ON" : "OFF" );
+    iframe, frames, frame_time, objType().c_str(), numobj, frameProc.sensitivity, tracking_object? "ON" : "OFF" );
   setWindowText( _title.c_str() );
 }
 
@@ -83,21 +83,26 @@ int trackRectangle( cv::VideoCapture& cap, cv::Rect& rect,
 
 void MarkupWindow::help()
 {
+  cout << "Markup hot keys:" << endl;
   cout << "<F1> - help" << endl;
   cout << "<F2> - save video markup" << endl;
   cout << "<F3> - write image of current frame  to <videoname>.<#frame>.jpg" << endl;
   cout << "<F4> - write image of marked objects on the current frame to <videoname>.<#frame>.<#object>.jpg" << endl;
-  cout << "Navigate:"  << endl;
+  cout << "*** Navigate:"  << endl;
   cout << "<Space> - pause/play"  << endl;
   cout << "<Left/RightArrow> - next/previous frame"  << endl;
   cout << "<PgUp/PgDn> - next/previous frames jump"  << endl;
-  cout << "Edit"  << endl;
+  cout << "<Home/End> - first/last frames jump"  << endl;
+  cout << "*** Edit:"  << endl;
   cout << "<Tab> - select object type to add" << endl;
   cout << "<Mouse-left-down> - start rubbering rectangle for object or start click inside pre-found" << endl;
   cout << "<Mouse-move> - while pressing left button - rubber new object rectangle" << endl;
   cout << "<Mouse-left-up> - finish rubbering rectangle for object or start click inside pre-found" << endl;
   cout << "<BackSpace> - delete last object added at the current frame" << endl;
-  cout << "<Enter> - start/stop auto-add-mode for last last object added at the current frame" << endl;
+  cout << "<Enter> - start/stop tracking mode for last last object added at the current frame" << endl;
+  cout << "<Ctrl-D> - toggle on/off detailed visualization"  << endl;
+  cout << "<//> or <*> - decrease/increase sensitivity"  << endl;
+
   // todo
 }
 
@@ -309,12 +314,21 @@ int MarkupWindow::process( string& _video_file_path, int start_frame )
     }
     if (key == kMultiply || key == kDivide)
     {
-      frameProc.sensitivity = (key == kMultiply) ? frameProc.sensitivity * 1.1 : frameProc.sensitivity / 1.1;
+      frameProc.sensitivity = (key == kMultiply) ? frameProc.sensitivity * 1.05 : frameProc.sensitivity / 1.05;
       cout << "Sensitivity " << frameProc.sensitivity << endl;
       frame_image = cv::Mat(); // hmm
       assert( frame_image.empty() );
       continue;
     }
+    if (key == kCtrl_D)
+    {
+      frameProc.detailed_visualization = !frameProc.detailed_visualization;
+      cout << "frameProc.detailed_visualization " << frameProc.detailed_visualization << endl;
+      frame_image = cv::Mat(); // hmm
+      assert( frame_image.empty() );
+      continue;
+    }
+
     if (key == kPageDown)
     {
       non_stop_mode = false;

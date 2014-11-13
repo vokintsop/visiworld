@@ -72,10 +72,13 @@ int main( int argc, char* argv[] )
 #if 0 // следуем за лексусом
   //string data = "/testdata/roadvideo/input/roadvideo.05/roadvideo.05.0010.avi.960.avi"; 
   string data = "/testdata/roadvideo/input/roadvideo.05/roadvideo.05.0011.avi.960.avi"; 
-  // подходим совсем издалека, есть вид вблизи, есть зеленый, есть круглые, комплексный тест
 #endif
 
-#if 1 // входим в поворот перед пешеходным переходом
+#if 1 // следуем за лексусом
+  string data = "/testdata/roadvideo/input/roadvideo.05/roadvideo.05.0030.avi.960.avi"; 
+#endif
+
+#if 0 // входим в поворот перед пешеходным переходом
   ///string data = "/testdata/roadvideo/input/roadvideo.01/roadvideo.01.0024.avi.1920.avi"; 
 
   ///string data = "/testdata/roadvideo/input/roadvideo.01/roadvideo.01.0024.avi.960.avi"; //+
@@ -85,7 +88,7 @@ int main( int argc, char* argv[] )
   ///string data = "/testdata/roadvideo/input/roadvideo.01/roadvideo.01.0028.avi.960.avi"; //+
   ///string data = "/testdata/roadvideo/input/roadvideo.01/roadvideo.01.0029.avi.960.avi"; //- один раз сбивается...
   ///string data = "/testdata/roadvideo/input/roadvideo.01/roadvideo.01.0030.avi.960.avi"; //+
-  string data = "/testdata/roadvideo/input/roadvideo.01/roadvideo.01.0031.avi.960.avi"; //+ 
+  ///string data = "/testdata/roadvideo/input/roadvideo.01/roadvideo.01.0031.avi.960.avi"; //+ 
 
 #endif
 
