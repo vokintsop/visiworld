@@ -88,7 +88,6 @@ public:
 
 class MarkupAction
 {
-
   int action;
 #define MA_ADD_OBJECT 1
 #define MA_START_OBJECT_TRACKING 2
@@ -101,14 +100,18 @@ public:
 
 class MarkupWindow
 {
-  std::string title; // заголовок (id)/(opencv идентификатор окна)
-  vector< MarkupAction > undo; // стек дл€ отката
+/////////////////////////// supported object types
   int iObjType; // индекс активного типа объекта 
-  std::deque< int > pressed_keys; // очередь необработанных клавиш
 public:
   AFOTypes afoTypes; // текущие поддерживаемые типы объектов
-
   string objType() { return afoTypes.objTypes[iObjType]; }; // активный тип объекта 
+
+
+  vector< FrameData > marked_frames; /// синхронизирован с video <===> [iframe]
+  std::string title; // заголовок (id)/(opencv идентификатор окна)
+  vector< MarkupAction > undo; // стек дл€ отката
+  std::deque< int > pressed_keys; // очередь необработанных клавиш
+
 private:
   // подрежим -- т€нем мышкой
   //...>> rubbering_pts[] << Point rubber_start, rubber_finish; // выт€гиваемый мышкой пр€моугольник, отрезок
@@ -137,6 +140,8 @@ public:
 
   FrameProc frameProc; // обработчик кадра
 
+///////////////////////////////////// video
+public:
   bool loadVideo( string& _video_file_name, int& start_frame ); // открытие видеопотока и загрузка данных разметки 
   bool readFrame( int pos ); // считываем запрошенный кадр
 
@@ -152,14 +157,6 @@ private: // video properties, initialized by loadVideo()
   Mat frame_image; // кадр, прин€тый из видеопотока
   int iframe; // номер обрабатываемого фрейма
   int frame_time; // врем€ фрейма в миллисекундах от начала ролика
-
-
-public: 
-  bool loadMarkupData( int& start_frame );
-private: // markup data, initialized by loadMarkupData()
-  string markup_filename;
-  vector< FrameData > marked_frames; /// синхронизирован с video <===> [iframe]
-
 
 public:
   void setWindowText( const char* window_title );
@@ -260,6 +257,25 @@ public:
   );
 
   void help(); // F1
+
+//////////////////////////////////////////////// persistence
+private:
+  string markup_filename; // file based
+
+public: 
+  bool loadMarkupData( int& start_frame );
+
+  bool MarkupWindow::readVideoData( 
+    std::string& filename, 
+    vector< FrameData >& frames,
+    int& start_frame
+    );
+  bool MarkupWindow::writeVideoData( 
+    std::string& filename, 
+    vector< FrameData >& frames,  
+    int start_frame
+    );
+
   bool saveMarkup(); // F2
   bool saveFrameImage();// F3
   bool saveFrameObjectsImages(); // F4

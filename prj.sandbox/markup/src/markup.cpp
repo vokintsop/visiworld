@@ -448,6 +448,61 @@ bool MarkupWindow::loadVideo( string& _video_file_path, int& start_frame )
 }
 
 
+bool MarkupWindow::readVideoData( 
+  std::string& filename, 
+  vector< FrameData >& frames,
+  int& start_frame
+  )
+{
+  cv::FileStorage fs(filename, cv::FileStorage::READ);
+  if (!fs.isOpened())
+    return false;
+
+  cv::FileNode last_session_node = fs["LastMarkupSession"];
+  if (!last_session_node.empty())
+  {
+    if (start_frame < 0)
+    try {  
+      last_session_node["LastVisitedFrame"] >> start_frame;
+    }
+    catch (...)
+    {
+      cout << "no StartFrame specified" << endl;
+      start_frame = -1;
+    }
+
+    string activeObjectType;
+    last_session_node[ "ActiveObjectType" ] >> activeObjectType;
+    if (!activeObjectType.empty()) // setup iObjType
+      for (iObjType = int(afoTypes.objTypes.size()-1); iObjType >=0; iObjType-- ) // if not found -- set to 0
+        if ( afoTypes.objTypes[iObjType] == activeObjectType )
+          break;
+  }
+
+  return readFrames( fs, frames );
+}
+
+
+bool MarkupWindow::writeVideoData( 
+  std::string& filename, 
+  vector< FrameData >& frames,  
+  int start_frame
+  )
+{
+  cv::FileStorage fs(filename, cv::FileStorage::WRITE);
+  if (!fs.isOpened())
+    return false;
+
+  fs << "LastMarkupSession" << "{";
+  fs << "LastVisitedFrame" << start_frame;
+  fs << "ActiveObjectType" << objType();
+  fs << "}";
+  
+  return writeFrames( fs, frames );
+}
+
+
+
 bool MarkupWindow::loadMarkupData( int& start_frame )
 {
   ensure_folder( format( "%s.dat", video_file_path.c_str() ) );
