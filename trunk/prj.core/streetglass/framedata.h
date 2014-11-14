@@ -638,26 +638,10 @@ inline bool exportFrameData( cv::Mat& base_image, std::string& videofile, int if
   return true;
 }
 
-inline bool readVideoData( 
-  std::string& filename, 
-  vector< FrameData >& frames,
-  int& start_frame
-  )
+inline bool readFrames( 
+  cv::FileStorage& fs, 
+  vector< FrameData >& frames )
 {
-  cv::FileStorage fs(filename, cv::FileStorage::READ);
-  if (!fs.isOpened())
-    return false;
-
-  if (start_frame < 0)
-  try {  
-    fs["StartFrame"] >> start_frame;
-  }
-  catch (...)
-  {
-    cout << "no StartFrame specified" << endl;
-    start_frame = -1;
-  }
-
   // read frames
   frames.clear();
   cv::FileNode fdaNode = fs["FrameDataArray"];
@@ -672,18 +656,13 @@ inline bool readVideoData(
   return true;
 }
 
-inline bool writeVideoData( 
-  std::string& filename, 
-  vector< FrameData >& frames,  
-  int start_frame
+
+inline bool writeFrames( 
+  cv::FileStorage& fs, 
+  vector< FrameData >& frames
   )
 {
-  cv::FileStorage fs(filename, cv::FileStorage::WRITE);
-  if (!fs.isOpened())
-    return false;
-
   fs << "FramesCount" << int( frames.size() );
-  fs << "StartFrame" << start_frame;
   fs << "FrameDataArray" << "[";
   for (int i=0; i<int(frames.size()); i++)
   {
@@ -691,9 +670,10 @@ inline bool writeVideoData(
   }
   fs << "]";
   fs.release();
-
   return true;
 }
+
+
 
 
 #endif // __FRAMEDATA_H
