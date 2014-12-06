@@ -86,6 +86,9 @@ bool FrameProc::process( cv::Mat& input_bgr720, int scheme )// подготовка основн
 
   //bgr720 = input_bgr720.clone();
   bgr720 = input_bgr720; //.clone();
+  if (detailed_visualization)
+    imwrite("/temp/markup/bgr_image.png", bgr720);
+
 
   //Mat1b ii; cvtColor( bgr720, ii, COLOR_BGR2GRAY );
   //imshow( "intens", ii );
@@ -119,30 +122,23 @@ bool FrameProc::process( cv::Mat& input_bgr720, int scheme )// подготовка основн
 bool FrameProc::draw( cv::Mat& display, const string& objType )// визуализация
 {
   static bool binmaskwindow = false;
+  cv::Mat1b * pmask=NULL;
   if      (objType.find( "AFO_Red" ) == 0)
-  {
-    redcc.draw( display, Scalar( 128, 128, 0 ), 2, 1 );
-    if (detailed_visualization)
-      imshow("FrameProc::binmask", FrameProc::redmask), binmaskwindow=true;
-    else if (binmaskwindow)
-      cv::destroyWindow("FrameProc::binmask"), binmaskwindow=false;
-  }
+    redcc.draw( display, Scalar( 128, 128, 0 ), 2, 1 ), pmask = &redmask;
   else if (objType.find( "AFO_Gre" ) == 0)
-  {
-    grecc.draw( display, Scalar( 128, 0, 128 ), 2, 1 );
-    if (detailed_visualization)
-      imshow("FrameProc::binmask", FrameProc::gremask), binmaskwindow=true;
-    else if (binmaskwindow)
-      cv::destroyWindow("FrameProc::binmask"), binmaskwindow=false;
-  }
+    grecc.draw( display, Scalar( 128, 0, 128 ), 2, 1 ), pmask = &gremask;
   else  if (objType.find( "AFO_Blu" ) == 0)
-  {
-    blucc.draw( display, Scalar( 0, 128, 128 ), 2, 1 );
-    if (detailed_visualization)
-      imshow("FrameProc::binmask", FrameProc::blumask), binmaskwindow=true;
-    else if (binmaskwindow)
-      cv::destroyWindow("FrameProc::binmask"), binmaskwindow=false;
-  }
+    blucc.draw( display, Scalar( 0, 128, 128 ), 2, 1 ), pmask = &blumask;
+
+  if (detailed_visualization)
+
+
+  if (detailed_visualization && pmask != NULL)
+    imshow("FrameProc::binmask", *pmask), imwrite("/temp/markup/binmask.png", *pmask), binmaskwindow=true;
+  else if (binmaskwindow)
+    cv::destroyWindow("FrameProc::binmask"), binmaskwindow=false;
+
+
   return true;
 }
 

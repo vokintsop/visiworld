@@ -582,10 +582,17 @@ bool MarkupWindow::saveFrameObjectImage( int iobj )
 {
   FrameData& fd = marked_frames[iframe];
   Rect rc = fd.objects[iobj]->rect;
-  rc.x-= rc.width/2; //// todo: обработка случаев когда объект выходит за границы картинки...
-  rc.y-= rc.height/2;
-  rc.width *=2;
-  rc.height *=2;
+  Rect base = cv::Rect( Point(0,0), base_image.size());
+  int dw = max( 5, min( 20, rc.width/2 ));
+  int dh = max( 5, min( 20, rc.height/2 ));
+
+  rc.x-= dw; //// todo: обработка случаев когда объект выходит за границы картинки...
+  rc.y-= dh;
+  rc.width  +=dw*2;
+  rc.height +=dh*2;
+
+  rc &= base;
+
   string frame_obj_name = makeFrameObjectImageName( iframe, rc, iobj, fd.objects[iobj]->type.c_str(), true );
     //format( "%s.frame%04d.x%04d.y%04d.w%04d.h%04d.obj%02d.%s.png", 
     //video_file_path.c_str(), iframe, rc.x, rc.y, rc.width, rc.height, iobj, 
@@ -593,6 +600,12 @@ bool MarkupWindow::saveFrameObjectImage( int iobj )
     //);
   try {
   Mat object_image = base_image(rc);
+  Rect rc2 = fd.objects[iobj]->rect; 
+  rc2.x -= rc.x;
+  rc2.y -= rc.y;
+
+  rectangle( object_image, rc2, Scalar( 255, 0, 255, 0 ), 1 );
+
   if (!imwrite( frame_obj_name, object_image )) // try catch?
     return __false( format("Write object image '%s' failed\n", frame_obj_name.c_str() ) );
   cout << "Frame object " << iobj << " saved to: " << frame_obj_name << endl;

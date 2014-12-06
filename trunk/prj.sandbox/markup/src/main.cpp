@@ -26,6 +26,11 @@ int markup( string& data, int start_frame )
 
   return 0;
 }
+string nmea_file; // gps data .nmea file (produced by akenori)
+#include "gnss/gnss.h"
+NMEA NmeaFile; // возможный компаньон видео
+
+string gps_file; // gps data .gps file (produced by blackvue)
 
 int main( int argc, char* argv[] )
 {
@@ -74,8 +79,21 @@ int main( int argc, char* argv[] )
   string data = "/testdata/roadvideo/input/roadvideo.05/roadvideo.05.0011.avi.960.avi"; 
 #endif
 
-#if 1 // следуем за лексусом
+#if 0 // следуем за лексусом
   string data = "/testdata/roadvideo/input/roadvideo.05/roadvideo.05.0030.avi.960.avi"; 
+#endif
+
+
+#if 0 
+  string data = "/testdata/glass/milano/20140913_123209_598.mp4"; 
+#endif
+
+#if 1 
+  string data = "/testdata/poligon/akenori/AKN00002.ts"; 
+  nmea_file = "/testdata/poligon/akenori/AKN00002.nmea";
+  //nmea_file = "/testdata/poligon/akenori/test.nmea";
+  NmeaFile.open(nmea_file);
+  NmeaFile.draw();
 #endif
 
 #if 0 // входим в поворот перед пешеходным переходом
