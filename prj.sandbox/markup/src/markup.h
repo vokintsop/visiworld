@@ -135,7 +135,7 @@ private:
   Mat draw_image; // background image + marked objects
   bool draw_image_dirty; // отрисованная картинка draw_image не соответствует внутреннему состоянию
 public:
-  MarkupWindow( const char* title = "markup" );
+  MarkupWindow( const char* title = "markup1" );
   int process( string& _video_file_name, int start_frame=0 ); // обработка ролика
 
   FrameProc frameProc; // обработчик кадра
