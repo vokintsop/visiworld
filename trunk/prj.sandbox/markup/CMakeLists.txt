@@ -12,6 +12,8 @@ IF( MSVC )
     ${CMAKE_SOURCE_DIR}/prj.core/conncomp/ccmap.cpp 
     ${CMAKE_SOURCE_DIR}/prj.core/detect/detect_segment.h 
     ${CMAKE_SOURCE_DIR}/prj.core/detect/detect_segment.cpp
+    ${CMAKE_SOURCE_DIR}/prj.core/geomap/geomap.h
+    ${CMAKE_SOURCE_DIR}/prj.core/geomap/geomap.cpp
     ${CMAKE_SOURCE_DIR}/prj.core/gnss/gnss.h
     ${CMAKE_SOURCE_DIR}/prj.core/gnss/gnss.cpp
     ${CMAKE_SOURCE_DIR}/prj.core/ocvutils/ocvkeys.h

@@ -26,11 +26,16 @@ int markup( string& data, int start_frame )
 
   return 0;
 }
+////////////////////////////////////////////////////////////////
+string gps_file; // gps data .gps file (produced by blackvue)
+
 string nmea_file; // gps data .nmea file (produced by akenori)
 #include "gnss/gnss.h"
 NMEA NmeaFile; // возможный компаньон видео
 
-string gps_file; // gps data .gps file (produced by blackvue)
+#include "geomap/geomap.h"
+GeoMap TheGeoMap; // singleton
+////////////////////////////////////////////////////////////////
 
 int main( int argc, char* argv[] )
 {
@@ -93,7 +98,36 @@ int main( int argc, char* argv[] )
   nmea_file = "/testdata/poligon/akenori/AKN00002.nmea";
   //nmea_file = "/testdata/poligon/akenori/test.nmea";
   NmeaFile.open(nmea_file);
-  NmeaFile.draw();
+/*
+  TheGeoMap.open("/testdata/poligon/poligon1.png");
+  TheGeoMap.a.xy = cv::Point(  19, 225 );  TheGeoMap.a.ns = cv::Point2d( 38.476627, 55.918096 ); // северо-западный угол трассы
+  TheGeoMap.b.xy = cv::Point( 629, 709 );  TheGeoMap.b.ns = cv::Point2d( 38.484416, 55.914618 );  // юго-восточный угол трассы
+*/
+
+  TheGeoMap.open("/testdata/poligon/poligon4.png");
+  TheGeoMap.a.xy = cv::Point(  403, 212 );  TheGeoMap.a.ns = cv::Point2d( 38.477603, 55.918571 ); // левая штанга западного въезда в тоннель
+  TheGeoMap.b.xy = cv::Point( 1130, 613 );  TheGeoMap.b.ns = cv::Point2d( 38.479553, 55.917969 );  // юго-восточный угол вагона поезда
+
+
+
+  //NmeaFile.draw();
+
+  Mat display = TheGeoMap.raster.clone();
+
+  Scalar col( 255,0,255, 0);
+  for (int i=1; i< NmeaFile.records.size();i++)
+  {
+    Point2d p1( NmeaFile.records[i-1].east, NmeaFile.records[i-1].nord  );
+    Point2d p2( NmeaFile.records[i].east, NmeaFile.records[i].nord  );
+    Point pp1 = TheGeoMap.ns2xy( p1 );
+    Point pp2 = TheGeoMap.ns2xy( p2 );
+    line( display, pp1, pp2, col, 2 );
+  }
+
+  imshow("TheGeoMap trace", display );
+  waitKey(0);
+
+  //return 0;
 #endif
 
 #if 0 // входим в поворот перед пешеходным переходом
