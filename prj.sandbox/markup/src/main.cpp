@@ -31,10 +31,10 @@ string gps_file; // gps data .gps file (produced by blackvue)
 
 string nmea_file; // gps data .nmea file (produced by akenori)
 #include "gnss/gnss.h"
-NMEA NmeaFile; // возможный компаньон видео
+NMEA theNmeaFile; // возможный компаньон видео
 
 #include "geomap/geomap.h"
-GeoMap TheGeoMap("/testdata/poligon/map/pics.map"); // singleton
+GeoMap theGeoMap("/testdata/poligon/map/pics.map"); // singleton
 ////////////////////////////////////////////////////////////////
 
 
@@ -42,10 +42,16 @@ void onTimer( double time )
 {
   cout << time << endl;
   Point2d en(0,0);
-  if (NmeaFile.getEastNord( time, en.x, en.y ))
+static Point2d en_prev(0,0);
+  if (theNmeaFile.getEastNord( time, en.x, en.y ))
   {
     cout << en << endl;
   }
+  if (en != en_prev)
+  {
+    theGeoMap.draw(en);
+  }
+
 }
 
 int main( int argc, char* argv[] )
@@ -107,7 +113,7 @@ int main( int argc, char* argv[] )
 #if 1 
   string data = "/testdata/poligon/akenori/AKN00002.ts"; 
   nmea_file = "/testdata/poligon/akenori/AKN00002.nmea";
-  NmeaFile.load(nmea_file);
+  theNmeaFile.load(nmea_file);
 
 /*
   TheGeoMap.open("/testdata/poligon/poligon1.png");

@@ -203,7 +203,7 @@ bool NMEA::getEastNord( double time, double& east, double& nord )
     else
       return false;
   }
-  if (low == records.end())
+  if (low-records.end() == -1)
   {
     east = low->east;
     nord = low->nord;

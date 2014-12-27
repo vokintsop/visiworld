@@ -35,7 +35,7 @@ public:
   GeoMap( const char* sheets_list_file ) { open( sheets_list_file ); }
   bool open(  const char* sheets_list_file  );	
 
-  ///void update( double time );
+  void draw( cv::Point2d en );
 };
 
 #endif
