@@ -2,6 +2,8 @@
 #include <string>
 #include <fstream>
 #include <iostream>
+#include <algorithm>
+#include <cassert>
 using namespace std;
 
 
@@ -105,7 +107,14 @@ bool gprmc( string& line, GNSSRecord& rec )
     line = line.substr( pos+1, len );
   } else 
     return false;
-  rec.time = atof( utc_time.c_str() );
+  double hhmmss_ss = atof( utc_time.c_str() );
+  int hhmmss = int( hhmmss_ss ); // последние два знака после точки -- доли секунды (HHMMSS.SS)
+  int ss = hhmmss%100; // количество полных секунд после начала текущей минуты
+  double _ss = hhmmss_ss - hhmmss; // количество дробных секунд
+  int hhmm = hhmmss/100; // последние два знака после округления -- секунды (HHMMSS)
+  int mm = hhmm%100; // количество полных минут после начала текущего часа суток
+  int hh = hhmm/100; // количество полных часов после полуночи
+  rec.time = (hh*60+mm)*60 + ss + _ss;
 
   eat_comma(line); // skip "A,"
 
@@ -139,12 +148,14 @@ bool gprmc( string& line, GNSSRecord& rec )
 }
 
 
-bool NMEA::open( const std::string& filename )
+bool NMEA::load( const std::string& filename )
 {
   ifstream ifs( filename.c_str() );
   string line;
   if (!ifs.is_open())
     return false;
+
+  double start_time = -1.;
 
   while ( std::getline( ifs, line ) )
   {
@@ -162,10 +173,45 @@ bool NMEA::open( const std::string& filename )
     {
       GNSSRecord rec;
       gprmc( line, rec );
+      if (start_time < 0)
+        start_time = rec.time;
+      rec.time -= start_time;
+      if (rec.time < -12*60*60) // перевалили через полночь по UTC
+        rec.time += 24*60*60; // todo TEST!
+
       records.push_back(rec);
     }
   }
 
+  return true;
+}
+
+inline bool compareByTime( const GNSSRecord& rec, const GNSSRecord& val )
+{
+  return rec.time < val.time;
+}
+
+bool NMEA::getEastNord( double time, double& east, double& nord )
+{
+  GNSSRecord rec(time);
+  vector< GNSSRecord >::iterator low = std::lower_bound( records.begin(), records.end(), rec, compareByTime );
+  if (low == records.end() && records.size() > 0)
+  {
+    assert( records.back().time < time );
+    if (time - records.back().time <= 1.)
+      low--;
+    else
+      return false;
+  }
+  if (low == records.end())
+  {
+    east = low->east;
+    nord = low->nord;
+    return true;
+  }
+
+  east = low->east; // todo: interpolate
+  nord = low->nord;
   return true;
 }
 
@@ -189,7 +235,7 @@ void NMEA::draw()
   double ma_nord = records[0].nord;
   double mi_east = records[0].east;
   double ma_east = records[0].east;
-  for (int i=1; i<records.size();i++)
+  for (int i=1; i < int( records.size() ); i++)
   {
     mi_nord = min( records[i].nord, mi_nord );
     ma_nord = max( records[i].nord, ma_nord );
@@ -200,7 +246,7 @@ void NMEA::draw()
   Scalar col( 255,0,255, 0);
   double alpha =  display.cols / (ma_east-mi_east);
   double betha =  display.rows / (ma_nord-mi_nord);
-  for (int i=1; i<records.size();i++)
+  for (int i=1; i < int( records.size() );i++)
   {
     Point2d p1( ( records[i-1].east - mi_east) * alpha, display.rows - ( records[i-1].nord - mi_nord ) * betha );
     Point2d p2( ( records[i].east   - mi_east) * alpha, display.rows - ( records[i].nord   - mi_nord ) * betha );

@@ -34,8 +34,19 @@ string nmea_file; // gps data .nmea file (produced by akenori)
 NMEA NmeaFile; // возможный компаньон видео
 
 #include "geomap/geomap.h"
-GeoMap TheGeoMap; // singleton
+GeoMap TheGeoMap("/testdata/poligon/map/pics.map"); // singleton
 ////////////////////////////////////////////////////////////////
+
+
+void onTimer( double time )
+{
+  cout << time << endl;
+  Point2d en(0,0);
+  if (NmeaFile.getEastNord( time, en.x, en.y ))
+  {
+    cout << en << endl;
+  }
+}
 
 int main( int argc, char* argv[] )
 {
@@ -96,21 +107,24 @@ int main( int argc, char* argv[] )
 #if 1 
   string data = "/testdata/poligon/akenori/AKN00002.ts"; 
   nmea_file = "/testdata/poligon/akenori/AKN00002.nmea";
-  //nmea_file = "/testdata/poligon/akenori/test.nmea";
-  NmeaFile.open(nmea_file);
+  NmeaFile.load(nmea_file);
+
 /*
   TheGeoMap.open("/testdata/poligon/poligon1.png");
   TheGeoMap.a.xy = cv::Point(  19, 225 );  TheGeoMap.a.ns = cv::Point2d( 38.476627, 55.918096 ); // северо-западный угол трассы
   TheGeoMap.b.xy = cv::Point( 629, 709 );  TheGeoMap.b.ns = cv::Point2d( 38.484416, 55.914618 );  // юго-восточный угол трассы
 */
-
+/*
   TheGeoMap.open("/testdata/poligon/poligon4.png");
   TheGeoMap.a.xy = cv::Point(  403, 212 );  TheGeoMap.a.ns = cv::Point2d( 38.477603, 55.918571 ); // левая штанга западного въезда в тоннель
   TheGeoMap.b.xy = cv::Point( 1130, 613 );  TheGeoMap.b.ns = cv::Point2d( 38.479553, 55.917969 );  // юго-восточный угол вагона поезда
 
-
+*/
 
   //NmeaFile.draw();
+
+
+  /*
 
   Mat display = TheGeoMap.raster.clone();
 
@@ -126,6 +140,8 @@ int main( int argc, char* argv[] )
 
   imshow("TheGeoMap trace", display );
   waitKey(0);
+
+  */
 
   //return 0;
 #endif

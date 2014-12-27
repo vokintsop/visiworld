@@ -7,23 +7,35 @@ struct Reper
   cv::Point2d   ns;
 };
 
-class GeoMap
+struct GeoSheet
 {
-public:
   cv::Mat3b raster;
   Reper a,b;
 
-  cv::Point GeoMap::ns2xy( cv::Point2d ns )
+  cv::Point ns2xy( cv::Point2d ns )
   {
     return Point( 
       0.5 + a.xy.x + (ns.x-a.ns.x) * (b.xy.x-a.xy.x)/(b.ns.x-a.ns.x), 
       0.5 + a.xy.y + (ns.y-a.ns.y) * (b.xy.y-a.xy.y)/(b.ns.y-a.ns.y));
   }
 
+  GeoSheet() {}
+  GeoSheet( const char* sheet_file_name ) {  read( sheet_file_name ); }
+  bool read(  const char* sheet_file_name );
+
+};
+
+class GeoMap
+{
+public:
+  std::vector< GeoSheet > sheets;
+
 public:
   GeoMap(){}
-  GeoMap( const char* image_file ) { open( image_file ); }
-  bool open(  const char* image_file  );	
+  GeoMap( const char* sheets_list_file ) { open( sheets_list_file ); }
+  bool open(  const char* sheets_list_file  );	
+
+  ///void update( double time );
 };
 
 #endif

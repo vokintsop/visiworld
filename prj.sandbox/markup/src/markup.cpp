@@ -241,6 +241,9 @@ bool MarkupWindow::readFrame( int pos )
   return true;
 }
 
+void onTimer( double time );
+
+
 int MarkupWindow::process( string& _video_file_path, int start_frame )
 {
   video_file_path = _video_file_path;
@@ -266,6 +269,9 @@ int MarkupWindow::process( string& _video_file_path, int start_frame )
       if (!frameProc.process(frame_image))
         cout << "frameProc.process(frame_image) failed";
       setBaseImage( frame_image );
+
+      double msec = double(frame_time)/1000.;
+      onTimer( msec );
 
       if (tracking_object)
       {
