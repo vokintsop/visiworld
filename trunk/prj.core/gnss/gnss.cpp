@@ -203,15 +203,18 @@ bool NMEA::getEastNord( double time, double& east, double& nord )
     else
       return false;
   }
-  if (low-records.end() == -1)
+  if (low == records.end()-1)
   {
     east = low->east;
     nord = low->nord;
     return true;
   }
 
-  east = low->east; // todo: interpolate
-  nord = low->nord;
+// interpolate
+  GNSSRecord a = *low;
+  GNSSRecord b = *(low+1);
+  east = a.east + (b.east - a.east)*(time-a.time) / (b.time-a.time); 
+  nord = a.nord + (b.nord - a.nord)*(time-a.time) / (b.time-a.time);
   return true;
 }
 
