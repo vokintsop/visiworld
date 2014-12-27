@@ -54,6 +54,18 @@ bool MarkupWindow::addMouseObject( // пытаемся добавить новый объект вытянув или
   return addObject(rect, flags);
 }
 
+//template< class T>
+//bool operator && (const Rect_< T >& a, const Rect_< T >& b )
+//{
+//
+//}
+
+template< class T>
+bool operator !(const Rect_< T >& a)
+{
+  return a.width <=0 || a.height <=0;
+}
+
 
 bool MarkupWindow::trackObject( // пытаемся добавить новый объект протащив старый с прежнего кадра 
     cv::Rect& rect, // note: in-out -- подкручиваем ректангл по законам трекинга для данного объекта
@@ -81,6 +93,23 @@ bool MarkupWindow::trackObject( // пытаемся добавить новый объект протащив стары
     cout << "tracking object changed size" << endl;
     return false;
   }
+
+  // проверим на дублирование и перекрытие с другими объектами
+  FrameData& fd = marked_frames[iframe];
+  for (int i=0; i < int( fd.objects.size() ); i++ )
+  {
+    AFrameObject* afo = fd.objects[i];
+    if (afo->type != objType())
+      continue;
+    if (!!(afo->rect & target))
+    {
+      assert(tracking_object);
+      cout << "tracking object intersects the object of the same type" << endl;
+      return false;
+    }
+  }
+
+  /// решили добавить с учетом корректировки rect->target
   rect = target;
   return addObject(rect, flags);
 }
