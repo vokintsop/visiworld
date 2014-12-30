@@ -27,6 +27,8 @@ void MarkupWindow::drawRubbering()
       circle( draw_image, rubbering_pts[i], 5, Scalar( 255, 255, 0 ) );
       if (i>0)
         line( draw_image, rubbering_pts[i], rubbering_pts[i-1], Scalar( 255, 255, 0 ) );
+      else if (rubbering_pts.size() >2)
+        line( draw_image, rubbering_pts[0], rubbering_pts.back(), Scalar( 255, 255, 0 ) );
     }
 
   if (rubbering_mode == RUBBERING_RECTANGLE && rubbering_pts.size() == 2)
