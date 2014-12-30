@@ -222,7 +222,7 @@ Track gen_track_inside_pyramid( const std::vector<Point3d>& pyr )
 void testgen_points3d_line_vconst( string res_folder )
 {  
   const int dist = 3 * img_width;//расстояние от плоскости изображения до плоскости, ограничивающей пирамиду
-  std::vector< cv::Point3d > pyramid(8,0);
+  std::vector< cv::Point3d > pyramid(8,cv::Point3d());
   building_pyramid( pyramid, dist );//пирамида из точек реального мира, которые окажутся при проектировании на плоскости изображения
  
   const int max_img_count = 10;

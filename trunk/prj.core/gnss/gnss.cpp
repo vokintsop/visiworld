@@ -162,6 +162,11 @@ bool NMEA::load( const std::string& filename )
     if (line.empty()) // spaces?
       continue;
 
+    if( line.size() > 0 && line[0] == '[' ) {
+        int start_pos = line.find( "$GP" );
+        line = std::string( line, start_pos, line.size() - start_pos );
+    }
+
     if (line.find( "$GP" ) != 0)
       continue;
 
