@@ -163,9 +163,12 @@ class AFO_Polygon : public AFrameObject  // многоугольник "общего назначения"
 public:
   std::vector<cv::Point> pts;
 public:
-  AFO_Polygon( std::string type, const std::vector<cv::Point>& pts, int flags ):
-    AFrameObject( type, bounding(pts), flags ), pts(pts)
-    {}
+  AFO_Polygon( std::string type, const std::vector<cv::Point>& _pts, int flags ):
+    AFrameObject( type, bounding(pts), flags ), pts(_pts)
+    {
+      if (pts.size() > 1 && pts[0] == pts.back())
+        pts.pop_back();
+    }
   AFO_Polygon( std::string type, cv::Rect rect, int flags ):
     AFrameObject( type, rect, flags )
     {}
@@ -515,13 +518,19 @@ inline AFrameObject* CreateAFrameObject( // создай объект указанного типа из мас
     }
     break;
   case 3:
+    if (type == "AFO_Segm"  && pts[0] == pts[2])
+      return new AFO_Segm( type, pts[0], pts[1], flags );
     if (type == "AFO_Triangle")
       return new AFO_Triangle( type, pts, flags );
     break;
   case 4:
     if (type == "AFO_Quad")
       return new AFO_Quad( type, pts, flags );
+
+    if (type == "AFO_Triangle" && pts[0] == pts[3])
+      return new AFO_Triangle( type, pts, flags );
     break;
+
   case 5:
     if (type == "AFO_Quad" && pts[0] == pts[4])
     {
