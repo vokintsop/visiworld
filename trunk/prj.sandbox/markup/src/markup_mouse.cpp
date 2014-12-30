@@ -38,8 +38,17 @@ int MarkupWindow::processMouseEvent(int event, int x, int y, int flags)
 
   string objtype = objType(); // тип объекта, с которым работаем
   bool object_poligonal = (objtype == "AFO_Segm" || objtype == "AFO_Triangle" || objtype == "AFO_Quad" || objtype == "AFO_Polygon");
-  bool object_segment_based = (objtype == "AFO_Segm"); // либо производные двух точечные отрезкообразные
+  ///bool object_segment_based = (objtype == "AFO_Segm"); // либо производные двух точечные отрезкообразные
   cv::Point curPoint(x,y);
+  int max_poly_points=1000;
+  if (objtype == "AFO_Segm")
+    max_poly_points=2;
+  if (objtype == "AFO_Triangle")
+    max_poly_points=3;
+  if (objtype == "AFO_Quad")
+    max_poly_points=4;
+
+
 
   switch (event)
   {
@@ -114,9 +123,10 @@ int MarkupWindow::processMouseEvent(int event, int x, int y, int flags)
       {
         assert(rubbering_pts.size() >= 2);
         rubbering_pts.back() = curPoint;
-        if ( l2norm( rubbering_pts[0], curPoint) < 25 // замкнули или просто клик был. конец банкета
-          ||
-            (object_segment_based && rubbering_pts.size() == 2 )
+        if ( l2norm( rubbering_pts[0], curPoint) < 100 // замкнули или просто клик был. конец банкета
+          //////||
+          //////  (object_segment_based && rubbering_pts.size() == 2 )
+          || rubbering_pts.size() == max_poly_points+1
             ) 
         {
           if (rubbering_pts.size() > 2)
