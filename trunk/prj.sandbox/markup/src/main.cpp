@@ -111,6 +111,12 @@ int main( int argc, char* argv[] )
 #endif
 
 #if 1 
+  string data = "/testdata/poligon/input/bvu.01/20141127_121836_N.mp4"; 
+  nmea_file = "/testdata/poligon/input/bvu.01/20141127_121836_N.gps";
+  theNmeaFile.load(nmea_file);
+#endif
+
+#if 0 
   string data = "/testdata/poligon/akenori/AKN00002.ts"; 
   nmea_file = "/testdata/poligon/akenori/AKN00002.nmea";
   theNmeaFile.load(nmea_file);
