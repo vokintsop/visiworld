@@ -1,17 +1,18 @@
-#include <fstream>
-#include <string>
-#include <algorithm>
-#include <cassert>
-
-#include <iostream>
-#include <stdio.h>
-using namespace std;
-
-#include <opencv/cv.h>
-#include <opencv/highgui.h>
-
-#include <opencv2/core/core.hpp>
-#include <opencv2/highgui/highgui.hpp>
+////#include <fstream>
+////#include <string>
+////#include <algorithm>
+////#include <cassert>
+////
+////#include <iostream>
+////#include <stdio.h>
+////using namespace std;
+////
+////#include <opencv/cv.h>
+////#include <opencv/highgui.h>
+////
+////#include <opencv2/core/core.hpp>
+////#include <opencv2/highgui/highgui.hpp>
+#include "ocvutils/precomp.h"
 
 #include "markup.h"
 #include "streetglass/frameproc.h" // обработка кадра
@@ -218,13 +219,6 @@ int MarkupWindow::processEvents()
   update_window();
   return processKeys();
 }
-
-bool __false( string message = "" )
-{
-  cout << message;
-  return false;
-}
-
 
 bool MarkupWindow::readFrame( int pos )
 {
