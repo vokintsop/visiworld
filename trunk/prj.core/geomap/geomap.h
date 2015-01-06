@@ -121,23 +121,29 @@ class GeoMap
 {
 public:
   std::vector< GeoSheet > sheets;
-  int cur_sheet;
   std::vector< Point2d > enpoints;
-  Point2d location;
 public:
-  string title;
-  GeoMap();
-  GeoMap( const char* sheets_list_file );
+  GeoMap(){};
   bool open(  const char* sheets_list_file  );	
   int find_best_sheet( Point2d en );
+};
+
+class GeoMapEditor
+{
+  GeoMap gm;
+  string title;
+  int cur_sheet;
+  Point2d location;
+  int iObjType; // индекс активного типа объекта 
+public:
   void update_location( cv::Point2d en );
   void draw();
-
 //////////////////// GeoMapEditor ??
 
 /////////////////////////// supported object types
-  int iObjType; // индекс активного типа объекта 
 public:
+  GeoMapEditor( const char* sheets_list_file=NULL );
+
   AGMTypes agmTypes; // текущие поддерживаемые типы объектов
   std::string objType() { return agmTypes.objTypes[iObjType]; }; // активный тип объекта 
   int processMouseEvent(int event, int x, int y, int flags);
@@ -158,7 +164,7 @@ public:
     cv::Rect& rect, // note: in-out -- подкручиваем ректангл по законам первого рождения для данного объекта
     int flags );
 
-  bool GeoMap::addMouseObject( // пытаемся добавить новый объект вытянув или кликнув мышкой
+  bool addMouseObject( // пытаемся добавить новый объект вытянув или кликнув мышкой
     std::vector< cv::Point >& pts, // note: in-out -- подкручиваем точки по законам первого рождения для данного объекта
     int flags );
 

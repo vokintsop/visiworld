@@ -18,28 +18,23 @@ bool GeoSheet::read( const char* sheet_file_name )
   return true;
 }	
 
-
-void mouseCallBack4GeoMap(int event, int x, int y, int flags, void *userdata)
+void mouseCallBack4GeoMapEditor(int event, int x, int y, int flags, void *userdata)
 {
-  GeoMap* mw = (GeoMap*)userdata;
+  GeoMapEditor* mw = (GeoMapEditor*)userdata;
   mw->processMouseEvent(event, x, y, flags);
 }
 
-GeoMap::GeoMap()
-  :cur_sheet(0), title("map_view") 
-{
-  namedWindow( title, WINDOW_NORMAL ); //WINDOW_AUTOSIZE); // -- в режиме AUTOSIZE координаты x y мышки надо пересчитывать
-  setMouseCallback( title, mouseCallBack4GeoMap, this);
-}
-
-GeoMap::GeoMap( const char* sheets_list_file )
-  :cur_sheet(0), title("map_view")
+GeoMapEditor::GeoMapEditor( const char* sheets_list_file ) /// = NULL )
+  : title("map_view")
 { 
   namedWindow( title, WINDOW_NORMAL ); //WINDOW_AUTOSIZE); // -- в режиме AUTOSIZE координаты x y мышки надо пересчитывать
-  setMouseCallback( title, mouseCallBack4GeoMap, this);
+  setMouseCallback( title, mouseCallBack4GeoMapEditor, this);
 
-  open( sheets_list_file ); 
+  if (sheets_list_file!=NULL)
+    gm.open(sheets_list_file);
 };
+
+
 
 
 
@@ -92,22 +87,22 @@ int GeoMap::find_best_sheet( Point2d en )
   return _best_sheet;
 }
 
-void GeoMap::update_location( Point2d en )
+void GeoMapEditor::update_location( Point2d en )
 {
   location = en;
-  cur_sheet = find_best_sheet(en);
+  cur_sheet = gm.find_best_sheet(en);
   draw();
 }
 
-void GeoMap::draw()
+void GeoMapEditor::draw()
 {
-  if (cur_sheet >= 0 && cur_sheet < int(sheets.size()) )
+  if (cur_sheet >= 0 && cur_sheet < int(gm.sheets.size()) )
   {
-    Mat draw = sheets[cur_sheet].raster.clone();
-    circle( draw, sheets[cur_sheet].en2xy( location ), 5, Scalar( 0, 0, 255 ), 2 );
-    for (int i=0; i<enpoints.size(); i++)
+    Mat draw = gm.sheets[cur_sheet].raster.clone();
+    circle( draw, gm.sheets[cur_sheet].en2xy( location ), 5, Scalar( 0, 0, 255 ), 2 );
+    for (int i=0; i< int(gm.enpoints.size()); i++)
     {
-      Point pt = sheets[cur_sheet].en2xy( enpoints[i] );
+      Point pt = gm.sheets[cur_sheet].en2xy( gm.enpoints[i] );
       circle( draw, pt, 5, Scalar( 255, 0, 255 ), 2 );
     }
     imshow( title, draw );
@@ -116,7 +111,7 @@ void GeoMap::draw()
 }
 
 
-int GeoMap::finishMouseEvent() // евент обработан, надо отрисовать и закончить его обработку
+int GeoMapEditor::finishMouseEvent() // евент обработан, надо отрисовать и закончить его обработку
 {
   draw();
   return 0;
@@ -141,7 +136,7 @@ int GeoMap::finishMouseEvent() // евент обработан, надо отрисовать и закончить е
 #define ADD_OBJECT_TRACKED      0x1000 // автоматическое добавление в режиме трекинга
 
 
-int GeoMap::processMouseEvent(int event, int x, int y, int flags)
+int GeoMapEditor::processMouseEvent(int event, int x, int y, int flags)
 {
 
   //switch (mouseScenario)
@@ -272,19 +267,19 @@ int GeoMap::processMouseEvent(int event, int x, int y, int flags)
   }
 }
 
-bool GeoMap::addMouseObject( // пытаемся добавить новый объект вытянув или кликнув мышкой
+bool GeoMapEditor::addMouseObject( // пытаемся добавить новый объект вытянув или кликнув мышкой
     cv::Rect& rect, // note: in-out -- подкручиваем ректангл по законам первого рождения для данного объекта
     int flags )
 {
   Point xy = center( rect );
-  GeoSheet& sh = sheets[ cur_sheet ];
+  GeoSheet& sh = gm.sheets[ cur_sheet ];
   Point2d en = sh.xy2en( xy );
-  enpoints.push_back(en);
+  gm.enpoints.push_back(en);
   return true;
 };
 
 
-bool GeoMap::addMouseObject( // пытаемся добавить новый объект вытянув или кликнув мышкой
+bool GeoMapEditor::addMouseObject( // пытаемся добавить новый объект вытянув или кликнув мышкой
   std::vector< cv::Point >& pts, // note: in-out -- подкручиваем точки по законам первого рождения для данного объекта
   int flags )
 {
