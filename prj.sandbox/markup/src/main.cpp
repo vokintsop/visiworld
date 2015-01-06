@@ -34,7 +34,7 @@ string nmea_file; // gps data .nmea file (produced by akenori)
 NMEA theNmeaFile; // возможный компаньон видео
 
 #include "geomap/geomap.h"
-GeoMap theGeoMap("/testdata/poligon/map/pics.map"); // singleton
+GeoMapEditor theGeoMapEditor("/testdata/poligon/map/pics.map"); // singleton
 ////////////////////////////////////////////////////////////////
 
 
@@ -49,7 +49,7 @@ static Point2d en_prev(0,0);
   }
   if (en != en_prev)
   {
-    theGeoMap.update_location(en);
+    theGeoMapEditor.update_location(en);
   }
 
 }
