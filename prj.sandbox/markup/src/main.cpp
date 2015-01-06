@@ -49,7 +49,7 @@ static Point2d en_prev(0,0);
   }
   if (en != en_prev)
   {
-    theGeoMap.draw(en);
+    theGeoMap.update_location(en);
   }
 
 }
