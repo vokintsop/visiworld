@@ -18,6 +18,10 @@ public:
 /////////////////////////// supported object types
 public:
   GeoMapEditor( const char* sheets_list_file=NULL );
+  ~GeoMapEditor()
+  {
+    gm.write();
+  };
 
   AGMTypes agmTypes; // текущие поддерживаемые типы объектов
   std::string objType() { return agmTypes.objTypes[iObjType]; }; // активный тип объекта 

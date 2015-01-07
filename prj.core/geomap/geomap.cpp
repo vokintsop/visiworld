@@ -2,7 +2,7 @@
 #include "geomap/geomapeditor.h"
 
 
-bool GeoSheet::read( const char* sheet_file_name )
+bool GeoSheet::create( const char* sheet_file_name )
 {
   raster = imread( sheet_file_name ); // todo try { }
   if (raster.empty()) 
@@ -17,12 +17,11 @@ bool GeoSheet::read( const char* sheet_file_name )
   return true;
 }	
 
-
-
-bool GeoMap::open( const char *sheets_list_file )
+bool GeoMap::import( const char * _root_folder )
 {
-  string root(sheets_list_file);
-  ifstream ifs( root.c_str() );
+  root_folder = _root_folder;
+  string sheets_list_file = root_folder + "/sheets.map";
+  ifstream ifs( sheets_list_file.c_str() );
   if (!ifs.is_open())
     return false;
   int nsheets = 0;
@@ -33,14 +32,25 @@ bool GeoMap::open( const char *sheets_list_file )
   for ( int i=0; i<nsheets; i++ )
   {
     GeoSheet& sh = sheets[i]; 
-    string sheet_name;
-    ifs >> sheet_name;
-    string sheet_path = root + "/../" + sheet_name;
-    if ( !sh.read( sheet_path.c_str() ))
+    ifs >> sh.sheet_name;
+    string sheet_path = root_folder + "/" + sh.sheet_name;
+    if ( !sh.create( sheet_path.c_str() ))
       return false;
     ifs >> sh.a.xy.x >> sh.a.xy.y >> sh.a.en.y >> sh.a.en.x; 
     ifs >> sh.b.xy.x >> sh.b.xy.y >> sh.b.en.y >> sh.b.en.x; 
   }
+  return true;
+}
+
+bool GeoMap::write()
+{
+  string filename = root_folder + "/geomap.xml";
+  cv::FileStorage fs( filename, cv::FileStorage::WRITE );
+  if (!fs.isOpened())
+    return __false( format("Can't open storage '%s' to write", root_folder ) );
+
+  if (!write(fs))
+    return false;
   return true;
 }
 

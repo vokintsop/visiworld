@@ -9,6 +9,7 @@ struct Reper
 
 struct GeoSheet  // топографический лист карты
 {
+  std::string sheet_name; // короткое (относительное) имя файла листа
   cv::Mat3b raster;
   Reper a,b;
 
@@ -28,8 +29,11 @@ struct GeoSheet  // топографический лист карты
   }
 
   GeoSheet() {}
-  GeoSheet( const char* sheet_file_name ) {  read( sheet_file_name ); }
-  bool read(  const char* sheet_file_name );
+  GeoSheet( const char* sheet_file_name ) {  create( sheet_file_name ); }
+  bool create(  const char* sheet_file_name );
+
+  inline bool read( cv::FileNode &node );
+  inline bool write( cv::FileStorage& fs );
 
 };
 
@@ -120,13 +124,64 @@ public:
 class GeoMap
 {
 public:
+  string root_folder; 
   std::vector< GeoSheet > sheets;
-  std::vector< Point2d > enpoints;
+  std::vector< Point2d > objects;
 public:
   GeoMap(){};
-  bool open(  const char* sheets_list_file  );	
+  bool import( const char * _root_folder );	
   int find_best_sheet( Point2d en );
+
+  bool read( cv::FileNode &node );
+  bool write( cv::FileStorage& fs );
+
+  bool write();
+  bool read( const char* _root_folder );
+
 };
 
+inline bool GeoSheet::write( cv::FileStorage& fs )
+{
+  fs << "{:";
+  fs << "sheet_name"    << sheet_name;
+  fs << "reper_a_xy" << a.xy;
+  fs << "reper_a_en" << a.en;
+  fs << "reper_b_xy" << b.xy;
+  fs << "reper_b_en" << b.en;
+  fs << "}";
+  return true; // todo __try
+}
+
+inline bool GeoMap::read( cv::FileNode &node )
+{
+  if (!node.empty())
+  {
+    cv::FileNode sheets_node = node["GeoMapSheets"];
+    for (cv::FileNodeIterator it = sheets_node.begin(); it != sheets_node.end(); ++it)
+    {
+      GeoSheet sh; 
+      if (!sh.read(*it))
+        return __false("Cannot read GeoMap sheet");
+      sheets.push_back( sh );
+    }
+  }
+  return true;
+}
+
+inline bool GeoMap::write( cv::FileStorage& fs )
+{
+  fs << "GeoMapSheets" << "[";
+  for (int i=0; i<int(sheets.size()); i++)
+    if (!sheets[i].write( fs ))
+      return __false("Can't write GeoMap sheet");
+  fs << "]";
+
+  //fs << "GeoMapObjects" << "[";
+  //for (int i=0; i<int(objects.size()); i++)
+  //  objects[i].write( fs );
+  //fs << "]";
+
+  return true;
+}
 
 #endif

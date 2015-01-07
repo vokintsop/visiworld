@@ -8,14 +8,14 @@ void mouseCallBack4GeoMapEditor(int event, int x, int y, int flags, void *userda
   mw->processMouseEvent(event, x, y, flags);
 }
 
-GeoMapEditor::GeoMapEditor( const char* sheets_list_file ) /// = NULL )
+GeoMapEditor::GeoMapEditor( const char* _root_folder ) /// = NULL )
   : title("map_view")
 { 
   namedWindow( title, WINDOW_NORMAL ); //WINDOW_AUTOSIZE); // -- в режиме AUTOSIZE координаты x y мышки надо пересчитывать
   setMouseCallback( title, mouseCallBack4GeoMapEditor, this);
 
-  if (sheets_list_file!=NULL)
-    gm.open(sheets_list_file);
+  if (_root_folder!=NULL)
+    gm.import(_root_folder);
 };
 
 
@@ -32,9 +32,9 @@ void GeoMapEditor::draw()
   {
     Mat draw = gm.sheets[cur_sheet].raster.clone();
     circle( draw, gm.sheets[cur_sheet].en2xy( location ), 5, Scalar( 0, 0, 255 ), 2 );
-    for (int i=0; i< int(gm.enpoints.size()); i++)
+    for (int i=0; i< int(gm.objects.size()); i++)
     {
-      Point pt = gm.sheets[cur_sheet].en2xy( gm.enpoints[i] );
+      Point pt = gm.sheets[cur_sheet].en2xy( gm.objects[i] );
       circle( draw, pt, 5, Scalar( 255, 0, 255 ), 2 );
     }
     imshow( title, draw );
@@ -207,7 +207,7 @@ bool GeoMapEditor::addMouseObject( // пытаемся добавить новый объект вытянув или
   Point xy = center( rect );
   GeoSheet& sh = gm.sheets[ cur_sheet ];
   Point2d en = sh.xy2en( xy );
-  gm.enpoints.push_back(en);
+  gm.objects.push_back(en);
   return true;
 };
 

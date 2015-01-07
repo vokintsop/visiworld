@@ -43,4 +43,10 @@ inline bool __true( std::string message = "" )
   return true;
 }
 
+inline bool file_readable( const char* name )
+{
+  ifstream ifs( name );
+  return ifs.good();
+}
+
 

@@ -19,6 +19,7 @@ IF( MSVC )
     ${CMAKE_SOURCE_DIR}/prj.core/gnss/gnss.h
     ${CMAKE_SOURCE_DIR}/prj.core/gnss/gnss.cpp
     ${CMAKE_SOURCE_DIR}/prj.core/ocvutils/ocvkeys.h
+    ${CMAKE_SOURCE_DIR}/prj.core/ocvutils/ocvutils.h
     ${CMAKE_SOURCE_DIR}/prj.core/ocvutils/precomp.h
     ${CMAKE_SOURCE_DIR}/prj.core/ocvutils/ticker.h
     ${CMAKE_SOURCE_DIR}/prj.core/streetglass/framedata.h 

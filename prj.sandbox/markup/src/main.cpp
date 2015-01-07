@@ -2,14 +2,6 @@
 #include "markup.h"
 using namespace std;
 
-
-bool file_readable( const char* name )
-{
-  ifstream ifs( name );
-  return ifs.good();
-}
-
-
 int markup( string& data, int start_frame )
 {
   cout << "File to process " << data << endl << " Start frame " << start_frame << endl;
@@ -34,7 +26,7 @@ string nmea_file; // gps data .nmea file (produced by akenori)
 NMEA theNmeaFile; // возможный компаньон видео
 
 #include "geomap/geomapeditor.h"
-GeoMapEditor theGeoMapEditor("/testdata/poligon/map/pics.map"); // singleton
+GeoMapEditor theGeoMapEditor("/testdata/poligon/map"); // singleton
 ////////////////////////////////////////////////////////////////
 
 
