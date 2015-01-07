@@ -20,6 +20,7 @@
 using namespace std;
 using namespace cv;
 
+#include "ocvutils/ocvutils.h"
 
 inline void dbgPressAnyKey()
 {

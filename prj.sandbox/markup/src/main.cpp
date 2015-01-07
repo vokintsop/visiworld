@@ -33,7 +33,7 @@ string nmea_file; // gps data .nmea file (produced by akenori)
 #include "gnss/gnss.h"
 NMEA theNmeaFile; // возможный компаньон видео
 
-#include "geomap/geomap.h"
+#include "geomap/geomapeditor.h"
 GeoMapEditor theGeoMapEditor("/testdata/poligon/map/pics.map"); // singleton
 ////////////////////////////////////////////////////////////////
 
