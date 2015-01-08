@@ -148,7 +148,7 @@ bool GeoMap::read( cv::FileStorage& fs )
     {
       AGMObject* obj = ReadAGMObject(*it);
       if (obj)
-        objects.push_back(obj);
+        objects.push_back(cv::Ptr<AGMObject>(obj));
       //else
       //  assert(0); // ??
     }

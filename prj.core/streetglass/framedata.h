@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <ocvutils/ocvutils.h>
+#include <opencv2/imgproc/imgproc.hpp> 
 
 struct FrameObject // объект, распознанный или размеченный на кадре
 {

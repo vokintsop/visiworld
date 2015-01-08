@@ -1,5 +1,6 @@
 #ifndef __GEOMAP_H
 #define __GEOMAP_H
+#include <opencv2/imgproc/imgproc.hpp> 
 
 struct Reper
 {
