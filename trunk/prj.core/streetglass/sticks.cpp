@@ -1,5 +1,6 @@
 #include "ocvutils/precomp.h"
 #include "streetglass/sticks.h"
+#include <opencv2/imgproc/imgproc.hpp> 
 
 bool computeVerticalSticsAsMat1b( cv::Mat& img, cv::Mat1b& vsticks )
 {

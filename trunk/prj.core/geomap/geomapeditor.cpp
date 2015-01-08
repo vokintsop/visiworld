@@ -215,7 +215,7 @@ bool GeoMapEditor::addMouseObject( // пытаемся добавить новый объект вытянув или
   GeoSheet& sh = gm.sheets[ cur_sheet ];
   Point2d en = sh.xy2en( xy );
   AGM_Point* pp = new AGM_Point( en );
-  gm.objects.push_back(pp);
+  gm.objects.push_back(cv::Ptr<AGM_Point>(pp));
   return true;
 };
 

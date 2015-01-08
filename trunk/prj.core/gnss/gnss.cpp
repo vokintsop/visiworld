@@ -4,6 +4,7 @@
 #include <iostream>
 #include <algorithm>
 #include <cassert>
+#include <opencv2/imgproc/imgproc.hpp> 
 using namespace std;
 
 
