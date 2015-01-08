@@ -13,9 +13,6 @@ class GeoMapEditor
 public:
   void update_location( cv::Point2d en );
   void draw();
-//////////////////// GeoMapEditor ??
-
-/////////////////////////// supported object types
 public:
   GeoMapEditor( const char* sheets_list_file=NULL );
   ~GeoMapEditor()

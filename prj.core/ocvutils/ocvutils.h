@@ -51,12 +51,13 @@ inline void operator >> (const cv::FileNode& node, cv::Rect & rect )
   node >> rc;
   rect = cv::Rect(rc[0],rc[1],rc[2],rc[3]);
 }
-
-inline void operator >> (const cv::FileNode& node, cv::Point & pt )
+template <class T>
+inline void operator >> (const cv::FileNode& node, cv::Point_<T> & pt )
 {
-  std::vector< int > p;
+  std::vector< T > p;
   node >> p;
-  pt = cv::Point(p[0],p[1]);
+  pt = cv::Point_<T>(p[0],p[1]);
 }
+
 
 #endif // __OCVUTILS_H

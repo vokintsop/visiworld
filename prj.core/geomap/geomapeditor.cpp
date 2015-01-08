@@ -15,7 +15,10 @@ GeoMapEditor::GeoMapEditor( const char* _root_folder ) /// = NULL )
   setMouseCallback( title, mouseCallBack4GeoMapEditor, this);
 
   if (_root_folder!=NULL)
-    gm.import(_root_folder);
+  {
+    gm.import(_root_folder); // импорт имеет преференцию перед тем что было.
+    gm.read(_root_folder); // в момент чтения если лист карты уже _импортирован_ (по имени) то старый не вкл
+  }
 };
 
 
@@ -34,8 +37,12 @@ void GeoMapEditor::draw()
     circle( draw, gm.sheets[cur_sheet].en2xy( location ), 5, Scalar( 0, 0, 255 ), 2 );
     for (int i=0; i< int(gm.objects.size()); i++)
     {
-      Point pt = gm.sheets[cur_sheet].en2xy( gm.objects[i] );
-      circle( draw, pt, 5, Scalar( 255, 0, 255 ), 2 );
+      AGMObject* pagmo = gm.objects[i];
+      for (int j=0; j< int(pagmo->pts.size()); j++)
+      {
+        Point pt = gm.sheets[cur_sheet].en2xy( pagmo->pts[j] );
+        circle( draw, pt, 5, Scalar( 255, 0, 255 ), 2 );
+      }
     }
     imshow( title, draw );
     //waitKey(1);
@@ -207,7 +214,8 @@ bool GeoMapEditor::addMouseObject( // пытаемся добавить новый объект вытянув или
   Point xy = center( rect );
   GeoSheet& sh = gm.sheets[ cur_sheet ];
   Point2d en = sh.xy2en( xy );
-  gm.objects.push_back(en);
+  AGM_Point* pp = new AGM_Point( en );
+  gm.objects.push_back(pp);
   return true;
 };
 
@@ -216,5 +224,5 @@ bool GeoMapEditor::addMouseObject( // пытаемся добавить новый объект вытянув или
   std::vector< cv::Point >& pts, // note: in-out -- подкручиваем точки по законам первого рождения для данного объекта
   int flags )
 {
-  return __false("not implemented");
+  return __false("GeoMapEditor::addMouseObject(std::vector< cv::Point >& pts) not implemented");
 };

@@ -6,14 +6,7 @@ bool GeoSheet::create( const char* sheet_file_name )
 {
   raster = imread( sheet_file_name ); // todo try { }
   if (raster.empty()) 
-    return false;
-
-  //imshow("GeoMap", raster);
-  //waitKey(0);
-
-  //a.xy = cv::Point(  19, 225 );  a.ns = cv::Point2d( 38.476627, 55.918096 ); // северо-западный угол трассы
-  //b.xy = cv::Point( 629, 709 );  b.ns = cv::Point2d( 38.484416, 55.914618 );  // юго-восточный угол трассы
-  
+    return false;  
   return true;
 }	
 
@@ -42,12 +35,25 @@ bool GeoMap::import( const char * _root_folder )
   return true;
 }
 
+bool GeoMap::read( const char * _root_folder )
+{
+  root_folder = _root_folder;
+  string filename = root_folder + "/geomap.yaml";
+  cv::FileStorage fs( filename, cv::FileStorage::READ );
+  if (!fs.isOpened())
+    return __false( format("Can't open storage '%s' to read", filename ) );
+
+  if (!read(fs))
+    return false;
+  return true;
+}
+
 bool GeoMap::write()
 {
-  string filename = root_folder + "/geomap.xml";
+  string filename = root_folder + "/geomap.yaml";
   cv::FileStorage fs( filename, cv::FileStorage::WRITE );
   if (!fs.isOpened())
-    return __false( format("Can't open storage '%s' to write", root_folder ) );
+    return __false( format("Can't open storage '%s' to write", filename ) );
 
   if (!write(fs))
     return false;
@@ -62,6 +68,8 @@ int GeoMap::find_best_sheet( Point2d en )
   {
     GeoSheet& sh = sheets[i];
     Point xy = sh.en2xy( en );
+    assert(sh.raster.cols>0);
+    assert(sh.raster.rows>0);
     double dx = abs( double( sh.raster.cols/2 - xy.x ) / sh.raster.cols );
     double dy = abs( double( sh.raster.rows/2 - xy.y ) / sh.raster.rows );
 
@@ -77,3 +85,142 @@ int GeoMap::find_best_sheet( Point2d en )
   }
   return _best_sheet;
 }
+
+bool GeoSheet::write( cv::FileStorage& fs )
+{
+  fs << "{:";
+  fs << "sheet_name" << sheet_name;
+  fs << "reper_a_xy" << a.xy;
+  fs << "reper_a_en" << a.en;
+  fs << "reper_b_xy" << b.xy;
+  fs << "reper_b_en" << b.en;
+  fs << "}";
+  return true; // todo __try
+}
+
+bool GeoSheet::read( cv::FileNode& fn )
+{
+  if (fn.empty())
+    return false;
+
+  fn[ "sheet_name" ] >> sheet_name;
+  fn[ "reper_a_xy" ] >> a.xy;
+  fn[ "reper_a_en" ] >> a.en;
+  fn[ "reper_b_xy" ] >> b.xy;
+  fn[ "reper_b_en" ] >> b.en;
+
+  return true; // todo __try
+}
+
+bool GeoMap::read( cv::FileStorage& fs )
+{ 
+  cv::FileNode& node = fs.root(); 
+  if (node.empty())
+    return __false();
+
+  {
+    cv::FileNode sheets_node = node["GeoMapSheets"];
+    for (cv::FileNodeIterator it = sheets_node.begin(); it != sheets_node.end(); ++it)
+    {
+      GeoSheet sh; 
+      if (!sh.read(*it))
+        return __false("Cannot read GeoMap sheet");
+
+      string sheet_path = root_folder + "/" + sh.sheet_name;
+      if ( !sh.create( sheet_path.c_str() ))
+        return false;
+      // проверим нет ли такого листа в карте. если уже есть -- проигнорируем.
+      bool found=false;
+      for (int i=0; i<int(sheets.size()); i++)
+      {
+        if (sheets[i].sheet_name == sh.sheet_name)
+        {
+          found=true;
+          break;
+        }
+      }
+      sheets.push_back( sh );
+    }
+  }
+  {
+    cv::FileNode obects_node = node["GeoMapObjects"];
+    for (cv::FileNodeIterator it = obects_node.begin(); it != obects_node.end(); ++it)
+    {
+      AGMObject* obj = ReadAGMObject(*it);
+      if (obj)
+        objects.push_back(obj);
+      //else
+      //  assert(0); // ??
+    }
+  }
+  return true;
+}
+
+bool GeoMap::write( cv::FileStorage& fs )
+{
+  fs << "GeoMapSheets" << "[";
+  for (int i=0; i<int(sheets.size()); i++)
+    if (!sheets[i].write( fs ))
+      return __false("Can't write GeoMap sheet");
+  fs << "]";
+
+  fs << "GeoMapObjects" << "[";
+  for (int i=0; i<int(objects.size()); i++)
+    WriteAGMObject( fs, objects[i] ); // => корневой write() отпишет базовые данные и вызовет writeSelf() для производного
+  fs << "]";
+
+  return true;
+}
+
+
+
+AGMObject* CreateAGMObject( GMObject& gmo ) //фабрика
+{
+  if (gmo.type == "AGM_Point" )
+    return new AGM_Point( gmo );
+  return NULL;
+}
+
+AGMObject* ReadAGMObject(cv::FileNode &node) // фабрика-читальня c использованием виртуального readSelf()
+{ 
+  GMObject gmo;
+  cv::Rect rect;
+  int flags=0; 
+  AGMObject* agmo = NULL;
+  try {
+    node["type"]    >> gmo.type;
+    node["pts"]    >> gmo.pts;
+    node["flags"]   >> gmo.flags;
+    node["tags"]   >> gmo.tags;
+    agmo = CreateAGMObject( gmo );
+  } 
+  catch (...) 
+  {
+    cout << "readAGMObject() failed" << endl;
+    return NULL; // unknown object type or no type tag at all
+  }
+
+  if (agmo)
+    agmo->readSelf(node); 
+
+  return agmo; 
+}
+
+bool WriteAGMObject(cv::FileStorage& fs, AGMObject* agmo ) // запись, инициирует виртуальный writeSelf()
+{
+  fs << "{:";
+  fs << "type"  << agmo->type;
+  fs << "pts"   << agmo->pts;
+  if (agmo->flags != 0)
+    fs << "flags"   << agmo->flags;
+  if (!agmo->tags.empty())
+    fs << "tags"   << agmo->tags;
+
+  agmo->writeSelf(fs); // virtual -- extended by successors
+
+  fs << "}";
+
+  return true; // todo __try
+}
+
+
