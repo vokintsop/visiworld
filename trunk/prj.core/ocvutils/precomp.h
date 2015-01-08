@@ -30,7 +30,7 @@ inline void dbgPressAnyKey()
 #endif
 }
 
-inline bool __false( std::string message = "" )
+inline bool __false( std::string message = "__false():" )
 {
   cout << message;
   dbgPressAnyKey();

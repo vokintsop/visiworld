@@ -515,14 +515,9 @@ inline AFrameObject* readFrameObject(cv::FileNode &node)
   AFrameObject* afo = NULL;
   try {
     node["type"]    >> type;
-
-    //node["x"]       >> rect.x;
-    //node["y"]       >> rect.y;
-    //node["width"]   >> rect.width;
-    //node["height"]  >> rect.height;
     node["rect"]    >> rect;
-
     node["flags"]   >> flags;
+    //node["tags"]    >> tags;
     afo = CreateAFrameObject( type, rect, flags );
   } 
   catch (...) 
@@ -541,14 +536,12 @@ inline void writeFrameObject( cv::FileStorage& fs, AFrameObject* afo )
 {
   fs << "{:";
   fs << "type"    << afo->type;
-
-  //fs << "x"       << afo->rect.x;
-  //fs << "y"       << afo->rect.y;
-  //fs << "width"   << afo->rect.width;
-  //fs << "height"  << afo->rect.height;
   fs << "rect" << afo->rect;
+  if (afo->flags != 0)
+    fs << "flags"   << afo->flags;
+  if (!afo->tags.empty())
+    fs << "tags"   << afo->tags;
 
-  fs << "flags"   << afo->flags;
   afo->writeSelf(fs);
   fs << "}";
 }

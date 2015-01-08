@@ -69,16 +69,20 @@ struct GMObject // GeoMap Object. Объект, отмеченный на карте
   std::string type;
   std::vector< ENPoint2d > pts;  // набор ключевых точек в координатах EN (ENU?)
   int flags;
+  string tags;
+  GMObject():flags(0){}
   GMObject( ENPoint2d pt, const char* _type = "", int flags=0 ): type(_type), flags(flags) { pts.push_back(pt); }
 };
 
-class AGeoMapObject : public GMObject
+class AGMObject : public GMObject
 {
 public:
-  AGeoMapObject( ENPoint2d pt, const char* _type = "", int flags=0 ): GMObject( pt, _type, flags ) {}
-  virtual ~AGeoMapObject(){};
-  virtual bool readSelf(cv::FileNode &node) { return true; }
-  virtual bool writeSelf(cv::FileStorage& fs) { return true; };
+  AGMObject( GMObject& gmo ): GMObject(gmo){}
+  AGMObject( ENPoint2d pt, const char* _type = "", int flags=0 ): GMObject( pt, _type, flags ) {}
+  virtual ~AGMObject(){};
+
+  virtual bool readSelf(cv::FileNode &node) { return true; } // наследники могут дописать
+  virtual bool writeSelf(cv::FileStorage& fs) { return true; } // наследники могут дочитать
   virtual cv::Scalar getDrawColor() { return cv::Scalar(255,255,0); } // иногда проще только цвет переопределить
   virtual int getDrawThickness() { return 2; } // иногда проще только толщину линий переопределить
   virtual int getNodeRadius() { return 5; }
@@ -101,21 +105,27 @@ public:
   } 
 };
 
-class AGM_Unknown : public AGeoMapObject
+AGMObject* CreateAGMObject( GMObject& gmo ); //фабрика
+AGMObject* ReadAGMObject(cv::FileNode &node); // фабрика-читальня c использованием виртуального readSelf()
+bool WriteAGMObject(cv::FileStorage& fs, AGMObject* agmo ); // запись, инициирует виртуальный writeSelf()
+
+
+class AGM_Unknown : public AGMObject
 {
 public:
   AGM_Unknown( ENPoint2d pt, const char* _type = "", int flags=0 ):
-    AGeoMapObject( pt, _type, flags )
+    AGMObject( pt, _type, flags )
     {}
   virtual cv::Scalar getDrawColor() { return cv::Scalar(128,128,128); } 
   virtual int getDrawThickness() { return 3; } 
 };
 
-class AGM_Point : public AGeoMapObject
+class AGM_Point : public AGMObject
 {
 public:
-  AGM_Point( ENPoint2d pt, const char* _type = "", int flags=0 ):
-    AGeoMapObject( pt, _type, flags )
+  AGM_Point( GMObject& gmo ): AGMObject(gmo) {}
+  AGM_Point( ENPoint2d pt, const char* _type = "AGM_Point", int flags=0 ):
+    AGMObject( pt, _type, flags )
     {}
   virtual cv::Scalar getDrawColor() { return cv::Scalar(255,255,0); } 
   virtual int getDrawThickness() { return 2; } 
@@ -126,13 +136,13 @@ class GeoMap
 public:
   string root_folder; 
   std::vector< GeoSheet > sheets;
-  std::vector< Point2d > objects;
+  std::vector< cv::Ptr< AGMObject > > objects;
 public:
   GeoMap(){};
   bool import( const char * _root_folder );	
   int find_best_sheet( Point2d en );
 
-  bool read( cv::FileNode &node );
+  bool read( cv::FileStorage& fs );
   bool write( cv::FileStorage& fs );
 
   bool write();
@@ -140,48 +150,6 @@ public:
 
 };
 
-inline bool GeoSheet::write( cv::FileStorage& fs )
-{
-  fs << "{:";
-  fs << "sheet_name"    << sheet_name;
-  fs << "reper_a_xy" << a.xy;
-  fs << "reper_a_en" << a.en;
-  fs << "reper_b_xy" << b.xy;
-  fs << "reper_b_en" << b.en;
-  fs << "}";
-  return true; // todo __try
-}
 
-inline bool GeoMap::read( cv::FileNode &node )
-{
-  if (!node.empty())
-  {
-    cv::FileNode sheets_node = node["GeoMapSheets"];
-    for (cv::FileNodeIterator it = sheets_node.begin(); it != sheets_node.end(); ++it)
-    {
-      GeoSheet sh; 
-      if (!sh.read(*it))
-        return __false("Cannot read GeoMap sheet");
-      sheets.push_back( sh );
-    }
-  }
-  return true;
-}
-
-inline bool GeoMap::write( cv::FileStorage& fs )
-{
-  fs << "GeoMapSheets" << "[";
-  for (int i=0; i<int(sheets.size()); i++)
-    if (!sheets[i].write( fs ))
-      return __false("Can't write GeoMap sheet");
-  fs << "]";
-
-  //fs << "GeoMapObjects" << "[";
-  //for (int i=0; i<int(objects.size()); i++)
-  //  objects[i].write( fs );
-  //fs << "]";
-
-  return true;
-}
 
 #endif
