@@ -178,6 +178,8 @@ AGMObject* CreateAGMObject( GMObject& gmo ) //фабрика
 {
   if (gmo.type == "AGM_Point" )
     return new AGM_Point( gmo );
+  if (gmo.type == "AGM_Segm" )
+    return new AGM_Segm( gmo );
   return NULL;
 }
 
