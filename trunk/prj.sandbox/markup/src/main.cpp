@@ -27,6 +27,8 @@ NMEA theNmeaFile; // возможный компаньон видео
 
 #include "geomap/geomapeditor.h"
 GeoMapEditor theGeoMapEditor("/testdata/poligon/map"); // singleton
+//GeoMapEditor theGeoMapEditor("/testdata/kitti/map"); // singleton
+
 ////////////////////////////////////////////////////////////////
 
 

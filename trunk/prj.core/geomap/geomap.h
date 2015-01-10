@@ -46,8 +46,8 @@ public:
   AGMTypes()
   { // список поддерживаемых классов объектов
     // objTypes.push_back( "AFO_Unknown" );
-    objTypes.push_back( "AFO_Point" );
-    // objTypes.push_back( "AFO_Segm" );
+    objTypes.push_back( "AGM_Point" );
+    objTypes.push_back( "AGM_Segm" );
     //////objTypes.push_back( "AFO_Rect" );
     //////objTypes.push_back( "AFO_Quad" );
     //////objTypes.push_back( "AFO_Triangle" );
@@ -72,7 +72,17 @@ struct GMObject // GeoMap Object. Объект, отмеченный на карте
   int flags;
   string tags;
   GMObject():flags(0){}
-  GMObject( ENPoint2d pt, const char* _type = "", int flags=0 ): type(_type), flags(flags) { pts.push_back(pt); }
+  GMObject( ENPoint2d pt, const char* _type = "", int flags=0 ): 
+    type(_type), flags(flags) 
+    { 
+      pts.push_back(pt); 
+    }
+  GMObject( ENPoint2d pt1,  ENPoint2d pt2, const char* _type = "", int flags=0 ): 
+    type(_type), flags(flags) 
+    { 
+      pts.push_back(pt1); 
+      pts.push_back(pt2); 
+    }
 };
 
 class AGMObject : public GMObject
@@ -80,6 +90,8 @@ class AGMObject : public GMObject
 public:
   AGMObject( GMObject& gmo ): GMObject(gmo){}
   AGMObject( ENPoint2d pt, const char* _type = "", int flags=0 ): GMObject( pt, _type, flags ) {}
+  AGMObject( ENPoint2d pt1, ENPoint2d pt2, const char* _type = "", int flags=0 ): 
+    GMObject( pt1, pt2, _type, flags ) {}
   virtual ~AGMObject(){};
 
   virtual bool readSelf(cv::FileNode &node) { return true; } // наследники могут дописать
@@ -127,6 +139,17 @@ public:
   AGM_Point( GMObject& gmo ): AGMObject(gmo) {}
   AGM_Point( ENPoint2d pt, const char* _type = "AGM_Point", int flags=0 ):
     AGMObject( pt, _type, flags )
+    {}
+  virtual cv::Scalar getDrawColor() { return cv::Scalar(255,255,0); } 
+  virtual int getDrawThickness() { return 2; } 
+};
+
+class AGM_Segm : public AGMObject
+{
+public:
+  AGM_Segm( GMObject& gmo ): AGMObject(gmo) {}
+  AGM_Segm( ENPoint2d pt1,  ENPoint2d pt2, const char* _type = "AGM_Segm", int flags=0 ):
+    AGMObject( pt1, pt2, _type, flags )
     {}
   virtual cv::Scalar getDrawColor() { return cv::Scalar(255,255,0); } 
   virtual int getDrawThickness() { return 2; } 

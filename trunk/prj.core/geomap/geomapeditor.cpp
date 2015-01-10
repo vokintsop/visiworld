@@ -2,6 +2,8 @@
 #include "ocvutils/precomp.h"
 #include "geomap/geomapeditor.h"
 
+#define GEOMAP_EDITOR_TITLE "map_view"
+
 void mouseCallBack4GeoMapEditor(int event, int x, int y, int flags, void *userdata)
 {
   GeoMapEditor* mw = (GeoMapEditor*)userdata;
@@ -9,7 +11,7 @@ void mouseCallBack4GeoMapEditor(int event, int x, int y, int flags, void *userda
 }
 
 GeoMapEditor::GeoMapEditor( const char* _root_folder ) /// = NULL )
-  : title("map_view")
+  : title(GEOMAP_EDITOR_TITLE)
 { 
   namedWindow( title, WINDOW_NORMAL ); //WINDOW_AUTOSIZE); // -- в режиме AUTOSIZE координаты x y мышки надо пересчитывать
   setMouseCallback( title, mouseCallBack4GeoMapEditor, this);
