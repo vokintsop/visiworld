@@ -13,7 +13,7 @@ using namespace std;
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
-#include "markup.h"
+#include "markup/markupeditor.h"
 //#include "streetglass/frameproc.h" // обработка кадра
 
 using namespace cv;
