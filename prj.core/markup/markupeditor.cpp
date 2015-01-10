@@ -1,6 +1,6 @@
 #include "ocvutils/precomp.h"
 
-#include "markup.h"
+#include "markup/markupeditor.h"
 #include "streetglass/frameproc.h" // обработка кадра
 
 using namespace cv;
