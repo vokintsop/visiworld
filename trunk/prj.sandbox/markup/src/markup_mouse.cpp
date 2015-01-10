@@ -155,4 +155,6 @@ int MarkupWindow::processMouseEvent(int event, int x, int y, int flags)
     //case CV_EVENT_RBUTTONDBLCLK : // =8,
     //case CV_EVENT_MBUTTONDBLCLK : // =9
   }
+
+  return finishMouseEvent();
 }

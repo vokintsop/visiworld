@@ -98,7 +98,55 @@ public:
   action(action), iframe(iframe), iobject(iobject){}
 };
 
-class MarkupWindow
+class Markup
+{
+protected:
+  Markup();
+  vector< FrameData > marked_frames; /// синхронизирован с video <===> [iframe]
+
+///////////////////////////////////// video -- объект разметки
+protected:
+  bool loadVideo( string& _video_file_name, int& start_frame ); // открытие видеопотока и загрузка данных разметки 
+  bool readFrame( int pos ); // считываем запрошенный кадр
+
+protected: // video properties, initialized by loadVideo()
+  VideoCapture video;
+  string video_file_path; // full path+name
+  string video_file_name; // name+extension
+  // video properties
+  double fps; // = video.get( CV_CAP_PROP_FPS );
+  int frames; // = int( video.get( CV_CAP_PROP_FRAME_COUNT ) );
+  int frame_width; // = int( video.get( CV_CAP_PROP_FRAME_WIDTH ) );
+  int frame_height; // = int( video.get( CV_CAP_PROP_FRAME_HEIGHT ) );
+  Mat frame_image; // кадр, прин€тый из видеопотока
+  int iframe; // номер обрабатываемого фрейма
+  int frame_time; // врем€ фрейма в миллисекундах от начала ролика
+
+//////////////////////////////////////////////// persistence
+protected:
+  string markup_filename; // file based
+
+public: 
+
+  bool readVideoData( 
+    cv::FileStorage& fs, 
+    vector< FrameData >& frames
+    );
+  bool writeVideoData( 
+    cv::FileStorage& fs, 
+    vector< FrameData >& frames
+    );
+
+  bool saveFrameObjectsImages(); // F4
+
+  // visibank:
+  bool saveFrameObjectImage( int iobj );
+  bool deleteFrameObjectImage( int iobj ); // on undo
+  std::string makeFrameObjectImageName( int iframe, const Rect& objRoi, int iobj, 
+    const char* szObjType, bool ensureFolder = true );
+};
+
+class MarkupWindow : public Markup
 {
 /////////////////////////// supported object types
   int iObjType; // индекс активного типа объекта 
@@ -107,11 +155,27 @@ public:
   string objType() { return afoTypes.objTypes[iObjType]; }; // активный тип объекта 
 
 
-  vector< FrameData > marked_frames; /// синхронизирован с video <===> [iframe]
   std::string title; // заголовок (id)/(opencv идентификатор окна)
   vector< MarkupAction > undo; // стек дл€ отката
   std::deque< int > pressed_keys; // очередь необработанных клавиш
 
+  bool initialize( string& _video_file_path, int& start_frame );
+
+
+  bool loadMarkupData( int& start_frame );
+  bool saveMarkupData(); // F2
+  bool saveFrameImage();// F3
+
+  bool MarkupWindow::readSessionData( 
+    cv::FileStorage& fs, 
+    vector< FrameData >& frames,
+    int& start_frame
+    );
+  bool writeSessionData( 
+    cv::FileStorage& fs, 
+    vector< FrameData >& frames,  
+    int start_frame
+    );
 private:
   // подрежим -- т€нем мышкой
   //...>> rubbering_pts[] << Point rubber_start, rubber_finish; // выт€гиваемый мышкой пр€моугольник, отрезок
@@ -140,23 +204,7 @@ public:
 
   FrameProc frameProc; // обработчик кадра
 
-///////////////////////////////////// video
-public:
-  bool loadVideo( string& _video_file_name, int& start_frame ); // открытие видеопотока и загрузка данных разметки 
-  bool readFrame( int pos ); // считываем запрошенный кадр
 
-private: // video properties, initialized by loadVideo()
-  VideoCapture video;
-  string video_file_path; // full path+name
-  string video_file_name; // name+extension
-  // video properties
-  double fps; // = video.get( CV_CAP_PROP_FPS );
-  int frames; // = int( video.get( CV_CAP_PROP_FRAME_COUNT ) );
-  int frame_width; // = int( video.get( CV_CAP_PROP_FRAME_WIDTH ) );
-  int frame_height; // = int( video.get( CV_CAP_PROP_FRAME_HEIGHT ) );
-  Mat frame_image; // кадр, прин€тый из видеопотока
-  int iframe; // номер обрабатываемого фрейма
-  int frame_time; // врем€ фрейма в миллисекундах от начала ролика
 
 public:
   void setWindowText( const char* window_title );
@@ -181,17 +229,19 @@ public:
   void drawRubbering(); // отрисовка текущего состо€ни€ выт€гивани€ недоноска
   void update_image_to_draw()
   {
-    draw_image = base_image.clone(); 
+    draw_image = frame_image.clone(); 
     drawObjects();
     drawRubbering();
     updateTitle();
     draw_image_dirty = true;
   }
-  void setBaseImage( Mat& base )
-  {
-    base_image = base; 
-    update_image_to_draw();
-  }
+
+  //void setBaseImage( Mat& base )
+  //{
+  //  base_image = base; 
+  //  update_image_to_draw();
+  //}
+
   void updateTitle(); // обновл€ет информационную строку в заголовке
   // mouse
   int processMouseEvent(int event, int x, int y, int flags);
@@ -256,34 +306,6 @@ public:
   );
 
   void help(); // F1
-
-//////////////////////////////////////////////// persistence
-private:
-  string markup_filename; // file based
-
-public: 
-  bool loadMarkupData( int& start_frame );
-
-  bool MarkupWindow::readVideoData( 
-    std::string& filename, 
-    vector< FrameData >& frames,
-    int& start_frame
-    );
-  bool MarkupWindow::writeVideoData( 
-    std::string& filename, 
-    vector< FrameData >& frames,  
-    int start_frame
-    );
-
-  bool saveMarkup(); // F2
-  bool saveFrameImage();// F3
-  bool saveFrameObjectsImages(); // F4
-
-  // visibank:
-  bool saveFrameObjectImage( int iobj );
-  bool deleteFrameObjectImage( int iobj ); // on undo
-  std::string makeFrameObjectImageName( int iframe, const Rect& objRoi, int iobj, 
-    const char* szObjType, bool ensureFolder = true );
 
 }; // class MarkupWindow
 
