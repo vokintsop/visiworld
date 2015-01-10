@@ -160,7 +160,6 @@ private: // video properties, initialized by loadVideo()
 
 public:
   void setWindowText( const char* window_title );
-
   void update_window( bool quickly = false )  // _только_ здесь реальная отрисовка с отдачей управления
   {
     if (draw_image_dirty)

@@ -63,4 +63,30 @@ inline string name_and_extension( string filename )
   return filename;
 }
 
+///////////// windows specific (todo -- make for linux)
+#ifdef _WINDOWS
+#include <windows.h>
+#undef min
+#undef max
+#endif // _WINDOWS
+
+inline void set_window_text( const char* title, const char* text )
+{
+#ifdef _WINDOWS
+  HWND hWnd = (HWND)cvGetWindowHandle(title);
+	HWND hPar = GetParent(hWnd);
+  SetWindowText(hPar, text );
+#endif 
+}
+
+inline bool ensure_folder( string folder )
+{
+#ifdef _WINDOWS
+  if (CreateDirectory(folder.c_str(), NULL) ||
+    ERROR_ALREADY_EXISTS == GetLastError())
+    return true;
+#endif
+  cout << "Can't create directory " << folder << endl;
+  return false;
+}
 

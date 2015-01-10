@@ -139,7 +139,8 @@ bool GeoMap::read( cv::FileStorage& fs )
           break;
         }
       }
-      sheets.push_back( sh );
+      if (!found)
+        sheets.push_back( sh );
     }
   }
   {

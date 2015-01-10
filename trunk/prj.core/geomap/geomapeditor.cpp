@@ -23,6 +23,19 @@ GeoMapEditor::GeoMapEditor( const char* _root_folder ) /// = NULL )
   }
 };
 
+void GeoMapEditor::update_title()
+{
+  string text = format("Map [%d(%s)/%d] type=%s location=Nord:%f East:%f", 
+    cur_sheet+1, gm.sheets[cur_sheet].sheet_name.c_str(), gm.sheets.size(), 
+    objType().c_str(), // type
+    location.y, location.x // location
+    );
+    //format("Map: %s [#%d of %d, %d msec]; type=%s objects on frame=%d sensitivity=%f tracking=%s", 
+    //video_file_name.c_str(),
+    //iframe, frames, frame_time, objType().c_str(), numobj, frameProc.sensitivity, tracking_object? "ON" : "OFF" );
+  set_window_text( title.c_str(), text.c_str() );
+}
+
 
 void GeoMapEditor::update_location( Point2d en )
 {
@@ -55,6 +68,7 @@ void GeoMapEditor::draw()
 int GeoMapEditor::finishMouseEvent() // евент обработан, надо отрисовать и закончить его обработку
 {
   draw();
+  update_title();
   return 0;
       //update_image_to_draw();
       //draw_image_dirty = true;
