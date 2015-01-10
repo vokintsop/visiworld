@@ -27,6 +27,9 @@ IF( MSVC )
     ${CMAKE_SOURCE_DIR}/prj.core/markup/markup_addobject.cpp
     ${CMAKE_SOURCE_DIR}/prj.core/markup/markup_mouse.cpp    
     
+    ${CMAKE_SOURCE_DIR}/prj.core/ocvutils/ocvgui.h
+    ${CMAKE_SOURCE_DIR}/prj.core/ocvutils/ocvgui.cpp
+    
     ${CMAKE_SOURCE_DIR}/prj.core/ocvutils/ocvkeys.h
     ${CMAKE_SOURCE_DIR}/prj.core/ocvutils/ocvutils.h
     ${CMAKE_SOURCE_DIR}/prj.core/ocvutils/precomp.h

@@ -2,8 +2,10 @@
 #define __GEOMAPEDITOR_H
 
 #include <geomap/geomap.h>
+#include <ocvutils/ocvgui.h>
 
-class GeoMapEditor
+class GeoMapEditor 
+  : public OCVGuiWindow
 {
   GeoMap gm;
   string title;
@@ -20,6 +22,12 @@ public:
   {
     gm.write();
   };
+
+  virtual bool  procKey( int key ) // выполняет обработку клавиши для данного окна; возвращает true если клавиша обработана
+  {
+    return false; // пока не умеем обрабавать ничего
+  }
+
 
   AGMTypes agmTypes; // текущие поддерживаемые типы объектов
   std::string objType() { return agmTypes.objTypes[iObjType]; }; // активный тип объекта 
