@@ -395,12 +395,13 @@ int MarkupWindow::process( string& _video_file_path, int start_frame )
   return key;
 }
 
+void MarkupWindow::setWindowText( const char* window_title )
+{
+  set_window_text( title.c_str(), window_title );
+}
+
+
 ///////////////////////////////////// visibank
-
-
-
-static bool ensure_folder( string folder );
-
 bool MarkupWindow::loadVideo( string& _video_file_path, int& start_frame )
 {
   if (!video.open( _video_file_path ))
@@ -620,37 +621,3 @@ bool MarkupWindow::saveFrameObjectsImages() // F4
 }
 
 
-////////////////////////////////////////////////////////////////
-#ifdef _WINDOWS
-#include <windows.h>
-#endif
-
-void MarkupWindow::setWindowText( const char* window_title )
-{
-#ifdef _WINDOWS
-  HWND hWnd = (HWND)cvGetWindowHandle(title.c_str());
-	HWND hPar = GetParent(hWnd);
-  SetWindowText(hPar, window_title );
-#endif 
-}
-
-static bool ensure_folder( string folder )
-{
-#ifdef _WINDOWS
-  if (CreateDirectory(folder.c_str(), NULL) ||
-    ERROR_ALREADY_EXISTS == GetLastError())
-    return true;
-#endif
-  cout << "Can't create directory " << folder << endl;
-
-
-  //////const char* path = _filePath.c_str();
-  //////  boost::filesystem::path dir(path);
-  //////  if(boost::filesystem::create_directory(dir))
-  //////  {
-  //////      std::cerr<< "Directory Created: "<<_filePath<<std::endl;
-  //////  }
-
-  return false;
-
-}

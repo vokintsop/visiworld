@@ -1,4 +1,7 @@
 //ccdata.h -- connected components
+#ifndef __CCDATA_H
+#define __CCDATA_H
+
 #include <algorithm>
 
 class CCData
@@ -94,5 +97,7 @@ public:
     return 0 == (flags & CC_FILTERED_BY_AREA);
   }
 };
+
+#endif __CCDATA_H
 
 
