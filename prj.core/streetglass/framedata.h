@@ -612,7 +612,6 @@ inline bool writeFrames(
     writeFrameData( fs, frames[i] );
   }
   fs << "]";
-  fs.release();
   return true;
 }
 

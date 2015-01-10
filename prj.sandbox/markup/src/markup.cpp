@@ -66,12 +66,17 @@ void mouseCallBack(int event, int x, int y, int flags, void *userdata)
   mw->processMouseEvent(event, x, y, flags);
 }
 
+Markup::Markup():
+  fps(0),  frames(0),  frame_width(0),  frame_height(0)
+
+{
+}
+
 MarkupWindow::MarkupWindow( 
   const char* title // = "markup" 
   ) :
   non_stop_mode(false), tracking_object(false),
-  title(title), rubbering_mode(0),
-  fps(0),  frames(0),  frame_width(0),  frame_height(0)
+  title(title), rubbering_mode(0)
 {
   iObjType = 1; // "RedManOverTimer";
   namedWindow( title, WINDOW_NORMAL ); //WINDOW_AUTOSIZE); // -- в режиме AUTOSIZE координаты x y мышки надо пересчитывать
@@ -142,7 +147,7 @@ int MarkupWindow::processKeys() // здесь обработка клавиш до выхода из цикла обр
     if (key == kF2)
     {
       pressed_keys.pop_front();
-      saveMarkup();
+      saveMarkupData();
       continue;
     }
     if (key == kF3)
@@ -220,7 +225,7 @@ int MarkupWindow::processEvents()
   return processKeys();
 }
 
-bool MarkupWindow::readFrame( int pos )
+bool Markup::readFrame( int pos )
 {
   if (pos != iframe+1)
   {  // need jump
@@ -243,7 +248,7 @@ void onTimer( double time );
 int MarkupWindow::process( string& _video_file_path, int start_frame )
 {
   video_file_path = _video_file_path;
-  if (!loadVideo(_video_file_path, start_frame))
+  if (!initialize(_video_file_path, start_frame))
     return -1;
 
   // мы уже встали на нужный кадр start_frame:
@@ -264,7 +269,8 @@ int MarkupWindow::process( string& _video_file_path, int start_frame )
 
       if (!frameProc.process(frame_image))
         cout << "frameProc.process(frame_image) failed";
-      setBaseImage( frame_image );
+
+      update_image_to_draw();
 
       double msec = double(frame_time)/1000.;
       onTimer( msec );
@@ -390,7 +396,7 @@ int MarkupWindow::process( string& _video_file_path, int start_frame )
 
   } // main loop
 
-  saveMarkup(); // ask?
+  saveMarkupData(); // ask?
 
   return key;
 }
@@ -402,7 +408,7 @@ void MarkupWindow::setWindowText( const char* window_title )
 
 
 ///////////////////////////////////// visibank
-bool MarkupWindow::loadVideo( string& _video_file_path, int& start_frame )
+bool Markup::loadVideo( string& _video_file_path, int& start_frame )
 {
   if (!video.open( _video_file_path ))
     return __false( format( "\nCan't open %s\n", _video_file_path.c_str() ) );
@@ -419,8 +425,14 @@ bool MarkupWindow::loadVideo( string& _video_file_path, int& start_frame )
   cout << "Loaded video: " << video_file_path << endl;
   cout << "fps=" << fps << "\tframes=" << frames << endl;
   cout << "frame_width=" << frame_width << "\tframe_height=" << frame_height << endl;
-  
-  loadMarkupData( start_frame );
+}
+
+bool MarkupWindow::initialize( string& _video_file_path, int& start_frame )
+{
+  if (!loadVideo(_video_file_path, start_frame))
+    return __false("Failed to load video");
+  if (!loadMarkupData( start_frame ))
+    return __false("Failed to load markup");
 
   // go to start_frame position
   if (start_frame < 0)
@@ -440,15 +452,29 @@ bool MarkupWindow::loadVideo( string& _video_file_path, int& start_frame )
 }
 
 
-bool MarkupWindow::readVideoData( 
-  std::string& filename, 
+bool Markup::readVideoData( 
+  cv::FileStorage& fs, 
+  vector< FrameData >& frames
+  )
+{
+  if (!fs.isOpened())
+    return __false("Attempt to read from not open storage");
+
+  if (!readFrames( fs, frames ))
+    return __false("Failed to readFrames");
+
+  return true;
+}
+
+bool MarkupWindow::readSessionData( 
+  cv::FileStorage& fs, 
   vector< FrameData >& frames,
   int& start_frame
   )
 {
-  cv::FileStorage fs(filename, cv::FileStorage::READ);
   if (!fs.isOpened())
-    return false;
+    return __false("Attempt to read from not open storage");
+
 
   cv::FileNode last_session_node = fs["LastMarkupSession"];
   if (!last_session_node.empty())
@@ -470,30 +496,38 @@ bool MarkupWindow::readVideoData(
         if ( afoTypes.objTypes[iObjType] == activeObjectType )
           break;
   }
-
-  return readFrames( fs, frames );
+  return true;
 }
 
 
-bool MarkupWindow::writeVideoData( 
-  std::string& filename, 
+bool Markup::writeVideoData( 
+  cv::FileStorage& fs, 
+  vector< FrameData >& frames
+  )
+{
+  if (!fs.isOpened())
+    return __false("Attempt to write to not open storage");
+  if (!writeFrames( fs, frames ))
+    return __false("Failed to writeFrames()");
+  return true;
+}
+
+bool MarkupWindow::writeSessionData( 
+  cv::FileStorage& fs, 
   vector< FrameData >& frames,  
   int start_frame
   )
 {
-  cv::FileStorage fs(filename, cv::FileStorage::WRITE);
   if (!fs.isOpened())
-    return false;
+    return __false("Attempt to write to not open storage");
 
   fs << "LastMarkupSession" << "{";
   fs << "LastVisitedFrame" << start_frame;
   fs << "ActiveObjectType" << objType();
   fs << "}";
   
-  return writeFrames( fs, frames );
+  return true;
 }
-
-
 
 bool MarkupWindow::loadMarkupData( int& start_frame )
 {
@@ -503,13 +537,21 @@ bool MarkupWindow::loadMarkupData( int& start_frame )
     video_file_path.c_str(),
     name_and_extension(video_file_path).c_str() );
 
-  if (!readVideoData( markup_filename, marked_frames, start_frame ))
+  cv::FileStorage fs(markup_filename, cv::FileStorage::READ);
+  if (!fs.isOpened())
+    return __false( format( "Failed to open storage to read %s", markup_filename.c_str() ) );
+
+  if (!readVideoData( fs, marked_frames ))
     marked_frames.resize( frames );
+
+  if (!readSessionData( fs, marked_frames, start_frame ))
+    marked_frames.resize( frames );
+
   return true;
 }
 
 
-bool MarkupWindow::saveMarkup()  // F2
+bool MarkupWindow::saveMarkupData()  // F2
 {
   ensure_folder( format( "%s.dat", video_file_path.c_str() ) );
 
@@ -517,7 +559,12 @@ bool MarkupWindow::saveMarkup()  // F2
     video_file_path.c_str(),
     name_and_extension(video_file_path).c_str());
 
-  writeVideoData( markup_filename, marked_frames, iframe );
+  cv::FileStorage fs(markup_filename, cv::FileStorage::WRITE);
+  if (!fs.isOpened())
+    return __false( format( "Failed to open storage to read %s", markup_filename.c_str() ) );
+
+  writeVideoData( fs, marked_frames ); // todo -- check!!! try {} catch{{} for writeVideoData() ???
+  writeSessionData( fs, marked_frames, iframe ); // todo -- check!!! try {} catch{{} for writeVideoData() ???
   cout << "Markup saved to: " << markup_filename << endl;
   return true; // todo -- check!!! try {} catch{{} for writeVideoData() ???
 }
@@ -534,7 +581,7 @@ bool MarkupWindow::saveFrameImage() // F3
 
 
 
-std::string MarkupWindow::makeFrameObjectImageName( int iframe, const Rect& objRoi, int iobj, 
+std::string Markup::makeFrameObjectImageName( int iframe, const Rect& objRoi, int iobj, 
                                                    const char* szObjType, bool ensureFolder )
 {
   ensure_folder( format("%s.dat", video_file_path.c_str() ) );
@@ -551,7 +598,7 @@ std::string MarkupWindow::makeFrameObjectImageName( int iframe, const Rect& objR
   return frame_obj_name;
 }
 
-bool MarkupWindow::deleteFrameObjectImage( int iobj )
+bool Markup::deleteFrameObjectImage( int iobj )
 {
   FrameData& fd = marked_frames[iframe];
   Rect rc = fd.objects[iobj]->rect;
@@ -570,11 +617,11 @@ bool MarkupWindow::deleteFrameObjectImage( int iobj )
   return true;
 }
 
-bool MarkupWindow::saveFrameObjectImage( int iobj )
+bool Markup::saveFrameObjectImage( int iobj )
 {
   FrameData& fd = marked_frames[iframe];
   Rect rc = fd.objects[iobj]->rect;
-  Rect base = cv::Rect( Point(0,0), base_image.size());
+  Rect base = cv::Rect( Point(0,0), frame_image.size());
   int dw = max( 5, min( 20, rc.width/2 ));
   int dh = max( 5, min( 20, rc.height/2 ));
 
@@ -591,7 +638,7 @@ bool MarkupWindow::saveFrameObjectImage( int iobj )
     //fd.objects[iobj]->type.c_str() 
     //);
   try {
-  Mat object_image = base_image(rc);
+  Mat object_image = frame_image(rc);
   Rect rc2 = fd.objects[iobj]->rect; 
   rc2.x -= rc.x;
   rc2.y -= rc.y;
@@ -609,7 +656,7 @@ bool MarkupWindow::saveFrameObjectImage( int iobj )
   return true;
 }
 
-bool MarkupWindow::saveFrameObjectsImages() // F4
+bool Markup::saveFrameObjectsImages() // F4
 {
   FrameData& fd = marked_frames[iframe];
   //exportFrameData( cv::Mat& base_image, std::string& videofile, int iframe )
