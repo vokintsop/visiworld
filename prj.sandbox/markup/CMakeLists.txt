@@ -18,6 +18,15 @@ IF( MSVC )
     ${CMAKE_SOURCE_DIR}/prj.core/geomap/geomapeditor.cpp
     ${CMAKE_SOURCE_DIR}/prj.core/gnss/gnss.h
     ${CMAKE_SOURCE_DIR}/prj.core/gnss/gnss.cpp
+
+    ${CMAKE_SOURCE_DIR}/prj.core/markup/markup.h
+    ${CMAKE_SOURCE_DIR}/prj.core/markup/markup.cpp
+    ${CMAKE_SOURCE_DIR}/prj.core/markup/markupeditor.h
+    ${CMAKE_SOURCE_DIR}/prj.core/markup/markupeditor.cpp
+
+    ${CMAKE_SOURCE_DIR}/prj.core/markup/markup_addobject.cpp
+    ${CMAKE_SOURCE_DIR}/prj.core/markup/markup_mouse.cpp    
+    
     ${CMAKE_SOURCE_DIR}/prj.core/ocvutils/ocvkeys.h
     ${CMAKE_SOURCE_DIR}/prj.core/ocvutils/ocvutils.h
     ${CMAKE_SOURCE_DIR}/prj.core/ocvutils/precomp.h
@@ -27,11 +36,8 @@ IF( MSVC )
     ${CMAKE_SOURCE_DIR}/prj.core/streetglass/frameproc.cpp
     ${CMAKE_SOURCE_DIR}/prj.core/streetglass/sticks.h
     ${CMAKE_SOURCE_DIR}/prj.core/streetglass/sticks.cpp
+
     src/main.cpp
-    src/markup.h
-    src/markup.cpp
-    src/markup_addobject.cpp
-    src/markup_mouse.cpp
     src/track.cpp
     )
 

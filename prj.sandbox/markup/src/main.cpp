@@ -12,8 +12,8 @@ int markup( string& data, int start_frame )
     return -1;
   }
 
-  MarkupWindow markupWindow;
-  markupWindow.process(data, start_frame);
+  MarkupEditor MarkupEditor;
+  MarkupEditor.process(data, start_frame);
 
 
   return 0;
