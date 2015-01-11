@@ -5,6 +5,7 @@
 
 using namespace cv;
 #include "ocvutils/ocvkeys.h"
+#include "ocvutils/ocvgui.h"
 
 /****
 enum Key {
@@ -83,7 +84,10 @@ public:
 };
 
 
-class MarkupEditor : public Markup
+class MarkupEditor 
+    : public OCVGuiWindow
+    , public Markup // todo: сделать членом класса а не выводить
+
 {
 /////////////////////////// supported object types
   int iObjType; // индекс активного типа объекта 

@@ -11,7 +11,7 @@ void mouseCallBack4GeoMapEditor(int event, int x, int y, int flags, void *userda
 }
 
 GeoMapEditor::GeoMapEditor( const char* _root_folder ) /// = NULL )
-  : title(GEOMAP_EDITOR_TITLE)
+  : iObjType(0), title(GEOMAP_EDITOR_TITLE)
 { 
   namedWindow( title, WINDOW_NORMAL ); //WINDOW_AUTOSIZE); // -- в режиме AUTOSIZE координаты x y мышки надо пересчитывать
   setMouseCallback( title, mouseCallBack4GeoMapEditor, this);
