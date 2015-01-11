@@ -148,6 +148,8 @@ public:
 
 
 public:
+  int procKey();
+
   void setWindowText( const char* window_title );
   void update_window( bool quickly = false )  // _только_ здесь реальная отрисовка с отдачей управления
   {

@@ -1,8 +1,25 @@
 #include "ocvutils/precomp.h"
-#include "markup.h"
+
+#include "geomap/geomapeditor.h"
+#include "markup/markupeditor.h"
 using namespace std;
 
-int markup( string& data, int start_frame )
+// the single app
+Ptr< GeoMapEditor >  pGeoMapEditor( new GeoMapEditor("/testdata/poligon/map") ); // singleton
+Ptr< MarkupEditor >  pMarkupEditor( new MarkupEditor );
+
+/////////////////////////////////////////////////////////////// дело для разборок
+
+string gps_file; // gps data .gps file (produced by blackvue)
+
+string nmea_file; // gps data .nmea file (produced by akenori)
+#include "gnss/gnss.h"
+NMEA theNmeaFile; // возможный компаньон видео
+////////////////////////////////////////////////////////////// дело для разборок
+
+int markup( string& data, int start_frame ) 
+// итак, нам заказывают показ/просмотр разметки
+// с кадра start_frame, -1 означает "разберитесь мол"
 {
   cout << "File to process " << data << endl << " Start frame " << start_frame << endl;
 
@@ -12,22 +29,14 @@ int markup( string& data, int start_frame )
     return -1;
   }
 
-  MarkupEditor MarkupEditor;
-  MarkupEditor.process(data, start_frame);
+  // запустим же пару окон -- для карты и для обзора, мьсе
+  // как вам угодно, мадам: вот они
 
+  pMarkupEditor->process(data, start_frame);
 
   return 0;
 }
-////////////////////////////////////////////////////////////////
-string gps_file; // gps data .gps file (produced by blackvue)
 
-string nmea_file; // gps data .nmea file (produced by akenori)
-#include "gnss/gnss.h"
-NMEA theNmeaFile; // возможный компаньон видео
-
-#include "geomap/geomapeditor.h"
-
-Ptr< GeoMapEditor >  pGeoMapEditor( new GeoMapEditor("/testdata/poligon/map") ); // singleton
 
 //GeoMapEditor theGeoMapEditor("/testdata/kitti/map"); // singleton
 
