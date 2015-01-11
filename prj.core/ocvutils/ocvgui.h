@@ -12,7 +12,7 @@ class OCVGuiWindow
 {
 protected:
   virtual int   waitKey( int delay ) { return WaitKey(delay); }; //перекрывает cv::waitKey(). однажды она вернется на procKey(), но возможно в другое окно
-  virtual bool  procKey( int key )=0; // выполняет обработку клавиши для данного окна; возвращает true если клавиша обработана
+  virtual bool  procKey( int key ){ return false; }; // выполняет обработку клавиши для данного окна; возвращает true если клавиша обработана
 };
 
 #endif // __OCVGUI_H

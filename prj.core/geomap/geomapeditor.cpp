@@ -4,6 +4,7 @@
 
 #define GEOMAP_EDITOR_TITLE "map_view"
 
+
 void mouseCallBack4GeoMapEditor(int event, int x, int y, int flags, void *userdata)
 {
   GeoMapEditor* mw = (GeoMapEditor*)userdata;
