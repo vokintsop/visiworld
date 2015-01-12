@@ -2,11 +2,12 @@
 
 #include "markup.h"
 #include "streetglass/frameproc.h" // обработка кадра
+#include "kitti.h"
 
 using namespace cv;
 
-Markup::Markup():
-  fps(0),  frames(0),  frame_width(0),  frame_height(0)
+Markup::Markup(bool iskitti_):
+  fps(0),  frames(0),  frame_width(0),  frame_height(0), iskitti(iskitti_)
 {
 }
 
@@ -14,36 +15,94 @@ bool Markup::readFrame( int pos )
 {
   if (pos != iframe+1)
   {  // need jump
-    if (!video.set( CV_CAP_PROP_POS_FRAMES,  pos ))
+    if (!setCurFrame( pos ))
       return false;
   }
-  frame_time = int(video.get( CV_CAP_PROP_POS_MSEC  )); // время текущего кадра 
-  if (!video.read(frame_image)) 
+  frame_time = 1000 * iframe  / fps; //int(video.get( CV_CAP_PROP_POS_MSEC  )); // время текущего кадра 
+  bool success = false;
+  if (iskitti)
+    success = readKitti(pos);  
+  else
+    success = video.read(frame_image);
+  if (!success) 
   {
     cout << "Can't read requested frame " << pos << endl;
     return false;
   }
-  iframe = pos;
+  return true;
+}
+
+bool Markup::setCurFrame(int newIFrame)
+{
+  if ((newIFrame < 0) || (newIFrame >= frames))
+    return false;
+  iframe = newIFrame;
+  if (!iskitti)
+    return video.set(CV_CAP_PROP_POS_FRAMES, newIFrame);
+
+  return true;
+}
+
+bool Markup::readKitti(int pos)
+{
+  string imgfname = video_file_path + format("/image_00/data/%010d.png", pos);
+  frame_image = imread(imgfname);
+  if (frame_image.empty())
+    return __false(format("\nerror reading kitti frame: %s\n", imgfname));
+  if (iframe < frames - 1)
+    ++iframe;
   return true;
 }
 
 bool Markup::loadVideo( string& _video_file_path, int& start_frame )
 {
-  if (!video.open( _video_file_path ))
-    return __false( format( "\nCan't open %s\n", _video_file_path.c_str() ) );
+  if (!iskitti)
+  {
+    if (!video.open( _video_file_path ))
+      return __false( format( "\nCan't open %s\n", _video_file_path.c_str() ) );
 
-  video_file_path = _video_file_path;
-  video_file_name = name_and_extension(video_file_path);
+    video_file_path = _video_file_path;
+    video_file_name = name_and_extension(video_file_path);
 
-  ///video_short_name = 
+    ///video_short_name = 
 
-  fps = video.get( CV_CAP_PROP_FPS );
-  frames = int( video.get( CV_CAP_PROP_FRAME_COUNT ) );
-  frame_width = int( video.get( CV_CAP_PROP_FRAME_WIDTH ) );
-  frame_height = int( video.get( CV_CAP_PROP_FRAME_HEIGHT ) );
-  cout << "Loaded video: " << video_file_path << endl;
-  cout << "fps=" << fps << "\tframes=" << frames << endl;
-  cout << "frame_width=" << frame_width << "\tframe_height=" << frame_height << endl;
+    fps = video.get( CV_CAP_PROP_FPS );
+    frames = int( video.get( CV_CAP_PROP_FRAME_COUNT ) );
+    frame_width = int( video.get( CV_CAP_PROP_FRAME_WIDTH ) );
+    frame_height = int( video.get( CV_CAP_PROP_FRAME_HEIGHT ) );
+    cout << "Loaded video: " << video_file_path << endl;
+    cout << "fps=" << fps << "\tframes=" << frames << endl;
+    cout << "frame_width=" << frame_width << "\tframe_height=" << frame_height << endl;
+  }
+  else
+  {
+    vector<double> timestamps;
+    string timeStampFname = _video_file_path + "/image_00/timestamps.txt";
+    if (!readTimeStamps(timeStampFname, timestamps))
+      return __false(string("error reading kitti sequence ") + _video_file_path + "\n");
+    frames = timestamps.size();
+
+    //now calculate average fps:
+    double mean = 0;
+    for (int i = 0; i < timestamps.size() - 1; ++i)
+      mean += timestamps[i + 1] - timestamps[i];
+    mean /= (timestamps.size() - 1);
+    
+    if (mean == 0)
+      return __false(format("\nError wrong timestamp file: %s\n", _video_file_path));
+    
+    fps = 1 / mean;
+
+    Mat tmpimg = imread(_video_file_path + format("/image_00/data/%010d.png"));
+    if (tmpimg.empty())
+      return __false(format("\nError opening kitti sequence %s\n", _video_file_path));
+    frame_width = tmpimg.cols;
+    frame_height = tmpimg.rows;
+    cout << "Loaded kitti sequence: " << video_file_path << endl;
+    cout << "fps=" << fps << "\tframes=" << frames << endl;
+    cout << "frame_width=" << frame_width << "\tframe_height=" << frame_height << endl;
+  }
+  return true;
 }
 
 bool Markup::readVideoData( 

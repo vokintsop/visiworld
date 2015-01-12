@@ -10,7 +10,7 @@
 class Markup
 {
 protected:
-  Markup();
+  Markup::Markup(bool iskitti_ = false);
   std::vector< FrameData > marked_frames; /// синхронизирован с video <===> [iframe]
 
 ///////////////////////////////////// video -- объект разметки
@@ -31,11 +31,18 @@ protected: // video properties, initialized by loadVideo()
   int iframe; // номер обрабатываемого фрейма
   int frame_time; // время фрейма в миллисекундах от начала ролика
 
+/////////////////////////////////////////////// for kitty
+protected:
+  bool iskitti;
+  bool readKitti(int frame_pos);
+  bool setCurFrame(int newIFrame);
+
 //////////////////////////////////////////////// persistence
 protected:
   std::string markup_filename; // file based
-
 public: 
+
+
 
   bool readVideoData( 
     cv::FileStorage& fs, 

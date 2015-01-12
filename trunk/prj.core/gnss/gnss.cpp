@@ -5,6 +5,9 @@
 #include <algorithm>
 #include <cassert>
 #include <opencv2/imgproc/imgproc.hpp> 
+
+#include <prj.core/markup/kitti.h>
+#include <prj.core/ocvutils/precomp.h> 
 using namespace std;
 
 
@@ -191,6 +194,34 @@ bool NMEA::load( const std::string& filename )
 
   return true;
 }
+
+
+bool NMEA::loadKitti( const std::string &filename )
+{
+  string timestampfname = filename + "/oxts/timestamps.txt";
+  vector<double> timestamps;
+
+  if (!readTimeStamps(timestampfname, timestamps))
+  {
+    cout << "error reading timestamps file " << timestampfname << endl;
+    return false;
+  }
+  for (unsigned int i = 0; i < timestamps.size(); ++i)
+  {
+    string oxtfname = filename + format("/oxts/data/%010d.txt", i);
+    ifstream fin(oxtfname);
+    if (!fin.good())
+    {
+      cout << "error reading oxt (gnss) record number " << i << endl;
+      return false;
+    }
+    double nord, east;
+    fin >> nord >> east;
+    records.push_back(GNSSRecord(timestamps[i] - timestamps[0], nord, east));
+  }
+  return true;
+}
+
 
 inline bool compareByTime( const GNSSRecord& rec, const GNSSRecord& val )
 {

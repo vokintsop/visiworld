@@ -53,10 +53,11 @@ void mouseCallBack(int event, int x, int y, int flags, void *userdata)
 }
 
 MarkupEditor::MarkupEditor( 
+  bool iskitti,
   const char* title // = "markup" 
   ) :
   non_stop_mode(false), tracking_object(false),
-  title(title), rubbering_mode(0)
+    title(title), rubbering_mode(0), Markup(iskitti)
 {
   iObjType = 1; // "RedManOverTimer";
   namedWindow( title, WINDOW_NORMAL ); //WINDOW_AUTOSIZE); // -- в режиме AUTOSIZE координаты x y мышки надо пересчитывать
@@ -215,9 +216,9 @@ int MarkupEditor::process( string& _video_file_path, int start_frame )
     return -1;
 
   // мы уже встали на нужный кадр start_frame:
-  int last_frame = int( video.get( CV_CAP_PROP_FRAME_COUNT ) ) -1;
-  assert( int( video.get( CV_CAP_PROP_POS_FRAMES  ) ) == start_frame );
-  iframe = -1000; ///  int( video.get( CV_CAP_PROP_POS_FRAMES  );
+  int last_frame = frames - 1;
+  assert( iframe == start_frame );
+  //iframe = -1000; ///  int( video.get( CV_CAP_PROP_POS_FRAMES  );
 
 
   int next_frame = start_frame; // номер фрейма, куда хотим встать, но еще не встали
@@ -373,10 +374,13 @@ void MarkupEditor::setWindowText( const char* window_title )
 ///////////////////////////////////// visibank
 bool MarkupEditor::initialize( string& _video_file_path, int& start_frame )
 {
-  if (!loadVideo(_video_file_path, start_frame))
+  if (!loadVideo(_video_file_path, start_frame)) //не обязательно видео
     return __false("Failed to load video");
   if (!loadMarkupData( start_frame ))
-    return __false("Failed to load markup");
+  {
+    cout << "Failed to load markup" << endl;
+    //return __false("Failed to load markup");
+  }
 
   // go to start_frame position
   if (start_frame < 0)
@@ -386,7 +390,7 @@ bool MarkupEditor::initialize( string& _video_file_path, int& start_frame )
     cout << "Requested start frame " << start_frame << " is out of range" << endl;
     return false;
   }
-  if (!video.set( CV_CAP_PROP_POS_FRAMES,  start_frame ))
+  if (!setCurFrame(start_frame))
   {
     cout << "Can't start from requested frame " << start_frame << endl;
     return false;
@@ -457,7 +461,10 @@ bool MarkupEditor::loadMarkupData( int& start_frame )
 
   cv::FileStorage fs(markup_filename, cv::FileStorage::READ);
   if (!fs.isOpened())
+  {
+    marked_frames.resize( frames );
     return __false( format( "Failed to open storage to read %s", markup_filename.c_str() ) );
+  }
 
   if (!readVideoData( fs, marked_frames ))
     marked_frames.resize( frames );
