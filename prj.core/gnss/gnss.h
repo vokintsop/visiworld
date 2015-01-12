@@ -21,6 +21,7 @@ public:
   NMEA(){}
   NMEA( const std::string& filename ){ load(filename); }
   bool load( const std::string& filename );
+  bool loadKitti( const std::string &filename );
   void draw();
   bool getEastNord( double time, double& east, double& nord );
 };
