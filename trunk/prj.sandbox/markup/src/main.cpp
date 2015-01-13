@@ -5,8 +5,8 @@
 using namespace std;
 
 // the single app
-Ptr< GeoMapEditor >  pGeoMapEditor( new GeoMapEditor("/testdata/poligon/map") ); // singleton
-Ptr< MarkupEditor >  pMarkupEditor( new MarkupEditor );
+Ptr< GeoMapEditor >  pGeoMapEditor; // singleton
+Ptr< MarkupEditor >  pMarkupEditor;
 
 /////////////////////////////////////////////////////////////// дело для разборок
 
@@ -23,12 +23,13 @@ int markup( string& data, int start_frame )
 {
   cout << "File to process " << data << endl << " Start frame " << start_frame << endl;
 
+  /*
   if (!file_readable(data.c_str()))
   {
     cout << "no file or not readable:" << data << endl;
     return -1;
   }
-
+  */
   // запустим же пару окон -- для карты и для обзора, мьсе
   // как вам угодно, мадам: вот они
 
@@ -64,6 +65,7 @@ int main( int argc, char* argv[] )
   cout << "markup.exe <video.avi|.mov|.mp4> [<#start_frame>]" << endl; 
   string exe  = argv[0];
   int start_frame = -1;
+  bool iskitti = false;
 
 
 #if 0
@@ -115,10 +117,16 @@ int main( int argc, char* argv[] )
   string data = "/testdata/glass/milano/20140913_123209_598.mp4"; 
 #endif
 
-#if 1 
+#if 0
   string data = "/testdata/poligon/input/bvu.01/20141127_121836_N.mp4"; 
   nmea_file = "/testdata/poligon/input/bvu.01/20141127_121836_N.gps";
   theNmeaFile.load(nmea_file);
+#endif
+
+#if 1
+  string data = "/testdata/kitti/2011_09_26/2011_09_26_drive_0001";
+  iskitti = true;
+  theNmeaFile.loadKitti(data);
 #endif
 
 #if 0 
@@ -244,6 +252,17 @@ int main( int argc, char* argv[] )
     data = exe + argv[1];
   if (argc > 2)
     start_frame = atoi(argv[2]);
+
+  if (iskitti)
+  {
+    pGeoMapEditor = new GeoMapEditor("/testdata/kitti/map"); 
+  }
+  else
+  {
+    pGeoMapEditor = new GeoMapEditor("/testdata/poligon/map"); 
+  }
+  
+  pMarkupEditor = new MarkupEditor(iskitti);
 
   int res = markup( data, start_frame );
   return res;
