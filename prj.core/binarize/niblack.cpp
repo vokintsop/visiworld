@@ -10,307 +10,310 @@
 using namespace std;
 using namespace cv;
 
-int prev__niblack( cv::Mat1b& src, cv::Mat1b& res
-            , int wing_min // = 5
-            , double alpha // = 0.15,
-            , bool invert 
-            )
+int prev__niblack( cv::Mat1b& src, 
+                   cv::Mat1b& res, 
+                   int wing_min /* = 5*/,
+                   double alpha /*= 0.15*/, 
+                   bool invert )
 {
-  res = src.clone();
-  //int wing_min = 5;
-  int wing_max = wing_min; // *8;
+    res = src.clone();
+    // int wing_min = 5;
+    int wing_max = wing_min; // *8;
 
-  Mat sum, sumsq;
-  cv::integral( src, sum, sumsq );
+    Mat sum, sumsq;
+    cv::integral( src, sum, sumsq );
 
-  double avesigma = 0;
-  int avesigma_cnt = 0;
+    double avesigma = 0;
+    int avesigma_cnt = 0;
 
-  Mat e( src.rows, src.cols, CV_8U ); // average at [y x]
-  Mat d( src.rows, src.cols, CV_8U ); // sigma at [y x]
+    Mat e( src.rows, src.cols, CV_8U ); // average at [y x]
+    Mat d( src.rows, src.cols, CV_8U ); // sigma at [y x]
 
-  for (int y=0; y<src.rows; y++)
-    for (int x=0; x<src.cols; x++)
+    int object_value = invert ? 255 : 0;
+    int background_value = invert ? 0 : 255;
+
+    for ( int y = 0; y < src.rows; ++y )
     {
-      for (int wing = wing_min; wing <= wing_max; wing*=2 )
-      {
-				int sizex = min(wing, x) + min(wing, src.cols - x - 1) + 1;
-				int sizey = min(wing, y) + min(wing, src.rows - y - 1) + 1;
-				double size = sizex * sizey;
-
-        Point from = Point(max(0, x - wing), max(0, y - wing));
-				Point to = Point(min(src.cols, x + wing + 1), min(src.rows, y + wing + 1));
-				int s = sum.at<int>(to.y, to.x) - sum.at<int>(from.y, to.x) - sum.at<int>(to.y, from.x) + sum.at<int>(from.y, from.x);
-				double sq = sumsq.at<double>(to.y, to.x) - sumsq.at<double>(from.y, to.x) - sumsq.at<double>(to.y, from.x) + sumsq.at<double>(from.y, from.x);
-				
-				double E = double(s) / size;
-        e.at<uchar>(y,x) = saturate_cast<uchar>( E );
-
-				double sigma = sqrt( (double(sq) / size) - E*E );
-        d.at< uchar >(y,x) = saturate_cast<uchar>( sigma );
-
-        avesigma += sigma;
-        avesigma_cnt ++;
-
-        ///double alpha = 0.2;
-
-        if ( alpha * sigma < 4 && (wing/wing_min) >= 4 )
+        for ( int x = 0; x < src.cols; ++x )
         {
-          res[y][x] = E > 128 ? 255 : 64; /////(128+64) : 64;
-          break;
+            for ( int wing = wing_min; wing <= wing_max; wing*=2 )
+            {
+                int sizex = min(wing, x) + min(wing, src.cols - x - 1) + 1;
+                int sizey = min(wing, y) + min(wing, src.rows - y - 1) + 1;
+                double size = sizex * sizey;
+
+                Point from = Point(max(0, x - wing), max(0, y - wing));
+                Point to = Point(min(src.cols, x + wing + 1), min(src.rows, y + wing + 1));
+                int s = sum.at<int>(to.y, to.x) - sum.at<int>(from.y, to.x) - sum.at<int>(to.y, from.x) + sum.at<int>(from.y, from.x);
+                double sq = sumsq.at<double>(to.y, to.x) - sumsq.at<double>(from.y, to.x) - sumsq.at<double>(to.y, from.x) + sumsq.at<double>(from.y, from.x);
+
+                double E = double(s) / size;
+                e.at<uchar>(y,x) = saturate_cast<uchar>( E );
+
+                double sigma = sqrt( (double(sq) / size) - E*E );
+                d.at<uchar>( y, x ) = saturate_cast<uchar>( sigma );
+
+                avesigma += sigma;
+                ++avesigma_cnt;
+
+                /// double alpha = 0.2;
+
+                // ???
+                if ( alpha * sigma < 4 && (wing/wing_min) >= 4 )
+                {
+                    res[y][x] = E > 128 ? 255 : 64; /////(128+64) : 64;
+                    break;
+                }
+
+                int T1 = int( E - alpha * sigma + 0.5 );
+                int T2 = int( E + alpha * sigma + 0.5 );
+
+                int srcxy = src[y][x];
+
+                if ( srcxy < T1 )
+                {
+                    res[y][x] = background_value;
+                    break;
+                }
+                else if ( srcxy > T2 )
+                {
+                    res[y][x] = object_value;
+                    break;
+                }
+                else
+                {
+                    res[y][x] = 128;
+                }
+
+            }
         }
+    }
+    cv::imwrite( "res.jpg", res );
 
-        int T1 = int( E - alpha * sigma  +0.5 );
-        int T2 = int( E + alpha * sigma  +0.5 );
+    avesigma /= avesigma_cnt;
+//     printf( "avesigma = %f", avesigma );
 
+    Mat dbin( src.rows, src.cols, CV_8U );
+    double thr1 = threshold(d, dbin, 0, 255, THRESH_OTSU);
+//     printf("Thresh sigma %f", thr1 );
 
-        int srcxy = src[y][x];
+    dbin = 255 - dbin;
+//     imshow( "blocks", dbin );
 
-        int lo = invert ? 255 : 0;
-        int hi = invert ? 0 : 255;
+    ///double alpha = 0.15; // 0.2;
 
-        if ( srcxy < T1 )
+    for ( int y = 0; y < src.rows; ++y )
+    {
+        for ( int x = 0; x < src.cols; ++x )
         {
-          res[y][x] = lo;
-          break;
+            int ee = e.at<uchar>(y, x);
+            int dd = d.at<uchar>(y, x);
+            if (dd < thr1)
+            {
+                res[y][x] = background_value; // 200;
+                continue;
+            }
+
+            int srcxy = src[y][x];
+            int T1 = int( ee - alpha * dd + 0.5 );
+            int T2 = int( ee + alpha * dd + 0.5 );
+            res[y][x] = (srcxy > T1) ? object_value : background_value;
         }
-        else if ( srcxy > T2 )
-        {
-          res[y][x] = hi;
-          break;
-        }
-        else
-        {
-          res[y][x] = 128;
-        }
-      }
     }
 
-  avesigma /= avesigma_cnt;
-  printf( "avesigma = %f", avesigma );
-  
-  Mat dbin( src.rows, src.cols, CV_8U ); 
-  double thr1 = threshold(d, dbin, 0, 255, THRESH_OTSU);
-  printf("Thresh sigma %f", thr1 );
+    //imshow( "binarized niblack ex", res );
+    //waitKey(0);
 
-  for (int i=0; i< dbin.rows; i++)
-    for (int j=0; j< dbin.cols; j++)
-      dbin.at<uchar>(i,j) = 255 - dbin.at<uchar>(i,j);
-  imshow( "blocks", dbin );
-
-  ///double alpha = 0.15; // 0.2;
-
-  for (int y=0; y<src.rows; y++)
-    for (int x=0; x<src.cols; x++)
-    {
-      int ee = e.at<uchar>(y, x);;
-      int dd = d.at<uchar>(y, x);;
-      if (dd < thr1)
-      {
-        res[y][x]=200;
-        continue;
-      }
-
-
-      int srcxy = src[y][x];
-      int T1 = int( ee - alpha * dd  +0.5 );
-      int T2 = int( ee + alpha * dd  +0.5 );
-      res[y][x]=(srcxy > T1) ? 255 : 0;
-
-    }
-
-  //imshow( "binarized niblack ex", res );
-  //waitKey(0);
-
-  return 0;
+    return 0;
 }
 
 
-int niblack( 
-     cv::Mat1b& src, cv::Mat1b& res
-    , int wing // = 5
-    , double alpha // = 0.15,
-    , bool invert 
-            )
+int niblack( cv::Mat1b& src, cv::Mat1b& res, 
+             int wing /*= 5 */, 
+             double alpha /*= 0.15*/,
+             bool invert )
 {
-  Mat sum, sumsq;
-  cv::integral( src, sum, sumsq );
+    int object_value = invert ? 255 : 0;
+    int background_value = invert ? 0 : 255;
 
-  double avesigma = 0;
-  int avesigma_cnt = 0;
+    Mat sum, sumsq;
+    cv::integral( src, sum, sumsq );
 
-  // pass one -- thresh sigma
-  Mat e( src.rows, src.cols, CV_8U ); // average at [y x]
-  Mat d( src.rows, src.cols, CV_8U ); // sigma at [y x]
+    double avesigma = 0;
+    int avesigma_cnt = 0;
 
-  for (int y=0; y<src.rows; y++)
-  {
-    for (int x=0; x<src.cols; x++)
+    // pass one -- thresh sigma
+    Mat e( src.rows, src.cols, CV_8U ); // average at [y x]
+    Mat d( src.rows, src.cols, CV_8U ); // sigma at [y x]
+
+    for ( int y = 0; y < src.rows; ++y )
     {
-			int sizex = min(wing, x) + min(wing, src.cols - x - 1) + 1;
-			int sizey = min(wing, y) + min(wing, src.rows - y - 1) + 1;
-			double size = sizex * sizey;
+        for ( int x = 0; x < src.cols; ++x )
+        {
+            int sizex = min(wing, x) + min(wing, src.cols - x - 1) + 1;
+            int sizey = min(wing, y) + min(wing, src.rows - y - 1) + 1;
+            double size = sizex * sizey;
 
-      Point from = Point(max(0, x - wing), max(0, y - wing));
-			Point to = Point(min(src.cols, x + wing + 1), min(src.rows, y + wing + 1));
-			int s = sum.at<int>(to.y, to.x) - sum.at<int>(from.y, to.x) - sum.at<int>(to.y, from.x) + sum.at<int>(from.y, from.x);
-			double sq = sumsq.at<double>(to.y, to.x) - sumsq.at<double>(from.y, to.x) - sumsq.at<double>(to.y, from.x) + sumsq.at<double>(from.y, from.x);
-			
-			double E = double(s) / size;
-      e.at<uchar>(y,x) = saturate_cast<uchar>( E );
+            Point from = Point(max(0, x - wing), max(0, y - wing));	
+            Point to = Point(min(src.cols, x + wing + 1), min(src.rows, y + wing + 1));
+            int s = sum.at<int>(to.y, to.x) - sum.at<int>(from.y, to.x) - sum.at<int>(to.y, from.x) + sum.at<int>(from.y, from.x);
+            double sq = sumsq.at<double>(to.y, to.x) - sumsq.at<double>(from.y, to.x) - sumsq.at<double>(to.y, from.x) + sumsq.at<double>(from.y, from.x);
 
-			double sigma = sqrt( (double(sq) / size) - E*E );
-      d.at< uchar >(y,x) = saturate_cast<uchar>( sigma );
+            double E = double(s) / size;
+            e.at<uchar>(y,x) = saturate_cast<uchar>( E );
 
-      avesigma += sigma;
-      avesigma_cnt ++;
+            double sigma = sqrt( (double(sq) / size) - E*E );
+            d.at<uchar>(y,x) = saturate_cast<uchar>( sigma );
+
+            avesigma += sigma;
+            avesigma_cnt++;
+        }
     }
-  }
 
-  res.create( src.rows, src.cols ); 
-  double thr1 = threshold(d, res, 0, 200, THRESH_OTSU | THRESH_BINARY_INV);
-  printf("Thresh sigma %f", thr1 );
+    res.create( src.rows, src.cols );
+    double thr1 = threshold(d, res, 0, 255 /*200*/, THRESH_OTSU | ( invert ? THRESH_BINARY : THRESH_BINARY_INV ) );
+//     printf("Thresh sigma %f", thr1 );
+//     imshow( "blocks", res );
 
-  //for (int i=0; i< dbin.rows; i++)
-  //  for (int j=0; j< dbin.cols; j++)
-  //    dbin.at<uchar>(i,j) = 255 - dbin.at<uchar>(i,j);
-  imshow( "blocks", res );
+    wing *= 3;
 
-  wing *=3;
-
-  for (int y=0; y<src.rows; y++)
-  {
-    for (int x=0; x<src.cols; x++)
+    for ( int y = 0; y < src.rows; ++y )
     {
-      int val = 200;
-      if (res[y][x] == 0)
-      {
-			  int sizex = min(wing, x) + min(wing, src.cols - x - 1) + 1;
-			  int sizey = min(wing, y) + min(wing, src.rows - y - 1) + 1;
-			  double size = sizex * sizey;
+        for ( int x = 0; x < src.cols; ++x )
+        {
+            if ( res[y][x] == object_value )
+            {
+                int sizex = min(wing, x) + min(wing, src.cols - x - 1) + 1;
+                int sizey = min(wing, y) + min(wing, src.rows - y - 1) + 1;
+                double size = sizex * sizey;
 
-        Point from = Point(max(0, x - wing), max(0, y - wing));
-			  Point to = Point(min(src.cols, x + wing + 1), min(src.rows, y + wing + 1));
-			  int s = sum.at<int>(to.y, to.x) - sum.at<int>(from.y, to.x) - sum.at<int>(to.y, from.x) + sum.at<int>(from.y, from.x);
-			  double sq = sumsq.at<double>(to.y, to.x) - sumsq.at<double>(from.y, to.x) - sumsq.at<double>(to.y, from.x) + sumsq.at<double>(from.y, from.x);
-  			
-			  double E = double(s) / size;
-			  double sigma = sqrt( (double(sq) / size) - E*E );
-        if (src[y][x] > E - alpha*sigma)
-          res[y][x] =255;
-      }
+                Point from = Point(max(0, x - wing), max(0, y - wing));
+                Point to = Point(min(src.cols, x + wing + 1), min(src.rows, y + wing + 1));
+                int s = sum.at<int>(to.y, to.x) - sum.at<int>(from.y, to.x) - sum.at<int>(to.y, from.x) + sum.at<int>(from.y, from.x);
+                double sq = sumsq.at<double>(to.y, to.x) - sumsq.at<double>(from.y, to.x) - sumsq.at<double>(to.y, from.x) + sumsq.at<double>(from.y, from.x);
+
+                double E = double(s) / size;
+                double sigma = sqrt( (double(sq) / size) - E*E );
+                bool is_background = ( invert && 255 - src[y][x] > E - alpha*sigma ) || ( !invert && src[y][x] > E - alpha*sigma );
+                if ( is_background )
+                {
+                    res[y][x] = background_value;
+                }
+            }
+        }
     }
-  }
 
-  return 0;
+    return 0;
 }
 
 
 
 int niblack_ex( cv::Mat1b& src, cv::Mat1b& res, bool invert )
 {
-  res = src.clone();
-  int wing_min = 7;
-  int wing_max = wing_min; // *8;
+    int object_value = invert ? 255 : 0;
+    int background_value = invert ? 0 : 255;
 
-  Mat sum, sumsq;
-  cv::integral( src, sum, sumsq );
+    res = src.clone();
+    int wing_min = 7;
+    int wing_max = wing_min; // *8;
 
-  double avesigma = 0;
-  int avesigma_cnt = 0;
+    Mat sum, sumsq;
+    cv::integral( src, sum, sumsq );
 
-  Mat e( src.rows, src.cols, CV_8U ); // average at [y x]
-  Mat d( src.rows, src.cols, CV_8U ); // sigma at [y x]
+    double avesigma = 0;
+    int avesigma_cnt = 0;
 
-  for (int y=0; y<src.rows; y++)
-    for (int x=0; x<src.cols; x++)
+    Mat e( src.rows, src.cols, CV_8U ); // average at [y x]
+    Mat d( src.rows, src.cols, CV_8U ); // sigma at [y x]
+
+    for ( int y = 0; y < src.rows; ++y )
     {
-      for (int wing = wing_min; wing <= wing_max; wing*=2 )
-      {
-				int sizex = min(wing, x) + min(wing, src.cols - x - 1) + 1;
-				int sizey = min(wing, y) + min(wing, src.rows - y - 1) + 1;
-				double size = sizex * sizey;
-
-        Point from = Point(max(0, x - wing), max(0, y - wing));
-				Point to = Point(min(src.cols, x + wing + 1), min(src.rows, y + wing + 1));
-				int s = sum.at<int>(to.y, to.x) - sum.at<int>(from.y, to.x) - sum.at<int>(to.y, from.x) + sum.at<int>(from.y, from.x);
-				double sq = sumsq.at<double>(to.y, to.x) - sumsq.at<double>(from.y, to.x) - sumsq.at<double>(to.y, from.x) + sumsq.at<double>(from.y, from.x);
-				
-				double E = double(s) / size;
-        e.at<uchar>(y,x) = saturate_cast<uchar>( E );
-
-				double sigma = sqrt( (double(sq) / size) - E*E );
-        d.at< uchar >(y,x) = saturate_cast<uchar>( sigma );
-
-        avesigma += sigma;
-        avesigma_cnt ++;
-
-        double koeff = 0.2;
-
-        if ( koeff * sigma < 4 && (wing/wing_min) >= 4 )
+        for ( int x = 0; x < src.cols; ++x )
         {
-          res[y][x] = E > 128 ? 255 : 64; /////(128+64) : 64;
-          break;
+            for ( int wing = wing_min; wing <= wing_max; wing*=2 )
+            {
+                int sizex = min(wing, x) + min(wing, src.cols - x - 1) + 1;
+                int sizey = min(wing, y) + min(wing, src.rows - y - 1) + 1;
+                double size = sizex * sizey;
+
+                Point from = Point(max(0, x - wing), max(0, y - wing));
+                Point to = Point(min(src.cols, x + wing + 1), min(src.rows, y + wing + 1));
+                int s = sum.at<int>(to.y, to.x) - sum.at<int>(from.y, to.x) - sum.at<int>(to.y, from.x) + sum.at<int>(from.y, from.x);
+                double sq = sumsq.at<double>(to.y, to.x) - sumsq.at<double>(from.y, to.x) - sumsq.at<double>(to.y, from.x) + sumsq.at<double>(from.y, from.x);
+
+                double E = double(s) / size;
+                e.at<uchar>(y,x) = saturate_cast<uchar>( E );
+
+                double sigma = sqrt( (double(sq) / size) - E*E );
+                d.at< uchar >(y,x) = saturate_cast<uchar>( sigma );
+
+                avesigma += sigma;
+                avesigma_cnt++;
+
+                double koeff = 0.2;
+/*
+                // ???
+                if ( koeff * sigma < 4 && (wing/wing_min) >= 4 )
+                {
+                    res[y][x] = E > 128 ? 255 : 64; /////(128+64) : 64;
+                    break;
+                }
+
+                int T1 = int( E - koeff * sigma + 0.5 );
+                int T2 = int( E + koeff * sigma + 0.5 );
+
+                int srcxy = src[y][x];
+
+                if ( srcxy < T1 )
+                {
+                    res[y][x] = object_value;
+                    break;
+                }
+                else if ( srcxy > T2 )
+                {
+                    res[y][x] = background_value;
+                    break;
+                }
+                else
+                {
+                  res[y][x] = 128;
+                }
+*/
+            }
         }
-
-        int T1 = int( E - koeff * sigma  +0.5 );
-        int T2 = int( E + koeff * sigma  +0.5 );
-
-
-        int srcxy = src[y][x];
-
-        int lo = invert ? 255 : 0;
-        int hi = invert ? 0 : 255;
-
-        if ( srcxy < T1 )
-        {
-          res[y][x] = lo;
-          break;
-        }
-        else if ( srcxy > T2 )
-        {
-          res[y][x] = hi;
-          break;
-        }
-        else
-        {
-          res[y][x] = 128;
-        }
-      }
     }
 
-  avesigma /= avesigma_cnt;
-  printf( "avesigma = %f", avesigma );
-  
-  Mat dbin( src.rows, src.cols, CV_8U ); 
-  double thr1 = threshold(d, dbin, 0, 255, THRESH_OTSU);
-  printf("Thresh sigma %f", thr1 );
+    avesigma /= avesigma_cnt;
+//     printf( "avesigma = %f", avesigma );
 
-  for (int i=0; i< dbin.rows; i++)
-    for (int j=0; j< dbin.cols; j++)
-      dbin.at<uchar>(i,j) = 255 - dbin.at<uchar>(i,j);
-  imshow( "blocks", dbin );
+    Mat dbin( src.rows, src.cols, CV_8U ); 
+    double thr1 = threshold(d, dbin, 0, 255, THRESH_OTSU);
+//     printf("Thresh sigma %f", thr1 );
 
-  double koeff = 0.2;
+//    dbin = 255 - dbin;
+//     imshow( "blocks", dbin );
 
-  for (int y=0; y<src.rows; y++)
-    for (int x=0; x<src.cols; x++)
+    double koeff = 0.2;
+
+    for ( int y = 0; y < src.rows; ++y )
     {
-      int ee = e.at<uchar>(y, x);;
-      int dd = d.at<uchar>(y, x);;
-      if (dd < thr1)
-      {
-        res[y][x]=240;
-        continue;
-      }
+        for ( int x = 0; x < src.cols; ++x )
+        {
+            int ee = e.at<uchar>(y, x);
+            int dd = d.at<uchar>(y, x);
+            if ( dd < thr1 )
+            {
+                res[y][x] = background_value; // 200;
+                continue;
+            }
 
-
-      int srcxy = src[y][x];
-      int T1 = int( ee - koeff * dd  +0.5 );
-      int T2 = int( ee + koeff * dd  +0.5 );
-      res[y][x]=(srcxy > T1) ? 255 : 0;
-
+            int srcxy = src[y][x];
+            int T1 = int( ee - koeff * dd + 0.5 );
+            int T2 = int( ee + koeff * dd + 0.5 );
+//             T2 = std::max( T2, 64 );
+            res[y][x] = (srcxy > T2) ? object_value : background_value;
+        }
     }
 
-  return 0;
+    return 0;
 }
