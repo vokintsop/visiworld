@@ -26,15 +26,18 @@ GeoMapEditor::GeoMapEditor( const char* _root_folder ) /// = NULL )
 
 void GeoMapEditor::update_title()
 {
-  string text = format("Map [%d(%s)/%d] type=%s location=Nord:%f East:%f", 
-    cur_sheet+1, gm.sheets[cur_sheet].sheet_name.c_str(), gm.sheets.size(), 
-    objType().c_str(), // type
-    location.y, location.x // location
-    );
-    //format("Map: %s [#%d of %d, %d msec]; type=%s objects on frame=%d sensitivity=%f tracking=%s", 
-    //video_file_name.c_str(),
-    //iframe, frames, frame_time, objType().c_str(), numobj, frameProc.sensitivity, tracking_object? "ON" : "OFF" );
-  set_window_text( title.c_str(), text.c_str() );
+  if (gm.sheets.size() > 0 && cur_sheet>=0)
+  {
+    string text = format("Map [%d(%s)/%d] type=%s location=Nord:%f East:%f", 
+      cur_sheet+1, gm.sheets[cur_sheet].sheet_name.c_str(), gm.sheets.size(), 
+      objType().c_str(), // type
+      location.y, location.x // location
+      );
+      //format("Map: %s [#%d of %d, %d msec]; type=%s objects on frame=%d sensitivity=%f tracking=%s", 
+      //video_file_name.c_str(),
+      //iframe, frames, frame_time, objType().c_str(), numobj, frameProc.sensitivity, tracking_object? "ON" : "OFF" );
+    set_window_text( title.c_str(), text.c_str() );
+  }
 }
 
 

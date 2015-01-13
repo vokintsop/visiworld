@@ -6,8 +6,8 @@
 #include <cassert>
 #include <opencv2/imgproc/imgproc.hpp> 
 
-#include <prj.core/markup/kitti.h>
-#include <prj.core/ocvutils/precomp.h> 
+#include <markup/kitti.h>
+#include <ocvutils/precomp.h> 
 using namespace std;
 
 
@@ -209,7 +209,7 @@ bool NMEA::loadKitti( const std::string &filename )
   for (unsigned int i = 0; i < timestamps.size(); ++i)
   {
     string oxtfname = filename + format("/oxts/data/%010d.txt", i);
-    ifstream fin(oxtfname);
+    ifstream fin(oxtfname.c_str());
     if (!fin.good())
     {
       cout << "error reading oxt (gnss) record number " << i << endl;
