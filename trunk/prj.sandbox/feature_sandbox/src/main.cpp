@@ -6,6 +6,7 @@
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
+#include <map>
 
 #include "simpleframe.h"
 #include "monocor.h"

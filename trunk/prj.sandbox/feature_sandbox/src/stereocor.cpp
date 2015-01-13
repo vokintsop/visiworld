@@ -27,11 +27,11 @@ void StereoCorrespond(Ptr<FeatureDetector> featureDetector,
   int h = cvRound(lcap.get(CV_CAP_PROP_FRAME_HEIGHT));
   Mat lbgr;
   Mat rbgr;
-  Ptr<HCoords> hcoords = new HCoords(w,h);
+  Ptr<HCoords> hcoords(new HCoords(w,h));
   KeyPointDescriptorRuler ruler;
   double rootRadius = 5.0;
   double minRadius = 0.15;
-  Ptr<CNType> coverNet = new CNType(&ruler, rootRadius, minRadius);
+  Ptr<CNType> coverNet(new CNType(&ruler, rootRadius, minRadius));
   Ptr<SimpleFrame> lFrame = NULL, rFrame = NULL;
   vector<Ptr<SimpleFrame> > lastFrames;
   lastFrames.reserve(10);
