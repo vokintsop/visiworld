@@ -9,7 +9,7 @@ using namespace std;
 
 bool readTimeStamps(const string &fname, vector<double> &timestamps)
 {
-  ifstream fin(fname);
+  ifstream fin(fname.c_str());
   if (!fin.good())
     return __false(format("\nCan't open timestamp file %s\n", fname));
     
@@ -23,8 +23,9 @@ bool readTimeStamps(const string &fname, vector<double> &timestamps)
   }
   fin.close();
 
-  for (auto &p : timestamps_str)
+  for (int i = 0; i < timestamps_str.size(); ++i)
   {
+    string p = timestamps_str[i];
     tm time = {0};
     double secs = 0.0;
     if (sscanf_s(p.c_str(), "%d-%d-%d %d:%d:%lf", &time.tm_year, &time.tm_mon, &time.tm_mday,
