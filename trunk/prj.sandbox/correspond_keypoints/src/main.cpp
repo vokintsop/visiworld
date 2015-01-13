@@ -10,6 +10,7 @@
 #include "correspond.h"
 #include "pointmatch.h"
 #include <cover_net/cover_net.h>
+#include <map>
 
 
 
@@ -120,7 +121,7 @@ int main( int argc, char** argv )
     CorrespondStereo(&ruler, lFrame, rFrame, pm);
     pms.push_back(pm);
     //return 0;
-    c = cvWaitKey(1);
+    c = cv::waitKey(1);
     if (c == 27)
     {
       WritePointMatchStorage(fs, pms);
