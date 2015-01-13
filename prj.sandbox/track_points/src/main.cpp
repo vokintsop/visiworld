@@ -23,10 +23,10 @@ int main( int argc, char** argv )
 {
   /// Load source image and convert it to gray
   src = imread( "/testdata/visiroad_10.jpg", 1 );
-  cvtColor( src, src_gray, CV_BGR2GRAY );
+  cvtColor( src, src_gray, cv::COLOR_BGR2GRAY );
 
   /// Create a window and a trackbar
-  namedWindow( source_window, CV_WINDOW_AUTOSIZE );
+  namedWindow( source_window, cv::WINDOW_AUTOSIZE );
   createTrackbar( "Threshold: ", source_window, &thresh, max_thresh, cornerHarris_demo );
   imshow( source_window, src );
 
@@ -66,7 +66,7 @@ void cornerHarris_demo( int, void* )
           }
      }
   /// Showing the result
-  namedWindow( corners_window, CV_WINDOW_AUTOSIZE );
+  namedWindow( corners_window, cv::WINDOW_AUTOSIZE );
   imshow( corners_window, dst_norm_scaled );
 }
 
