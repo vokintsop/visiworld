@@ -17,7 +17,7 @@ using namespace std;
 
 using namespace cv;
 
-
+//надо здесь исправить video;
 int trackRectangle( cv::VideoCapture& video, cv::Rect& rect, int nframes, 
           std::vector< cv::Rect >& result ) 
 // начиная с текущей позиции в video тречим rect на nframes вперед или назад (отрицательное nframes)

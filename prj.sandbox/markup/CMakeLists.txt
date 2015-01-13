@@ -27,6 +27,9 @@ IF( MSVC )
     ${CMAKE_SOURCE_DIR}/prj.core/markup/markup_addobject.cpp
     ${CMAKE_SOURCE_DIR}/prj.core/markup/markup_mouse.cpp    
     
+    ${CMAKE_SOURCE_DIR}/prj.core/markup/kitti.h
+    ${CMAKE_SOURCE_DIR}/prj.core/markup/kitti.cpp
+    
     ${CMAKE_SOURCE_DIR}/prj.core/ocvutils/ocvgui.h
     ${CMAKE_SOURCE_DIR}/prj.core/ocvutils/ocvgui.cpp
     
@@ -44,6 +47,8 @@ IF( MSVC )
     src/track.cpp
     )
 
+  include_directories(/ ${CMAKE_SOURCE_DIR})
+    
   ADD_EXECUTABLE( markup  ${SOURCES} )
   TARGET_LINK_LIBRARIES( markup  ${OpenCV_LIBS}  )
 
