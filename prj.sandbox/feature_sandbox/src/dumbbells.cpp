@@ -156,11 +156,11 @@ void MonoCorrespondDumbbells(Ptr<FeatureDetector> featureDetector,
   int w = cvRound(cap.get(CV_CAP_PROP_FRAME_WIDTH));
   int h = cvRound(cap.get(CV_CAP_PROP_FRAME_HEIGHT));
   Mat bgr;
-  Ptr<HCoords> hcoords = new HCoords(w,h);
+  Ptr<HCoords> hcoords(new HCoords(w,h));
   KeyPointDescriptorRuler ruler;
   double rootRadius = 5.0;
   double minRadius = 0.15;
-  Ptr<CNType> coverNet = new CNType(&ruler, rootRadius, minRadius);
+  Ptr<CNType> coverNet(new CNType(&ruler, rootRadius, minRadius));
   Ptr<SimpleFrame> pivotFrame = NULL, curFrame = NULL;
   int coverNetFlush = 0;
   int iFrame = 29.0 * 13; //int iFrame = 0;
