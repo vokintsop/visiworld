@@ -45,7 +45,7 @@ bool Markup::setCurFrame(int newIFrame)
 
 bool Markup::readKitti(int pos)
 {
-  string imgfname = video_file_path + format("/image_00/data/%010d.png", pos);
+  string imgfname = video_file_path + format("/image_03/data/%010d.png", pos);
   frame_image = imread(imgfname);
   if (frame_image.empty())
     return __false(format("\nerror reading kitti frame: %s\n", imgfname));
@@ -77,7 +77,7 @@ bool Markup::loadVideo( string& _video_file_path, int& start_frame )
   else
   {
     vector<double> timestamps;
-    string timeStampFname = _video_file_path + "/image_00/timestamps.txt";
+    string timeStampFname = _video_file_path + "/image_03/timestamps.txt";
     if (!readTimeStamps(timeStampFname, timestamps))
       return __false(string("error reading kitti sequence ") + _video_file_path + "\n");
     frames = timestamps.size();
@@ -93,7 +93,8 @@ bool Markup::loadVideo( string& _video_file_path, int& start_frame )
     
     fps = 1 / mean;
 
-    Mat tmpimg = imread(_video_file_path + format("/image_00/data/%010d.png"));
+    int img_zero = 0;
+    Mat tmpimg = imread(_video_file_path + format("/image_03/data/%010d.png", img_zero));
     if (tmpimg.empty())
       return __false(format("\nError opening kitti sequence %s\n", _video_file_path));
     frame_width = tmpimg.cols;
