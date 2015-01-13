@@ -48,7 +48,7 @@ void CorrespondStereoWithCNet(
   PointMatches &pm, 
   Mat &todraw)
 {
-  Ptr<CNType> coverNet = new CNType(ruler, 3.0 * lFrame->sigmaDescr, 0.05 * lFrame->sigmaDescr);
+  Ptr<CNType> coverNet(new CNType(ruler, 3.0 * lFrame->sigmaDescr, 0.05 * lFrame->sigmaDescr));
   InitCoverNet(coverNet, lFrame);
 
   double dist = 1.025 * lFrame->sigmaDescr;
