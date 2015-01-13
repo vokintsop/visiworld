@@ -1,6 +1,7 @@
 #include "ocvutils/precomp.h"
 #include "streetglass/frameproc.h"
 #include "detect/detect_segment.h"
+#include "binarize/niblack.h"
 
 void resize4max( Mat1b& inp, Mat1b& out )
 {
@@ -168,7 +169,14 @@ bool FrameProc::compute_binmask( int scheme )
     Mat1b rb2 = r2 - b2;
     redmask = rg2 + rb2;
     //imshow("redmask_before_threshold", redmask);
-    double thresh = threshold( redmask, redmask, 64 * sensitivity, 255., THRESH_BINARY  /*| CV_THRESH_OTSU*/ );
+
+//     cv::imwrite( "redmask_input.jpg", redmask );
+    niblack( redmask, redmask, 5, 0.55, true );
+
+//     double thresh = threshold( redmask, redmask, 64 * sensitivity, 255., THRESH_BINARY /*| CV_THRESH_OTSU*/ );
+
+//     cv::imwrite( "redmask.jpg", redmask );
+
     //imshow("redmask_before_morf", redmask);
     //open_vertical( redmask, redmask, 1, 2 );
   }
