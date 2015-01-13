@@ -265,6 +265,8 @@ int main( int argc, char* argv[] )
   pMarkupEditor = new MarkupEditor(iskitti);
 
   int res = markup( data, start_frame );
+
+  //_getch();
   return res;
 }
 
