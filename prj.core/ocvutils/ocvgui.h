@@ -1,7 +1,7 @@
 #ifndef __OCVGUI_H
 #define __OCVGUI_H
 
-bool SetWindowText( const char* window_id, const char* window_text ); // устанавливает window_text в заголовок окна, зарегистрированного как window_id
+bool setWindowText( const char* window_id, const char* window_text ); // устанавливает window_text в заголовок окна, зарегистрированного как window_id
 int WaitKey( int delay ); // централизованный обработчик cv::waitKey(), копит клавиши в буфере, распределяет клавиши для обработки между окнами
 
 class OCVGuiWindow 
