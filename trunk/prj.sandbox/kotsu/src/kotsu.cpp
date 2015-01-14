@@ -275,7 +275,7 @@ void drawKOtsu( KOtsu& kotsu, int k, int thr )
   }
   out << endl;
   cout << endl;
-  thePalette = Palette(cuts_, kotsu.distr);
+  // thePalette = Palette(cuts_, kotsu.distr);
   char p1[100];
   sprintf(p1, output_hist.c_str(), k);
   imwrite(p1, view);
@@ -515,9 +515,23 @@ void test_bcv( const char* path, const char *txt_path )
 
 }
 
+void gradient(Mat1b &input, Mat1b &output)
+{
+  output = Mat1b(input.rows - 1, input.cols - 1);
+  for (int y = 0; y < output.rows; ++y)
+  {
+    for (int x = 0; x < output.cols; ++x)
+    {
+      output(y, x) = sqrt((double)((int)input(y + 1, x) - input(y, x)) * ((int)input(y + 1, x) - input(y, x)) + ((int)input(y, x + 1) - input(y, x)) * ((int)input(y, x + 1) - input(y, x)));
+    }
+  }
+  imshow("grad", output * 10);
+  cvWaitKey();
+}
 
 int main( int argc, char* argv[] )
 {
+
   string exe  = argv[0];
   string data = exe + "/../../../testdata/card01.png";
   string txt = exe + "/../../../testdata/input.txt";
@@ -548,7 +562,6 @@ int main( int argc, char* argv[] )
     if (27==waitKey(0))
       break;
   }
-
 
 	return 0;
 }
