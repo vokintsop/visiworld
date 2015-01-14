@@ -20,6 +20,10 @@ void image_proc (Mat &frame)
    Mat1b grayimg;
 	 cvtColor(frame, grayimg, CV_RGB2GRAY);
 	
+   Mat1b gr1;
+   resize(grayimg, gr1, Size(grayimg.cols / 3, grayimg.rows));
+   grayimg = gr1;
+
    Mat1b transform = grayimg - grayimg;
    for (int y = 0; y < grayimg.rows - 1; ++y)
    {
@@ -28,16 +32,21 @@ void image_proc (Mat &frame)
         transform(y, x) = abs(grayimg(y, x) - grayimg(y, x + 1));
      }
    }
-   //blur(transform, transform, Size(3, 3));
+   blur(transform, transform, Size(3, 3));
    imshow ("input", transform * 10);
    //cvWaitKey(0);
    Mat1i outputl, outputr;
-   fht_vertical(transform, outputl, outputr);
+   //fht_vertical(transform, outputl, outputr);
+   //test_Haugh(transform);
+   test_find_vertical_line(transform);
 }
 
-int main()
+int main(int argc, char * argv[])
 {
-  VideoCapture capture("C:/visiroad_3/testdata/left0029.avi");
+  if (argc < 2)
+    return -1;
+  VideoCapture capture(argv[1]);
+//  VideoCapture capture("C:/visiroad_3/testdata/left0029.avi");
   if(!capture.isOpened()){
       std::cout<<"cannot read video!\n";
       return -1;
