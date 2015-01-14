@@ -62,24 +62,32 @@ bool GeoMap::write()
 
 int GeoMap::find_best_sheet( Point2d en )
 {
-  double best_dd = 1.;
+  double best_dd = 40000000.; // 40 000 000 метров, будем улучшать
   int _best_sheet =-1;
   for (int i=0; i< int(sheets.size()); i++)
   {
     GeoSheet& sh = sheets[i];
-    Point xy = sh.en2xy( en );
     assert(sh.raster.cols>0);
     assert(sh.raster.rows>0);
+
+    Point xy = sh.en2xy( en );
     double dx = abs( double( sh.raster.cols/2 - xy.x ) / sh.raster.cols );
     double dy = abs( double( sh.raster.rows/2 - xy.y ) / sh.raster.rows );
-
-    if (dx > 0.5 || dy > 0.5)
+    if (dx > 0.5 || dy > 0.5) // точка за пределами листа карты
       continue;
-    
+#if 0 
+    // старый вариант подматывает карту, в которой точка ближе к центру битмапа __в пикселях__
     double dd = max( dx, dy );
+#else
+    // новый вариант подматывает карту, в которой точка ближе к центру битмапа __в метрах__
+    Point2d delta_meters = sh.sheet_center_mercator( en );
+    double dd = sqrt( delta_meters.ddot( delta_meters ) );
+#endif
+
     if (dd < best_dd)
     {
       best_dd = dd;
+      cout  << "Distance to map sheet center:" << best_dd << endl;
       _best_sheet = i;
     }
   }

@@ -117,7 +117,7 @@ int GeoMapEditor::processMouseEvent(int event, int x, int y, int flags)
   if (objtype == "AFO_Quad")
     max_poly_points=4;
 
-  cout << "GeoMap:objtype" << objtype << endl;
+  //cout << "GeoMap:objtype" << objtype << endl;
 
   switch (event)
   {

@@ -29,6 +29,23 @@ struct GeoSheet  // топографический лист карты
       );
   }
 
+  cv::Point2d sheet_center_mercator( cv::Point2d& en ) 
+    // расчитывает рассто€ние от en до центра листа карты в метрах по проекции меркатора
+  {
+    Point sheet_xy_lu( 0, 0 );
+    Point sheet_xy_rb( raster.cols-1, raster.rows-1 );
+    Point2d sheet_en_lu = xy2en( sheet_xy_lu );
+    Point2d sheet_en_rb = xy2en( sheet_xy_rb );
+    Point2d sheet_en_center = (sheet_en_lu + sheet_en_rb)*0.5;
+
+    const double radius = 6378137; // примерный радиус земли в метрах
+    double scale = cos( sheet_en_center.y * CV_PI / 180 );
+
+    double xx = scale * radius * CV_PI * (en.x - sheet_en_center.x) / 180;
+    double yy = scale * radius * log( tan( CV_PI * (en.y - sheet_en_center.y + 90. ) / 360 ) );
+    return Point2d( xx, yy );
+  }
+
   GeoSheet() {}
   GeoSheet( const char* sheet_file_name ) {  create( sheet_file_name ); }
   bool create(  const char* sheet_file_name );
