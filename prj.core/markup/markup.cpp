@@ -18,7 +18,7 @@ bool Markup::readFrame( int pos )
     if (!setCurFrame( pos ))
       return false;
   }
-  frame_time = 1000 * iframe  / fps; //int(video.get( CV_CAP_PROP_POS_MSEC  )); // время текущего кадра 
+  //frame_time = 1000 * iframe  / fps; //int(video.get( CV_CAP_PROP_POS_MSEC  )); // время текущего кадра 
   bool success = false;
   if (iskitti)
     success = readKitti(pos);  
@@ -29,6 +29,8 @@ bool Markup::readFrame( int pos )
     cout << "Can't read requested frame " << pos << endl;
     return false;
   }
+  iframe = pos;
+  frame_time = 1000 * iframe  / fps; //int(video.get( CV_CAP_PROP_POS_MSEC  )); // время текущего кадра 
   return true;
 }
 
