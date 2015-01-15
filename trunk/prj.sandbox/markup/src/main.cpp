@@ -68,7 +68,7 @@ bool setup( int argc, char* argv[], string& data, int& start_frame )
   {
     string exe  = argv[0];
     string argv1 = argv[1];
-    bool filepass_is_absolute = ( argv1.length() >=2 && (argv1[0] == '/' || argv1[2] == ':') ); // ванильно
+    bool filepass_is_absolute = ( argv1.length() >=2 && (argv1[0] == '/' || argv1[1] == ':') ); // ванильно
     if (filepass_is_absolute)
       data = argv[1];
     else
