@@ -234,6 +234,9 @@ inline bool compareByTime( const GNSSRecord& rec, const GNSSRecord& val )
 
 bool NMEA::getEastNord( double time, double& east, double& nord )
 {
+  if (records.size() <= 0)
+    return false;
+
   GNSSRecord rec(time);
   vector< GNSSRecord >::iterator low = std::lower_bound( records.begin(), records.end(), rec, compareByTime );
   if (low == records.end() && records.size() > 0)
