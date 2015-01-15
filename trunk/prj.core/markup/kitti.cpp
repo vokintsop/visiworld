@@ -11,7 +11,7 @@ bool readTimeStamps(const string &fname, vector<double> &timestamps)
 {
   ifstream fin(fname.c_str());
   if (!fin.good())
-    return __false(format("\nCan't open timestamp file %s\n", fname));
+    return __false(format("\nCan't open timestamp file %s\n", fname.c_str()));
     
   vector<string> timestamps_str;
   while (fin.good())
