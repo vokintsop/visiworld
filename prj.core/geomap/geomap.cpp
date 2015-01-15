@@ -87,7 +87,7 @@ int GeoMap::find_best_sheet( Point2d en )
     if (dd < best_dd)
     {
       best_dd = dd;
-      cout  << "Distance to map sheet center:" << best_dd << endl;
+      cout  << "Distance to map sheet " << i << " center:" << best_dd << endl;
       _best_sheet = i;
     }
   }
