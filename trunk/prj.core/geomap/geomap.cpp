@@ -41,7 +41,7 @@ bool GeoMap::read( const char * _root_folder )
   string filename = root_folder + "/geomap.yaml";
   cv::FileStorage fs( filename, cv::FileStorage::READ );
   if (!fs.isOpened())
-    return __false( format("Can't open storage '%s' to read", filename ) );
+    return __false( format("Can't open storage '%s' to read", filename.c_str() ) );
 
   if (!read(fs))
     return false;
@@ -53,7 +53,7 @@ bool GeoMap::write()
   string filename = root_folder + "/geomap.yaml";
   cv::FileStorage fs( filename, cv::FileStorage::WRITE );
   if (!fs.isOpened())
-    return __false( format("Can't open storage '%s' to write", filename ) );
+    return __false( format("Can't open storage '%s' to write", filename.c_str() ) );
 
   if (!write(fs))
     return false;
