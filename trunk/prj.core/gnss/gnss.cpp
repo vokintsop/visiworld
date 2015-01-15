@@ -217,6 +217,10 @@ bool NMEA::loadKitti( const std::string &filename )
     }
     double nord, east;
     fin >> nord >> east;
+
+    //double east_delta = 5.31 / 3600;
+    //east += east_delta;
+
     records.push_back(GNSSRecord(timestamps[i] - timestamps[0], nord, east));
   }
   return true;

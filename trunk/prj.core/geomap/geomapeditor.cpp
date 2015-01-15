@@ -52,8 +52,24 @@ void GeoMapEditor::draw()
 {
   if (cur_sheet >= 0 && cur_sheet < int(gm.sheets.size()) )
   {
-    Mat draw = gm.sheets[cur_sheet].raster.clone();
-    circle( draw, gm.sheets[cur_sheet].en2xy( location ), 5, Scalar( 0, 0, 255 ), 2 );
+    GeoSheet& sh =  gm.sheets[cur_sheet];
+    Mat draw = sh.raster.clone();
+    circle( draw, sh.en2xy( location ), 5, Scalar( 0, 0, 255 ), 2 );
+
+    string text;
+    circle( draw, sh.a.xy, 5, Scalar( 0, 255, 255 ), 2 );
+    text = "A"; //format( "N:%f.10 E:%f.10", sh.a.en.y, sh.a.en.x );
+    putText( draw, text, sh.a.xy + Point( 10, 10 ), CV_FONT_HERSHEY_COMPLEX_SMALL, 1.6, Scalar( 0, 255, 255 ), 2, 8 ); 
+
+    circle( draw, sh.b.xy, 5, Scalar( 0, 255, 255 ), 2 );
+    text = "B"; //format( "N:%f.10 E:%f.10", sh.b.en.y, sh.b.en.x );
+    putText( draw, text, sh.b.xy + Point( 10, 10 ), CV_FONT_HERSHEY_COMPLEX_SMALL, 1.6, Scalar( 0, 255, 255 ), 2, 8 ); 
+
+    //cout << setprecision(10);
+    //cout << sh.sheet_name << " a.nord:" << sh.a.en.y << " a.east:" << sh.a.en.x << " raster:" << sh.a.xy << endl; 
+    //cout << sh.sheet_name << " b.nord:" << sh.b.en.y << " b.east:" << sh.b.en.x << " raster:" << sh.b.xy << endl; 
+
+
     for (int i=0; i< int(gm.objects.size()); i++)
     {
       AGMObject* pagmo = gm.objects[i];
