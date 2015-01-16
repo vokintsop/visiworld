@@ -4,6 +4,8 @@
 #include <iostream>
 #include <iterator>
 
+#include <cstdio>
+
 using namespace std;
 
 
@@ -28,9 +30,15 @@ bool readTimeStamps(const string &fname, vector<double> &timestamps)
     string p = timestamps_str[i];
     tm time = {0};
     double secs = 0.0;
+#ifdef _MSC_VER
     if (sscanf_s(p.c_str(), "%d-%d-%d %d:%d:%lf", &time.tm_year, &time.tm_mon, &time.tm_mday,
       &time.tm_hour, &time.tm_min, &secs) == EOF)
       return __false(format("\nWrong forman of timpestamp file: %s", fname));
+#else // _MSC_VER
+    if (sscanf(p.c_str(), "%d-%d-%d %d:%d:%lf", &time.tm_year, &time.tm_mon, &time.tm_mday,
+      &time.tm_hour, &time.tm_min, &secs) == EOF)
+      return __false(std::string("\nWrong forman of timpestamp file: ") + fname);
+#endif // _MSC_VER
     double int_secs = 0.0, dec_secs = 0.0;
     dec_secs = modf(secs, &int_secs);
     time.tm_sec = int_secs;

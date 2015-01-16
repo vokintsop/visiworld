@@ -95,10 +95,12 @@ void CorrespondStereoWithMinimalDist(
   for (int i = 0; i < rFrame->kps.size(); ++i)
   {
     int jmin = 0;
-    double mindist = ruler->computeDistance(make_pair(lFrame, 0), make_pair(rFrame, i));
+    double mindist = ruler->computeDistance(make_pair(const_cast<SimpleFrame*>((SimpleFrame*)lFrame), 0),
+                                            make_pair(const_cast<SimpleFrame*>((SimpleFrame*)rFrame), i)); // FIXME: do something about it, this is ugly
     for (int j = 1; j < lFrame->kps.size(); ++j)
     {
-      double dist = ruler->computeDistance(make_pair(lFrame, j), make_pair(rFrame, i));
+      double dist = ruler->computeDistance(make_pair(const_cast<SimpleFrame*>((SimpleFrame*)lFrame), j),
+                                           make_pair(const_cast<SimpleFrame*>((SimpleFrame*)rFrame), i));
       if (dist < mindist)
       {
         mindist = dist;

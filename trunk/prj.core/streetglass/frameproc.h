@@ -25,17 +25,17 @@ public:
 #define FP_NONE 0
 #define FP_ALL 0xffff
 
-  bool FrameProc::process( cv::Mat& input_bgr720, 
+  bool process( cv::Mat& input_bgr720,
     //int scheme = FP_ALL ); // подготовка основных рабочих битмапов
     int scheme = FP_NONE ); // подготовка основных рабочих битмапов
-  bool FrameProc::draw( cv::Mat& display, const std::string& objType ); // визуализация
+  bool draw( cv::Mat& display, const std::string& objType ); // визуализация
 
   // вариант 1
-  bool FrameProc::compute_binmask( int scheme );
+  bool compute_binmask( int scheme );
   cv::Mat1b blumask; // бинаризованная картинка синих пятен (знак пешеходного перехода, например)
   cv::Mat1b gremask; // бинаризованная картинка зеленых пятен (зеленый светофор)
   cv::Mat1b redmask; // бинаризованная картинка красных огоньков
-  bool FrameProc::compute_cc();
+  bool compute_cc();
   CCMap blucc; // синие компоненты связности
   CCMap grecc; // зеленые компоненты связности
   CCMap redcc; // красные компоненты связности

@@ -124,12 +124,16 @@ bool FrameProc::draw( cv::Mat& display, const string& objType )// визуализация
 {
   static bool binmaskwindow = false;
   cv::Mat1b * pmask=NULL;
-  if      (objType.find( "AFO_Red" ) == 0)
-    redcc.draw( display, Scalar( 128, 128, 0 ), 2, 1 ), pmask = &redmask;
-  else if (objType.find( "AFO_Gre" ) == 0)
-    grecc.draw( display, Scalar( 128, 0, 128 ), 2, 1 ), pmask = &gremask;
-  else  if (objType.find( "AFO_Blu" ) == 0)
-    blucc.draw( display, Scalar( 0, 128, 128 ), 2, 1 ), pmask = &blumask;
+  if      (objType.find( "AFO_Red" ) == 0) {
+    Scalar red( 128, 128, 0 );
+    redcc.draw( display, red, 2, 1 ), pmask = &redmask;
+  } else if (objType.find( "AFO_Gre" ) == 0) {
+    Scalar green( 128, 0, 128 );
+    grecc.draw( display, green, 2, 1 ), pmask = &gremask;
+  } else  if (objType.find( "AFO_Blu" ) == 0) {
+    Scalar blue( 0, 128, 128 );
+    blucc.draw( display, blue, 2, 1 ), pmask = &blumask;
+  }
 
   if (detailed_visualization)
 

@@ -10,6 +10,13 @@
 #include <queue>
 #include <iomanip>
 
+#include <vector>
+#include <string>
+#include <iostream>
+#include <algorithm>
+#include <queue>
+#include <cstdio>
+
 #define COVER_NET_VERBOSE
 //#define COVER_NET_VERBOSE_DETAILED
 
@@ -61,7 +68,7 @@ struct CoverSphere
 
   void print(int level)
   {
-    string indent;
+    std::string indent;
     for (int i=0; i<level; i++)
       indent.push_back('\t');
 
@@ -487,18 +494,20 @@ int CoverNet<PointType, Metrics>::insert(
   CoverNet<PointType, Metrics>::findNearestPoint( // ближайший к указанной точке центр сферы из дерева
     const PointType& pt, // точка для которой ищем сферу с ближайшим центром
     double &best_distance,// [in/out] рекорд расстояния -- оно же и отсечение (не искать дальше чем указано)
-    int iStartSphere = 0// с какой сферы начинать поиск, 0 - корень дерева 
+    int iStartSphere/* = 0 */ // с какой сферы начинать поиск, 0 - корень дерева  // redeclaration, no default params!
   )
   {
+    using namespace std;
     int iNearestSphere = findNearestSphere(pt, best_distance, -1, iStartSphere);
 	  if (iNearestSphere == -1)
-		  cerr << "error: distance to root is more then maximal radius" << endl;
+      cerr << "error: distance to root is more then maximal radius" << endl;
 	  return spheres[iNearestSphere].center;
   }
   
   template < class PointType, class Metrics> 
   bool CoverNet<PointType, Metrics>::checkCoverNetSphere(int iSphere, int iKidSphere) // функция, проверяющая корректность построения дерева -- на данный момент тот факт, что все потомки внутри данной сферы
   { 
+      using namespace std;
       int isp=iSphere; // текущая сфера
 	    int lev = spheres[isp].level; // текущий уровень
       double  rad = getRadius(lev);
@@ -537,11 +546,12 @@ int CoverNet<PointType, Metrics>::insert(
     const PointType& pt, // точка для которой ищем сферы с ближайшими центрами
     int k,// количество сфер, которые мы хотим найти
     std::priority_queue<std::pair<double, int> > &best_spheres,// куча лучштх сфер (пара - расстояние, радиус), начиная с максимально удаленной
-	  double distanceToPt = -1, // расстояние до точки, -1 -- если не посчитано
-    int iStartSphere = 0,// с какой сферы начинать поиск, 0 - корень дерева
-    bool is_copy = false //а не является ли эта сфера копией какой-то
+    double distanceToPt/* = -1*/, // расстояние до точки, -1 -- если не посчитано // redeclaration, no default params!
+    int iStartSphere/* = 0*/,// с какой сферы начинать поиск, 0 - корень дерева   // redeclaration, no default params!
+    bool is_copy/* = false*/ //а не является ли эта сфера копией какой-то         // redeclaration, no default params!
   )
   {
+    using namespace std;
     int isp=iStartSphere; // текущая сфера
 	  int lev = spheres[isp].level; // текущий уровень
     double  rad = getRadius(lev);// радиус текущей сферы (на данном уровне)
@@ -554,7 +564,7 @@ int CoverNet<PointType, Metrics>::insert(
 	  if (isp == 0 && dist >= rad)// если за пределами стартовой
 		  return INF;
 
-	  double min_dist = max(0.0, dist - rad);// расстояние от pt до сферы
+    double min_dist = std::max(0.0, dist - rad);// расстояние от pt до сферы
     
    
     double best_kth_distance = INF;
@@ -617,10 +627,11 @@ int CoverNet<PointType, Metrics>::insert(
   CoverNet<PointType, Metrics>::findKNearestPoints( // ближайшие к указанной точке центры сфер из дерева
     const PointType& pt,// точка для которой ищем сферу с ближайшим центром
     int k, // количество вершин
-    double best_distance = 1e100// [in/out] рекорд расстояния -- оно же и отсечение (не искать дальше чем указано)
-  , int iStartSphere = 0// с какой сферы начинать поиск, 0 - корень дерева 
+    double best_distance/* = 1e100*/ // [in/out] рекорд расстояния -- оно же и отсечение (не искать дальше чем указано) //redeclaration, no default params!
+  , int iStartSphere/* = 0*/// с какой сферы начинать поиск, 0 - корень дерева                                          //redeclaration, no default params!
   )
   {
+    using namespace std;
     priority_queue<pair<double, int> > best_dist;
     for (int i = 0; i < k; ++i)
       best_dist.push(make_pair(best_distance, -1)); // добавляем фиктивные вершины с расстоянием best_distance
@@ -647,10 +658,11 @@ int CoverNet<PointType, Metrics>::insert(
    CoverNet<PointType, Metrics>::findNearestSphere(
     const PointType& pt, // точка для которой ищем сферу с ближайшим центром
     double& best_distance,// [in/out] рекорд расстояния -- оно же и отсечение (не искать дальше чем указано)
-	double distanceToPt = -1, // расстояние до точки, -1 -- если не посчитано
-    int iStartSphere = 0// с какой сферы начинать поиск, 0 - корень дерева 
+  double distanceToPt/* = -1*/, // расстояние до точки, -1 -- если не посчитано // redeclaration, no default params!
+    int iStartSphere/* = 0*/ // с какой сферы начинать поиск, 0 - корень дерева // redeclaration, no default params!
   )
   {
+    using namespace std;
     if (spheres.empty())
       return -1;
     int isp=iStartSphere; // текущая сфера
@@ -665,7 +677,7 @@ int CoverNet<PointType, Metrics>::insert(
 		return -1;
 
 	  int ans = -1;
-	  double min_dist = max(0.0, dist - rad);// расстояние от pt до сферы  
+    double min_dist = std::max(0.0, dist - rad);// расстояние от pt до сферы
 	  if (min_dist > best_distance)// если минимальное расстояние больше оптимального
 		  return -1;
 	  if (dist < best_distance)// если можно улучшить ответ
@@ -713,7 +725,7 @@ int CoverNet<PointType, Metrics>::insert(
     std::vector< std::pair< int , int > >& proper_spheres, std::vector<int> &trueWeight ///<.points, index>
     )
   {
-    
+    using namespace std;
 
     for (int i=0; i < getSpheresCount(); i++)
     {
@@ -732,10 +744,11 @@ int CoverNet<PointType, Metrics>::insert(
     //???? int sigma, // будем считать что разброс изестен, кластеры круглые
     int   i_level, // использовать сферы указанного уровня
     std::vector< PointsCluster< PointType> >& res_clusters, // надо построить кластеры { center, points } // { center, sigma }
-    int   minPoints = 3,  // кластер должен содержать не меньше указанного кол-ва точек
-    int   maxClusters = 100 // but not more than maxClustersCount
+    int   minPoints/* = 3*/,  // кластер должен содержать не меньше указанного кол-ва точек   // redeclaration, no default params!
+    int   maxClusters/* = 100*/ // but not more than maxClustersCount                         // redeclaration, no default params!
                      )
   {
+    using namespace std;
     vector< pair< int , int > > proper_spheres; ///<points, index>
     vector<int> W;
     countTrueWeight(W);
@@ -773,7 +786,7 @@ int CoverNet<PointType, Metrics>::insert(
   }
   
    template < class PointType, class Metrics> 
-  void CoverNet<PointType, Metrics>::reportStatistics( int node =0,  int detailsLevel=3 ) 
+  void CoverNet<PointType, Metrics>::reportStatistics( int node/* =0*/,  int detailsLevel/*=3*/ ) // redeclaration, no default params!
     // 0-none, 1-overall statistics, 2-by levels, 3-print tree hierarchy, 4-print tree array with links
   {
     if (detailsLevel < 1)
@@ -868,6 +881,7 @@ int CoverNet<PointType, Metrics>::insert(
   template < class PointType, class Metrics>
   void CoverNet<PointType, Metrics>::countAncles_(int fromNum, int num) // fromNum - номер поддерева. num - номер сферы для которой считается ответ
   {
+    using namespace std;
     int level = spheres[fromNum].level;
     double radius = getRadius(level);
     double dist = computeDistance(fromNum, spheres[num].center);
@@ -907,6 +921,7 @@ int CoverNet<PointType, Metrics>::insert(
   template < class PointType, class Metrics>
   void CoverNet<PointType, Metrics>::printKids(int num)
   {
+    using namespace std;
     cout << "kids of vertex num " << num << ":  ";
     int kid = spheres[num].last_kid;// последний ребенок
     while (kid > 0)// идем по всем детям
@@ -920,6 +935,7 @@ int CoverNet<PointType, Metrics>::insert(
   template < class PointType, class Metrics>
   void CoverNet<PointType, Metrics>::testAncles() // тестирует дядьев
   {
+    using namespace std;
     std::cerr << "----------------------------" << std::endl;
     std::cerr << "Begin testing ancles" << std::endl;
     countAncles();
@@ -1006,6 +1022,7 @@ int CoverNet<PointType, Metrics>::insert(
   template < class PointType, class Metrics>
   void CoverNet<PointType, Metrics>::testKNearestPoints(PointType p, int k) // тестирует k ближайших
   {
+    using namespace std;
     std::cerr << "----------------------------" << std::endl;
     std::cerr << "Begin testing k nearest points" << std::endl;
 

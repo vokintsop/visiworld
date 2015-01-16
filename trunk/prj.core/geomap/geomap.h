@@ -50,7 +50,7 @@ struct GeoSheet  // топографический лист карты
   GeoSheet( const char* sheet_file_name ) {  create( sheet_file_name ); }
   bool create(  const char* sheet_file_name );
 
-  inline bool read( cv::FileNode &node );
+  inline bool read( const cv::FileNode &node );
   inline bool write( cv::FileStorage& fs );
 
 };
@@ -111,7 +111,7 @@ public:
     GMObject( pt1, pt2, _type, flags ) {}
   virtual ~AGMObject(){};
 
-  virtual bool readSelf(cv::FileNode &node) { return true; } // наследники могут дописать
+  virtual bool readSelf(const cv::FileNode &node) { return true; } // наследники могут дописать
   virtual bool writeSelf(cv::FileStorage& fs) { return true; } // наследники могут дочитать
   virtual cv::Scalar getDrawColor() { return cv::Scalar(255,255,0); } // иногда проще только цвет переопределить
   virtual int getDrawThickness() { return 2; } // иногда проще только толщину линий переопределить
@@ -136,7 +136,7 @@ public:
 };
 
 AGMObject* CreateAGMObject( GMObject& gmo ); //фабрика
-AGMObject* ReadAGMObject(cv::FileNode &node); // фабрика-читальня c использованием виртуального readSelf()
+AGMObject* ReadAGMObject(const cv::FileNode &node); // фабрика-читальня c использованием виртуального readSelf()
 bool WriteAGMObject(cv::FileStorage& fs, AGMObject* agmo ); // запись, инициирует виртуальный writeSelf()
 
 

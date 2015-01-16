@@ -107,7 +107,7 @@ public:
   bool saveMarkupData(); // F2
   bool saveFrameImage();// F3
 
-  bool MarkupEditor::readSessionData( 
+  bool readSessionData(
     cv::FileStorage& fs, 
     vector< FrameData >& frames,
     int& start_frame
@@ -226,12 +226,12 @@ public:
   //  bool rubber_by_left_button);
 
 
-  bool MarkupEditor::addObject( // финал добавления объекта: кликнули или мышкой обвели или тречим старый объект...
+  bool addObject( // финал добавления объекта: кликнули или мышкой обвели или тречим старый объект...
   const std::vector< cv::Point >& pts 
   , int flags
   );
 
-  bool MarkupEditor::addObject( // финал добавления объекта: кликнули или мышкой обвели или тречим старый объект...
+  bool addObject( // финал добавления объекта: кликнули или мышкой обвели или тречим старый объект...
     const cv::Rect& rect // note: __in__ : на выходе ректангл объекта не меняется
     , int flags
   )

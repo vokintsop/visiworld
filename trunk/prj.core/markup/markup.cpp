@@ -4,6 +4,10 @@
 #include "streetglass/frameproc.h" // обработка кадра
 #include "kitti.h"
 
+#ifdef __unix__
+#include <unistd.h>
+#endif // __unix__
+
 using namespace cv;
 
 Markup::Markup(bool iskitti_):
@@ -50,7 +54,7 @@ bool Markup::readKitti(int pos)
   string imgfname = video_file_path + format("/image_03/data/%010d.png", pos);
   frame_image = imread(imgfname);
   if (frame_image.empty())
-    return __false(format("\nerror reading kitti frame: %s\n", imgfname));
+    return __false(format("\nerror reading kitti frame: %s\n", imgfname.c_str()));
   if (iframe < frames - 1)
     ++iframe;
   return true;
@@ -91,14 +95,14 @@ bool Markup::loadVideo( string& _video_file_path, int& start_frame )
     mean /= (timestamps.size() - 1);
     
     if (mean == 0)
-      return __false(format("\nError wrong timestamp file: %s\n", _video_file_path));
+      return __false(format("\nError wrong timestamp file: %s\n", _video_file_path.c_str()));
     
     fps = 1 / mean;
 
     int img_zero = 0;
     Mat tmpimg = imread(_video_file_path + format("/image_03/data/%010d.png", img_zero));
     if (tmpimg.empty())
-      return __false(format("\nError opening kitti sequence %s\n", _video_file_path));
+      return __false(format("\nError opening kitti sequence %s\n", _video_file_path.c_str()));
     frame_width = tmpimg.cols;
     frame_height = tmpimg.rows;
     cout << "Loaded kitti sequence: " << video_file_path << endl;
@@ -165,7 +169,15 @@ bool Markup::deleteFrameObjectImage( int iobj )
     //video_file_path.c_str(), iframe, rc.x, rc.y, rc.width, rc.height, iobj, 
     //fd.objects[iobj]->type.c_str() 
     //);
+#ifdef _MSC_VER
   _unlink( frame_obj_name.c_str() );
+#else // _MSC_VER
+#ifdef __unix__
+  unlink(frame_obj_name.c_str());
+#else // __unix__
+  #error "FILE REMOVAL NOT IMPLEMENTED"
+#endif // __unix__
+#endif // _MSC_VER
   cout << "Frame object " << iobj << " file " << frame_obj_name << " is deleted" << endl;
 
   return true;
