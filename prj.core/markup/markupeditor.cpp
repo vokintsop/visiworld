@@ -226,6 +226,7 @@ int MarkupEditor::process( string& _video_file_path, int start_frame )
 
   while(1) // main loop
   {
+
     if (next_frame != iframe || frame_image.empty())
     {
       if (!readFrame(next_frame))
@@ -304,12 +305,16 @@ int MarkupEditor::process( string& _video_file_path, int start_frame )
     if (key == kPageDown)
     {
       non_stop_mode = false;
+      if (frames-1 < iframe + 30)
+        SoundUI( SUI_Bump );
       next_frame = min(frames-1, iframe + 30);
       continue;
     }
     if (key == kPageUp)
     {
       non_stop_mode = false;
+      if (0 > iframe - 30)
+        SoundUI( SUI_Bump );
       next_frame = max(0, iframe - 30);
       continue;
     }
@@ -329,12 +334,16 @@ int MarkupEditor::process( string& _video_file_path, int start_frame )
     if (key == kLeftArrow) // one frame back, paused
     {
       non_stop_mode = false;
-      next_frame = max(0, iframe -1);;
+      if (0 > iframe - 1)
+        SoundUI( SUI_Bump );
+      next_frame = max(0, iframe -1);
       continue;
     }
     if (key == kRightArrow) // one frame forward, paused
     {
       non_stop_mode = false;
+      if (frames-1 < iframe + 1)
+        SoundUI( SUI_Bump );
       next_frame = min(frames-1, iframe +1 );
       continue;
     }
@@ -350,8 +359,9 @@ int MarkupEditor::process( string& _video_file_path, int start_frame )
         next_frame = iframe+1; // direction??
       else
       {
+        SoundUI( SUI_Bump );
         if (tracking_object)
-          cout << "Last fame, so tracking stopped" << endl;
+          cout << "Last frame, so tracking stopped" << endl;
         tracking_object = false;
         non_stop_mode = false;
       }
