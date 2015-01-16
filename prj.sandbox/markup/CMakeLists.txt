@@ -37,6 +37,10 @@ IF( MSVC )
     ${CMAKE_SOURCE_DIR}/prj.core/ocvutils/ocvutils.h
     ${CMAKE_SOURCE_DIR}/prj.core/ocvutils/precomp.h
     ${CMAKE_SOURCE_DIR}/prj.core/ocvutils/ticker.h
+    
+    ${CMAKE_SOURCE_DIR}/prj.core/soundui/soundui.h
+    ${CMAKE_SOURCE_DIR}/prj.core/soundui/soundui.cpp
+    
     ${CMAKE_SOURCE_DIR}/prj.core/streetglass/framedata.h 
     ${CMAKE_SOURCE_DIR}/prj.core/streetglass/frameproc.h
     ${CMAKE_SOURCE_DIR}/prj.core/streetglass/frameproc.cpp

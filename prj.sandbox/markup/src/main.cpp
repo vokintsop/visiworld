@@ -2,6 +2,7 @@
 
 #include "geomap/geomapeditor.h"
 #include "markup/markupeditor.h"
+#include "soundui/soundui.h"
 using namespace std;
 
 // the single app
@@ -61,10 +62,12 @@ static Point2d en_prev(0,0);
 
 }
 
+#define IGNORE_COMMAD_LINE true
+//#define IGNORE_COMMAD_LINE false   //// нормальное состояние -- смело исправляйте на него при надобности ///
 
 bool setup( int argc, char* argv[], string& data, int& start_frame )
 {
-  if (argc > 1) // указаны явные параметры
+  if (argc > 1 && ! IGNORE_COMMAD_LINE ) // указаны явные параметры
   {
     string exe  = argv[0];
     string argv1 = argv[1];
@@ -138,8 +141,8 @@ bool setup( int argc, char* argv[], string& data, int& start_frame )
 #endif
 
 #if 1
-  data = "/testdata/kitti/2011_09_26/2011_09_26_drive_0001";
-  //data = "/testdata/kitti/2011_09_26/2011_09_26_drive_0002";
+  //data = "/testdata/kitti/2011_09_26/2011_09_26_drive_0001";
+  data = "/testdata/kitti/2011_09_26/2011_09_26_drive_0002";
   //data = "/testdata/kitti/2011_09_26/2011_09_26_drive_0005";
   //data = "/testdata/kitti/2011_09_26/2011_09_26_drive_0048";
   iskitti = true;
