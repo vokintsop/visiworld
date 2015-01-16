@@ -1,7 +1,7 @@
 // precomp.h -- project default context -- starter for .cpp files
 
 
-#include <conio.h>
+//#include <conio.h>   // NO SUCH FILE!
 #include <cassert>
 #include <climits>
 

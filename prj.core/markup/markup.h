@@ -10,7 +10,7 @@
 class Markup
 {
 protected:
-  Markup::Markup(bool iskitti_ = false);
+  Markup(bool iskitti_ = false);
   std::vector< FrameData > marked_frames; /// синхронизирован с video <===> [iframe]
 
 ///////////////////////////////////// video -- объект разметки

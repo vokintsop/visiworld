@@ -13,7 +13,7 @@ class GeoMapEditor
   Point2d location;
   int iObjType; // индекс активного типа объекта 
 public:
-  void GeoMapEditor::update_title();
+  void update_title();
   void update_location( cv::Point2d en );
   void draw();
 public:

@@ -106,7 +106,7 @@ bool GeoSheet::write( cv::FileStorage& fs )
   return true; // todo __try
 }
 
-bool GeoSheet::read( cv::FileNode& fn )
+bool GeoSheet::read( const cv::FileNode& fn )
 {
   if (fn.empty())
     return false;
@@ -122,7 +122,7 @@ bool GeoSheet::read( cv::FileNode& fn )
 
 bool GeoMap::read( cv::FileStorage& fs )
 { 
-  cv::FileNode& node = fs.root(); 
+  const cv::FileNode& node = fs.root();
   if (node.empty())
     return __false();
 
@@ -192,7 +192,7 @@ AGMObject* CreateAGMObject( GMObject& gmo ) //фабрика
   return NULL;
 }
 
-AGMObject* ReadAGMObject(cv::FileNode &node) // фабрика-читальня c использованием виртуального readSelf()
+AGMObject* ReadAGMObject(const cv::FileNode &node) // фабрика-читальня c использованием виртуального readSelf()
 { 
   GMObject gmo;
   cv::Rect rect;

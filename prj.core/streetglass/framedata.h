@@ -37,7 +37,7 @@ public:
       FrameObject( type, rect, flags, value ) {}
 
   virtual ~AFrameObject(){}
-  virtual bool readSelf(cv::FileNode &node) { return true; }
+  virtual bool readSelf(const cv::FileNode &node) { return true; }
   virtual bool writeSelf(cv::FileStorage& fs) { return true; };
   virtual cv::Scalar getDrawColor() { return cv::Scalar(255,255,0); } // иногда проще только цвет переопределить
   virtual int getDrawThickness() { return 2; } // иногда проще только толщину линий переопределить
@@ -508,7 +508,7 @@ inline AFrameObject* CreateAFrameObject( std::string type, cv::Rect rect=cv::Rec
   return new AFO_Unknown( type, rect, flags );  // объект неопознанного типа
 }
 
-inline AFrameObject* readFrameObject(cv::FileNode &node)
+inline AFrameObject* readFrameObject(const cv::FileNode &node)
 {
   std::string type("None");
   cv::Rect rect;
@@ -547,7 +547,7 @@ inline void writeFrameObject( cv::FileStorage& fs, AFrameObject* afo )
   fs << "}";
 }
 
-inline FrameData readFrameData(cv::FileNode &node)
+inline FrameData readFrameData(const cv::FileNode &node)
 {
   FrameData fd;
   if (!node.empty())
