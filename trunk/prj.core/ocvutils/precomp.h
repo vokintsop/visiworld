@@ -1,7 +1,5 @@
 // precomp.h -- project default context -- starter for .cpp files
 
-
-//#include <conio.h>   // NO SUCH FILE!
 #include <cassert>
 #include <climits>
 
@@ -23,6 +21,13 @@ using namespace cv;
 
 #include "ocvutils/ocvutils.h"
 #include "soundui/soundui.h"
+
+
+#ifdef _WINDOWS
+#include <conio.h>   
+#else
+int _getch(void) { return 0; } // TODO: Linux
+#endif
 
 inline void dbgPressAnyKey( int sound_ui_mood = 0 )
 {
