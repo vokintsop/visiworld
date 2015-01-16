@@ -34,7 +34,7 @@ bool Markup::readFrame( int pos )
     return false;
   }
   iframe = pos;
-  frame_time = 1000 * iframe  / fps; //int(video.get( CV_CAP_PROP_POS_MSEC  )); // время текущего кадра 
+  frame_time = cvRound(1000 * iframe  / fps); //int(video.get( CV_CAP_PROP_POS_MSEC  )); // время текущего кадра 
   return true;
 }
 
@@ -90,7 +90,7 @@ bool Markup::loadVideo( string& _video_file_path, int& start_frame )
 
     //now calculate average fps:
     double mean = 0;
-    for (int i = 0; i < timestamps.size() - 1; ++i)
+    for (unsigned int i = 0; i < timestamps.size() - 1; ++i)
       mean += timestamps[i + 1] - timestamps[i];
     mean /= (timestamps.size() - 1);
     

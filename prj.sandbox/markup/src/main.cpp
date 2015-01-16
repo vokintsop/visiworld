@@ -2,12 +2,14 @@
 
 #include "geomap/geomapeditor.h"
 #include "markup/markupeditor.h"
+#include "maptorealworld.h"
 #include "soundui/soundui.h"
 using namespace std;
 
 // the single app
 Ptr< GeoMapEditor >  pGeoMapEditor; // singleton
 Ptr< MarkupEditor >  pMarkupEditor;
+Ptr< Camera2DPoseEstimator> pCamPoseEst;
 
 bool iskitti = false;  // устанавливается в true если работаем со структурой датасета kitti
 
@@ -55,11 +57,21 @@ static Point2d en_prev(0,0);
   {
     cout << en << endl;
   }
+  CameraOnMap cam = pCamPoseEst->GetPoseAtTime(time);
   if (en != en_prev)
   {
-    pGeoMapEditor->update_location(en);
+    pGeoMapEditor->update_location(en, cam.direction);
   }
+  
+  Mat img = pMarkupEditor->GetBaseImageCopy();
+  if (img.empty())
+    return;
+  vector<Point2d> enPoints;
+  pGeoMapEditor->exportObjPoints(enPoints);
 
+  //CameraOnMap cam = pCamPoseEst->GetPoseAtTime(time);
+  drawMapPointsOnImage(enPoints, cam, img);
+  imshow("sticks_demonstration", img);
 }
 
 #define IGNORE_COMMAD_LINE true
@@ -232,7 +244,6 @@ bool setup( int argc, char* argv[], string& data, int& start_frame )
   data = "/testdata/glass/pedsign001.mp4"; 
   start_frame=1001;
 #endif
-
   return true;
 }
 
@@ -245,17 +256,25 @@ int main( int argc, char* argv[] )
 
   if (!setup( argc, argv, data, start_frame ))
     return -1;
-
+  
+  Mat intrinsics;
   if (iskitti)
   {
     pGeoMapEditor = new GeoMapEditor("/testdata/kitti/map"); 
+    intrinsics = (Mat_<double>(3, 3) << 984.2439, 0.000000, 690.0000,
+                                    0.000000, 980.8141, 233.1966,
+                                    0.000000, 0.000000, 1.000000);
   }
   else
   {
     pGeoMapEditor = new GeoMapEditor("/testdata/poligon/map"); 
+    intrinsics = (Mat_<double>(3, 3) << 997.89280, 0.00000, 1013.89921,
+	                                  0.00000, 918.43316, 594.69025,
+		                                0.00000, 0.00000, 1.00000 );
   }
   
   pMarkupEditor = new MarkupEditor(iskitti);
+  pCamPoseEst = new Camera2DPoseEstimator(theNmeaFile, intrinsics);
 
   int res = markup( data, start_frame );
 

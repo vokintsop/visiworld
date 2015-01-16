@@ -25,7 +25,7 @@ bool readTimeStamps(const string &fname, vector<double> &timestamps)
   }
   fin.close();
 
-  for (int i = 0; i < timestamps_str.size(); ++i)
+  for (unsigned int i = 0; i < timestamps_str.size(); ++i)
   {
     string p = timestamps_str[i];
     tm time = {0};
@@ -33,15 +33,15 @@ bool readTimeStamps(const string &fname, vector<double> &timestamps)
 #ifdef _MSC_VER
     if (sscanf_s(p.c_str(), "%d-%d-%d %d:%d:%lf", &time.tm_year, &time.tm_mon, &time.tm_mday,
       &time.tm_hour, &time.tm_min, &secs) == EOF)
-      return __false(format("\nWrong forman of timpestamp file: %s", fname));
+      return __false(format("\nWrong format of timpestamp file: %s", fname));
 #else // _MSC_VER
     if (sscanf(p.c_str(), "%d-%d-%d %d:%d:%lf", &time.tm_year, &time.tm_mon, &time.tm_mday,
       &time.tm_hour, &time.tm_min, &secs) == EOF)
-      return __false(std::string("\nWrong forman of timpestamp file: ") + fname);
+      return __false(std::string("\nWrong format of timpestamp file: ") + fname);
 #endif // _MSC_VER
     double int_secs = 0.0, dec_secs = 0.0;
     dec_secs = modf(secs, &int_secs);
-    time.tm_sec = int_secs;
+    time.tm_sec = static_cast<int> (int_secs);
     time.tm_year -= 1900; //так работает функция
     time_t dtime = mktime(&time);
     if (dtime == -1)
@@ -49,4 +49,119 @@ bool readTimeStamps(const string &fname, vector<double> &timestamps)
     timestamps.push_back(double(mktime(&time)) + dec_secs);
   }
   return true;
+}
+
+
+KittiCapture::KittiCapture(const string &sequence_path)
+  : seq_path(sequence_path)
+  , curframe(0)
+  , fps(.0)
+  , imgSize()
+{
+  open(seq_path);
+}
+
+bool KittiCapture::open(const string &sequence_path)
+{
+  seq_path = sequence_path;
+  if (!readTimeStamps(seq_path + "/timestamps.txt", timestamps))
+  {
+    seq_path = "";
+    return false;
+  }
+
+  if (timestamps.empty())
+    return __false(format("\nError opening kitti sequence %s", seq_path.c_str()));
+
+  for (unsigned int i = 0; i < timestamps.size(); ++i)
+  {
+    timestamps[i] -= timestamps[0];
+  }
+  
+  //now calculate average fps:
+  double mean = 0;
+  for (unsigned int i = 0; i < timestamps.size() - 1; ++i)
+    mean += timestamps[i + 1] - timestamps[i];
+  mean /= (timestamps.size() - 1);
+    
+  if (mean == 0)
+    return __false("\nError wrong timestamp file\n");
+    
+  fps = 1 / mean;
+
+  //нужна ли проверка наличия всех кадров?
+  Mat img;
+  if (!getFrame(0, img))
+    return false;  
+  imgSize = img.size();
+  return true;
+}
+
+bool KittiCapture::read(Mat &img)
+{
+  if (!getFrame(curframe, img))
+    return false;
+  ++curframe;
+  return true;
+}
+
+bool KittiCapture::getFrame(int frameid, Mat &img) const
+{
+  if (frameid < 0 || frameid >= getFramesNum())
+    return false;
+
+  string imgfname = seq_path + format("/data/%010d.png", frameid);
+  img = imread(imgfname);
+  return !img.empty();
+}
+
+bool KittiCapture::is_opened() const
+{
+  return imgSize.area() != 0;
+}
+
+void KittiCapture::release()
+{
+  seq_path = "";
+  timestamps.clear();
+  curframe = 0;
+  fps = 0;
+  imgSize = Size();
+}
+
+cv::Size KittiCapture::getImgSize() const
+{
+  return imgSize;
+}
+
+int KittiCapture::getFramesNum() const
+{
+  return timestamps.size();
+}
+
+double KittiCapture::getFrameMsec(int frameid) const
+{
+  return timestamps[frameid];
+}
+
+double KittiCapture::getCurMsec() const
+{
+  return getFrameMsec(curframe);
+}
+
+int KittiCapture::getCurFrameNum() const
+{
+  return curframe;
+}
+
+bool KittiCapture::setCurFrame(int frameid)
+{
+  if (frameid < 0 || frameid >= getFramesNum())
+    return false;
+  curframe = frameid;
+  return true;
+}
+double KittiCapture::getFps() const
+{
+  return fps;
 }

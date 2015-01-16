@@ -41,9 +41,10 @@ void GeoMapEditor::update_title()
 }
 
 
-void GeoMapEditor::update_location( Point2d en )
+void GeoMapEditor::update_location( Point2d en , Vec2d dir )
 {
   location = en;
+  direction = dir;
   cur_sheet = gm.find_best_sheet(en);
   draw();
 }
@@ -54,7 +55,10 @@ void GeoMapEditor::draw()
   {
     GeoSheet& sh =  gm.sheets[cur_sheet];
     Mat draw = sh.raster.clone();
-    circle( draw, sh.en2xy( location ), 5, Scalar( 0, 0, 255 ), 2 );
+    Point p1 = sh.en2xy( location );
+    Point p2 = Point(p1.x + direction[0] * 30, p1.y - direction[1] * 30);
+    circle( draw, p1, 5, Scalar( 0, 0, 255 ), 2 );
+    line( draw, p1, p2, Scalar(0, 0, 255), 2 );
 
     string text;
     circle( draw, sh.a.xy, 5, Scalar( 0, 255, 255 ), 2 );

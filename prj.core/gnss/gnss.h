@@ -14,6 +14,8 @@ struct GNSSRecord
   GNSSRecord( double time, double nord=0, double east=0 ):time(time),nord(nord),east(east){}
 };
 
+inline bool compareByTime( const GNSSRecord& rec, const GNSSRecord& val );
+
 class NMEA // vector of .nmea file records (currently as it produced by akenori)
 {
 public:
@@ -23,8 +25,7 @@ public:
   bool load( const std::string& filename );
   bool loadKitti( const std::string &filename );
   void draw();
-  bool getEastNord( double time, double& east, double& nord );
+  bool getEastNord( double time, double& east, double& nord ) const;
 };
-
 
 #endif

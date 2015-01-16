@@ -8,14 +8,49 @@ class GeoMapEditor
   : public OCVGuiWindow
 {
   GeoMap gm;
-  string title;
+  std::string title;
   int cur_sheet;
-  Point2d location;
+  cv::Point2d location;
+  cv::Vec2d direction;
   int iObjType; // индекс активного типа объекта 
 public:
   void update_title();
-  void update_location( cv::Point2d en );
+  void update_location( cv::Point2d en, cv::Vec2d dir = cv::Vec2d(0, 1));
   void draw();
+  void exportObjPoints( std::vector<cv::Point2d> &enPoints )
+  {
+    for (unsigned int i = 0; i < gm.objects.size(); ++i)
+    {
+      AGM_Point *ptPoint;
+      try
+      {
+        ptPoint = static_cast<AGM_Point *> (gm.objects.at(i).obj);
+      }
+      catch(std::out_of_range &e)
+      {
+        cout << "error, GeoMap::objects subscript out of range:\n" << e.what() << endl;
+        return;
+      }
+      catch(std::bad_cast &)
+      {
+      }
+      catch(cv::Exception &e)
+      {
+        cout << "cv::Exception cought:\n" << e.what() << endl;
+        return;
+      }
+      catch(std::exception &e)
+      {
+        cout << "std::exception\n" << e.what() << endl;
+        return;
+      }
+      catch(...)
+      {
+        cout << "unknown exception cought\n";
+      }
+      enPoints.push_back(ptPoint->pts[0]);
+    }
+  }
 public:
   GeoMapEditor( const char* sheets_list_file=NULL );
   ~GeoMapEditor()
