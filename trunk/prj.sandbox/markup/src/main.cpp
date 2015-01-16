@@ -142,8 +142,8 @@ bool setup( int argc, char* argv[], string& data, int& start_frame )
 
 #if 1
   //data = "/testdata/kitti/2011_09_26/2011_09_26_drive_0001";
-  data = "/testdata/kitti/2011_09_26/2011_09_26_drive_0002";
-  //data = "/testdata/kitti/2011_09_26/2011_09_26_drive_0005";
+  //data = "/testdata/kitti/2011_09_26/2011_09_26_drive_0002";
+  data = "/testdata/kitti/2011_09_26/2011_09_26_drive_0005";
   //data = "/testdata/kitti/2011_09_26/2011_09_26_drive_0048";
   iskitti = true;
   theNmeaFile.loadKitti(data);
