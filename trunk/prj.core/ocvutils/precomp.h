@@ -22,11 +22,13 @@ using namespace std;
 using namespace cv;
 
 #include "ocvutils/ocvutils.h"
+#include "soundui/soundui.h"
 
 inline void dbgPressAnyKey()
 {
 #ifdef _DEBUG
   printf("\n\nPress any key...");
+  SoundUI();
   _getch();
 #endif
 }
