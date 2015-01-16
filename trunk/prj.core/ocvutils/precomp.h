@@ -24,11 +24,11 @@ using namespace cv;
 #include "ocvutils/ocvutils.h"
 #include "soundui/soundui.h"
 
-inline void dbgPressAnyKey()
+inline void dbgPressAnyKey( int sound_ui_mood = 0 )
 {
 #ifdef _DEBUG
   printf("\n\nPress any key...");
-  SoundUI();
+  SoundUI(sound_ui_mood);
   _getch();
 #endif
 }
@@ -36,12 +36,13 @@ inline void dbgPressAnyKey()
 inline bool __false( std::string message = "__false():" )
 {
   cout << message;
-  dbgPressAnyKey();
+  dbgPressAnyKey( SUI_Alert );
   return false;
 }
 
 inline bool __true( std::string message = "" )
 {
+  SoundUI( SUI_Ok );
   cout << message;
   return true;
 }
