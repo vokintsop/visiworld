@@ -41,7 +41,7 @@ bool computeVerticalSticsAsMat1b( cv::Mat& img, cv::Mat1b& vsticks )
                 + idmv.at<Vec3i>(y+dh, x+dw);
 
       double diff = norm( sh-sv );
-      res[y][x] = diff;
+      res[y][x] = static_cast<float> (diff);
       max_diff = max( diff, max_diff );
 
       //if (prev <= diff)

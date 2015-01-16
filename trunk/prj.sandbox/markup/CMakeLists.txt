@@ -22,7 +22,6 @@ SET( SOURCES
   ${CMAKE_SOURCE_DIR}/prj.core/markup/markup.cpp
   ${CMAKE_SOURCE_DIR}/prj.core/markup/markupeditor.h
   ${CMAKE_SOURCE_DIR}/prj.core/markup/markupeditor.cpp
-
   ${CMAKE_SOURCE_DIR}/prj.core/markup/markup_addobject.cpp
   ${CMAKE_SOURCE_DIR}/prj.core/markup/markup_mouse.cpp
 
@@ -46,6 +45,8 @@ SET( SOURCES
   ${CMAKE_SOURCE_DIR}/prj.core/streetglass/sticks.h
   ${CMAKE_SOURCE_DIR}/prj.core/streetglass/sticks.cpp
 
+  src/maptorealworld.cpp
+  src/maptorealworld.h
   src/main.cpp
   src/track.cpp
   )

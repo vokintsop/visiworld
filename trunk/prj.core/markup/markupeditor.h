@@ -136,7 +136,7 @@ private:
   bool track_forward; // true -- вперед, иначе назад (ctrl-enter)
   Rect tracked_rect; // прямоугольник для поиска на следующем кадре
 
-  Mat base_image; // background image
+  //Mat base_image; // background image
   Mat draw_image; // background image + marked objects
   bool draw_image_dirty; // отрисованная картинка draw_image не соответствует внутреннему состоянию
 public:
@@ -145,7 +145,10 @@ public:
 
   FrameProc frameProc; // обработчик кадра
 
-
+  cv::Mat GetBaseImageCopy() const
+  {
+    return draw_image.clone();
+  }
 
 public:
   int procKey();
