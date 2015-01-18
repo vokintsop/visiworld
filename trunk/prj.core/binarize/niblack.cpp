@@ -10,8 +10,8 @@
 using namespace std;
 using namespace cv;
 
-int prev__niblack( cv::Mat1b& src, 
-                   cv::Mat1b& res, 
+int prev__niblack( cv::Mat1b& src,
+                   cv::Mat1b& res,
                    int wing_min /* = 5*/,
                    double alpha /*= 0.15*/, 
                    bool invert )
@@ -170,18 +170,21 @@ int niblack( cv::Mat1b& src, cv::Mat1b& res,
         }
     }
 
-    res.create( src.rows, src.cols );
-    double thr1 = threshold(d, res, 0, 255 /*200*/, THRESH_OTSU | ( invert ? THRESH_BINARY : THRESH_BINARY_INV ) );
+    // res.create( src.rows, src.cols );
+    cv::Mat1b tempResult( src.rows, src.cols );
+    tempResult.setTo( invert ? 0 : 255 );
+    double thr1 = threshold(src, tempResult, 0, 255 /*200*/, THRESH_OTSU | ( invert ? THRESH_BINARY : THRESH_BINARY_INV ) );
 //     printf("Thresh sigma %f", thr1 );
-//     imshow( "blocks", res );
+//    imshow( "blocks", tempResult );
 
-    wing *= 3;
+   
+    wing /= 3;
 
     for ( int y = 0; y < src.rows; ++y )
     {
         for ( int x = 0; x < src.cols; ++x )
         {
-            if ( res[y][x] == object_value )
+            if ( tempResult[y][x] == object_value )
             {
                 int sizex = min(wing, x) + min(wing, src.cols - x - 1) + 1;
                 int sizey = min(wing, y) + min(wing, src.rows - y - 1) + 1;
@@ -194,15 +197,18 @@ int niblack( cv::Mat1b& src, cv::Mat1b& res,
 
                 double E = double(s) / size;
                 double sigma = sqrt( (double(sq) / size) - E*E );
-                bool is_background = ( invert && 255 - src[y][x] > E - alpha*sigma ) || ( !invert && src[y][x] > E - alpha*sigma );
+                uchar srcxy = src[y][x];
+                bool is_background = ( invert && 255 - src[y][x] > E - alpha*sigma && src[y][x] < 5 )
+                                  || ( !invert && src[y][x] > E - alpha*sigma && src[y][x] > 250 );
                 if ( is_background )
                 {
-                    res[y][x] = background_value;
+                    tempResult[y][x] = background_value;
                 }
             }
         }
     }
 
+    tempResult.copyTo( res );
     return 0;
 }
 
