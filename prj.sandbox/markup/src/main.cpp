@@ -1,6 +1,6 @@
 #include "ocvutils/precomp.h"
 
-#include "mainframe.h"
+#include "mainframe/mainframe.h"
 #include "soundui/soundui.h"
 using namespace std;
 

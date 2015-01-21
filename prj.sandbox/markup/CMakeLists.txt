@@ -9,6 +9,10 @@ SET( SOURCES
   ${CMAKE_SOURCE_DIR}/prj.core/conncomp/ccdata.h
   ${CMAKE_SOURCE_DIR}/prj.core/conncomp/ccmap.h
   ${CMAKE_SOURCE_DIR}/prj.core/conncomp/ccmap.cpp
+  
+  ${CMAKE_SOURCE_DIR}/prj.core/coords/maptorealworld.h
+  ${CMAKE_SOURCE_DIR}/prj.core/coords/maptorealworld.cpp
+
   ${CMAKE_SOURCE_DIR}/prj.core/detect/detect_segment.h
   ${CMAKE_SOURCE_DIR}/prj.core/detect/detect_segment.cpp
   ${CMAKE_SOURCE_DIR}/prj.core/geomap/geomap.h
@@ -18,6 +22,9 @@ SET( SOURCES
   ${CMAKE_SOURCE_DIR}/prj.core/gnss/gnss.h
   ${CMAKE_SOURCE_DIR}/prj.core/gnss/gnss.cpp
 
+  ${CMAKE_SOURCE_DIR}/prj.core/mainframe/mainframe.h
+  ${CMAKE_SOURCE_DIR}/prj.core/mainframe/mainframe.cpp
+  
   ${CMAKE_SOURCE_DIR}/prj.core/markup/markup.h
   ${CMAKE_SOURCE_DIR}/prj.core/markup/markup.cpp
   ${CMAKE_SOURCE_DIR}/prj.core/markup/markupeditor.h
@@ -46,10 +53,6 @@ SET( SOURCES
   ${CMAKE_SOURCE_DIR}/prj.core/streetglass/sticks.cpp
 
   src/main.cpp
-  src/mainframe.cpp
-  src/mainframe.h
-  src/maptorealworld.cpp
-  src/maptorealworld.h
   src/track.cpp
   )
 

@@ -28,7 +28,7 @@ public:
       }
       catch(std::out_of_range &e)
       {
-        cout << "error, GeoMap::objects subscript out of range:\n" << e.what() << endl;
+        std::cout << "error, GeoMap::objects subscript out of range:\n" << e.what() << std::endl;
         return;
       }
       catch(std::bad_cast &)
@@ -36,17 +36,17 @@ public:
       }
       catch(cv::Exception &e)
       {
-        cout << "cv::Exception cought:\n" << e.what() << endl;
+        std::cout << "cv::Exception cought:\n" << e.what() << std::endl;
         return;
       }
       catch(std::exception &e)
       {
-        cout << "std::exception\n" << e.what() << endl;
+        std::cout << "std::exception\n" << e.what() << std::endl;
         return;
       }
       catch(...)
       {
-        cout << "unknown exception cought\n";
+        std::cout << "unknown exception cought\n";
       }
       enPoints.push_back(ptPoint->pts[0]);
     }

@@ -16,14 +16,14 @@ struct GeoSheet  // топографический лист карты
 
   cv::Point en2xy( cv::Point2d& en )
   {
-    return Point( 
+    return cv::Point( 
       int( 0.5 + a.xy.x + (en.x-a.en.x) * (b.xy.x-a.xy.x)/(b.en.x-a.en.x) ), 
       int( 0.5 + a.xy.y + (en.y-a.en.y) * (b.xy.y-a.xy.y)/(b.en.y-a.en.y) )
       );
   }
   cv::Point2d xy2en( cv::Point& xy )
   {
-    return Point2d( 
+    return cv::Point2d( 
       a.en.x + (xy.x-a.xy.x) * (b.en.x-a.en.x)/(b.xy.x-a.xy.x), 
       a.en.y + (xy.y-a.xy.y) * (b.en.y-a.en.y)/(b.xy.y-a.xy.y)
       );
@@ -32,18 +32,18 @@ struct GeoSheet  // топографический лист карты
   cv::Point2d sheet_center_mercator( cv::Point2d& en ) 
     // расчитывает расстояние от en до центра листа карты в метрах по проекции меркатора
   {
-    Point sheet_xy_lu( 0, 0 );
-    Point sheet_xy_rb( raster.cols-1, raster.rows-1 );
-    Point2d sheet_en_lu = xy2en( sheet_xy_lu );
-    Point2d sheet_en_rb = xy2en( sheet_xy_rb );
-    Point2d sheet_en_center = (sheet_en_lu + sheet_en_rb)*0.5;
+    cv::Point sheet_xy_lu( 0, 0 );
+    cv::Point sheet_xy_rb( raster.cols-1, raster.rows-1 );
+    cv::Point2d sheet_en_lu = xy2en( sheet_xy_lu );
+    cv::Point2d sheet_en_rb = xy2en( sheet_xy_rb );
+    cv::Point2d sheet_en_center = (sheet_en_lu + sheet_en_rb)*0.5;
 
     const double radius = 6378137; // примерный радиус земли в метрах
     double scale = cos( sheet_en_center.y * CV_PI / 180 );
 
     double xx = scale * radius * CV_PI * (en.x - sheet_en_center.x) / 180;
     double yy = scale * radius * log( tan( CV_PI * (en.y - sheet_en_center.y + 90. ) / 360 ) );
-    return Point2d( xx, yy );
+    return cv::Point2d( xx, yy );
   }
 
   GeoSheet() {}
@@ -59,7 +59,7 @@ struct GeoSheet  // топографический лист карты
 class AGMTypes // supported derived AFrameObject types
 {
 public:
-  std::vector< string > objTypes;
+  std::vector< std::string > objTypes;
   AGMTypes()
   { // список поддерживаемых классов объектов
     // objTypes.push_back( "AFO_Unknown" );
@@ -87,7 +87,7 @@ struct GMObject // GeoMap Object. Объект, отмеченный на карте
   std::string type;
   std::vector< ENPoint2d > pts;  // набор ключевых точек в координатах EN (ENU?)
   int flags;
-  string tags;
+  std::string tags;
   GMObject():flags(0){}
   GMObject( ENPoint2d pt, const char* _type = "", int flags=0 ): 
     type(_type), flags(flags) 
@@ -116,15 +116,15 @@ public:
   virtual cv::Scalar getDrawColor() { return cv::Scalar(255,255,0); } // иногда проще только цвет переопределить
   virtual int getDrawThickness() { return 2; } // иногда проще только толщину линий переопределить
   virtual int getNodeRadius() { return 5; }
-  virtual void draw( GeoSheet& sheet, Mat& display ) 
+  virtual void draw( GeoSheet& sheet, cv::Mat& display ) 
   { // умолчательный вариант отрисовки
     cv::Scalar color = getDrawColor();
     int thickness = getDrawThickness();
     int node_radius = getNodeRadius();
-    Point pt_prev;
+    cv::Point pt_prev;
     for (int i=0; i< int(pts.size()); i++)
     {
-      Point pt = sheet.en2xy( pts[i] );
+      cv::Point pt = sheet.en2xy( pts[i] );
       cv::circle( display, pt, getNodeRadius(), color, thickness );
       if (i>0)
       {
@@ -175,13 +175,13 @@ public:
 class GeoMap
 {
 public:
-  string root_folder; 
+  std::string root_folder; 
   std::vector< GeoSheet > sheets;
   std::vector< cv::Ptr< AGMObject > > objects;
 public:
   GeoMap(){};
   bool import( const char * _root_folder );	
-  int find_best_sheet( Point2d en );
+  int find_best_sheet( cv::Point2d en );
 
   bool read( cv::FileStorage& fs );
   bool write( cv::FileStorage& fs );
