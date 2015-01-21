@@ -45,9 +45,11 @@ SET( SOURCES
   ${CMAKE_SOURCE_DIR}/prj.core/streetglass/sticks.h
   ${CMAKE_SOURCE_DIR}/prj.core/streetglass/sticks.cpp
 
+  src/main.cpp
+  src/mainframe.cpp
+  src/mainframe.h
   src/maptorealworld.cpp
   src/maptorealworld.h
-  src/main.cpp
   src/track.cpp
   )
 

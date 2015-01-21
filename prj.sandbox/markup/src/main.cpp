@@ -278,7 +278,7 @@ int main( int argc, char* argv[] )
 
   int res = markup( data, start_frame );
 
-  dbgPressAnyKey();
+  //dbgPressAnyKey();
   return res;
 }
 
