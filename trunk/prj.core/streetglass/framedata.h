@@ -23,7 +23,8 @@ struct FrameObject // объект, распознанный или размеченный на кадре
       // -1 неопределенное значение, иначе связанное с типом числовое значение, 
 			// для светофоров -- распознанное значение числа
 
-  FrameObject( string type = "None", cv::Rect rect=cv::Rect(0,0,0,0), int flags=0, string value = "" ): 
+  FrameObject( std::string type = "None", cv::Rect rect=cv::Rect(0,0,0,0), int flags=0, 
+    std::string value = "" ): 
    type(type), rect(rect), flags(flags), value(value) {}
   //void setType( int _type ) { type = _type; }
   //void setVal( int _val ) { val = _val; }
@@ -33,7 +34,8 @@ struct FrameObject // объект, распознанный или размеченный на кадре
 class AFrameObject : public FrameObject
 {
 public:
-  AFrameObject(  const string& type, cv::Rect rect=cv::Rect(0,0,0,0), int flags=0, string value = "" ):
+  AFrameObject(  const std::string& type, cv::Rect rect=cv::Rect(0,0,0,0), int flags=0, 
+    std::string value = "" ):
       FrameObject( type, rect, flags, value ) {}
 
   virtual ~AFrameObject(){}
@@ -523,7 +525,7 @@ inline AFrameObject* readFrameObject(const cv::FileNode &node)
   } 
   catch (...) 
   {
-    cout << "readFrameObject() failed" << endl;
+    std::cout << "readFrameObject() failed" << std::endl;
     return NULL; // unknown object type or no type tag at all
   }
 
@@ -575,15 +577,15 @@ inline void writeFrameData( cv::FileStorage& fs, FrameData& fd )
 
 inline bool exportFrameData( cv::Mat& base_image, std::string& videofile, int iframe )
 {
-  string videofolder = cv::format( "%s.dat", videofile.c_str() );
-  string framefolder = cv::format( "%s/%05d", videofolder.c_str(), iframe );
-  cout << "Frame exported to " << framefolder << endl; 
+  std::string videofolder = cv::format( "%s.dat", videofile.c_str() );
+  std::string framefolder = cv::format( "%s/%05d", videofolder.c_str(), iframe );
+  std::cout << "Frame exported to " << framefolder << std::endl; 
   return true;
 }
 
 inline bool readFrames( 
   cv::FileStorage& fs, 
-  vector< FrameData >& frames )
+  std::vector< FrameData >& frames )
 {
   // read frames
   frames.clear();
@@ -602,7 +604,7 @@ inline bool readFrames(
 
 inline bool writeFrames( 
   cv::FileStorage& fs, 
-  vector< FrameData >& frames
+  std::vector< FrameData >& frames
   )
 {
   fs << "FramesCount" << int( frames.size() );

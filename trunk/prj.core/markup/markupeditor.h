@@ -167,7 +167,7 @@ public:
     if (pressed_keys.size() == 0)      
       key = waitKey( (non_stop_mode || quickly) ? 1 : 0);
     if (key != kNoKeyPressed)
-      cout << "Key pressed " << key << endl;
+      std::cout << "Key pressed " << key << std::endl;
     if (key != kNoKeyPressed && pressed_keys.size() < 1000)
       pressed_keys.push_back( key ); // отложено до processEvents()
 

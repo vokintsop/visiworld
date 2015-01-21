@@ -8,6 +8,7 @@
 
 #include <markup/kitti.h>
 #include <ocvutils/precomp.h> 
+#include <mainframe/mainframe.h>
 using namespace std;
 
 
@@ -301,7 +302,8 @@ void NMEA::draw()
   }
 
   imshow("NMEA", display );
-  waitKey(0);
+
+  WaitKey(0);
 }
 
 //////////////////////////////////////
