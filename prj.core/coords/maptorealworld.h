@@ -41,7 +41,8 @@ public:
   Camera2DPoseEstimator(const NMEA &nmea_, const cv::Mat &intrinsics_)
     : nmea(nmea_), intrinsics(intrinsics_) 
   {
-    LinearEstimatePose();
+    //LinearEstimatePose();
+    EstimatePoseWithOxtsYaw();
   }
 
   CameraOnMap GetPoseAtTime(double time);
@@ -53,5 +54,6 @@ private:
   std::vector<cv::Vec2d> directions;
 
   void LinearEstimatePose();
+  void EstimatePoseWithOxtsYaw();
 };
 #endif //MAPTOREALWORLD_H__

@@ -256,8 +256,8 @@ int main( int argc, char* argv[] )
   if (iskitti)
   {
     theFrame.pGeoMapEditor = new GeoMapEditor("/testdata/kitti/map"); 
-    intrinsics = (Mat_<double>(3, 3) << 984.2439, 0.000000, 690.0000,
-                                    0.000000, 980.8141, 233.1966,
+    intrinsics = (Mat_<double>(3, 3) << 721.5377, 0.000000, 609.5593,
+                                    0.000000,  721.5377,  172.8540,
                                     0.000000, 0.000000, 1.000000);
   }
   else

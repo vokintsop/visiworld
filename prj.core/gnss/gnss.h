@@ -1,5 +1,6 @@
 #ifndef __GNSS_H
 #define __GNSS_H
+#pragma once 
 
 #include <string>
 #include <vector>
@@ -10,9 +11,13 @@ struct GNSSRecord
   double time; // в секундах после первой записи
   // В полночь по гринвичу требуется сшивка!!!
   double nord, east;
+
+  double yaw, pitch, roll;
   GNSSRecord():time(0),nord(0),east(0){}
   GNSSRecord( double time, double nord=0, double east=0 ):time(time),nord(nord),east(east){}
 };
+
+std::istream & operator>>(std::istream &istr, GNSSRecord &gnss);
 
 inline bool compareByTime( const GNSSRecord& rec, const GNSSRecord& val );
 

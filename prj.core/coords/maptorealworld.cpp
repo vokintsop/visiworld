@@ -52,14 +52,19 @@ void TransformMapPointCoordinates(const Mat &affineMat,
 void GetImagePoints(const vector<Point2d> &mapPoints, const Mat &intrinsics,
   vector<Point> &imgPts)
 {
+  Vec3d t(-0.32, 0, -1.08);
   Mat pointMat(3, 2 * mapPoints.size(), CV_64F);
   for (unsigned int i = 0; i < mapPoints.size(); ++i)
   {
-    Mat(Vec3d(mapPoints[i].x, 0, mapPoints[i].y)).copyTo(pointMat.col(2 * i));
-    Mat(Vec3d(mapPoints[i].x, -4, mapPoints[i].y)).copyTo(pointMat.col(2 * i + 1));
+    Mat(Vec3d(mapPoints[i].x, 2.5, mapPoints[i].y) + t).copyTo(pointMat.col(2 * i));
+    Mat(Vec3d(mapPoints[i].x, -1.5, mapPoints[i].y) + t).copyTo(pointMat.col(2 * i + 1));
   }
 
   Mat projectedPoints = intrinsics * pointMat;
+  Mat t0to2 = (Mat_<double>(3,1) << 44.8573, 0.2164, 0.0027);
+  Mat toextract;
+  repeat(t0to2, 1, pointMat.cols, toextract);
+  projectedPoints += toextract;
   for (unsigned int i = 0; i < mapPoints.size(); ++i)
   {
     double z_1 = projectedPoints.at<double>(2, 2 * i);
@@ -124,6 +129,16 @@ void Camera2DPoseEstimator::LinearEstimatePose()
     }
   }
   directions[directions.size() - 1] = nonZeroDir;
+}
+
+void Camera2DPoseEstimator::EstimatePoseWithOxtsYaw()
+{
+  directions.clear();
+  directions.reserve(nmea.records.size());
+  for (int i = 0; i < nmea.records.size(); ++i)
+  {
+    directions.push_back(Vec2d(cos(nmea.records[i].yaw), sin(nmea.records[i].yaw)));
+  }  
 }
 
 CameraOnMap Camera2DPoseEstimator::GetPoseAtTime(double time)
