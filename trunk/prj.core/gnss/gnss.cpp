@@ -152,6 +152,13 @@ bool gprmc( string& line, GNSSRecord& rec )
   return true;
 }
 
+std::istream & operator>>(std::istream &istr, GNSSRecord &gnss)
+{
+  double tmp;
+  istr >> gnss.nord >> gnss.east >> tmp >> gnss.roll >> gnss.pitch >> gnss.yaw;
+  return istr;
+}
+
 
 bool NMEA::load( const std::string& filename )
 {
@@ -216,13 +223,10 @@ bool NMEA::loadKitti( const std::string &filename )
       cout << "error reading oxt (gnss) record number " << i << endl;
       return false;
     }
-    double nord, east;
-    fin >> nord >> east;
-
-    //double east_delta = 5.31 / 3600;
-    //east += east_delta;
-
-    records.push_back(GNSSRecord(timestamps[i] - timestamps[0], nord, east));
+    GNSSRecord gnss;
+    fin >> gnss;
+    gnss.time = timestamps[i] - timestamps[0];
+    records.push_back(gnss);
   }
   return true;
 }
