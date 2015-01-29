@@ -47,7 +47,7 @@ void onTimer( double time )
 {
   cout << time << endl;
   Point2d en(0,0);
-static Point2d en_prev(0,0);
+  static Point2d en_prev(0,0);
   if (theNmeaFile.getEastNord( time, en.x, en.y ))
   {
     cout << en << endl;
@@ -65,8 +65,11 @@ static Point2d en_prev(0,0);
   theFrame.pGeoMapEditor->exportObjPoints(enPoints);
 
   //CameraOnMap cam = pCamPoseEst->GetPoseAtTime(time);
-  drawMapPointsOnImage(enPoints, cam, img);
-  imshow("sticks_demonstration", img);
+  if (iskitti)
+  {
+    drawMapPointsOnImage(enPoints, cam, img);
+    imshow("sticks_demonstration", img);
+  }
 }
 
 #define IGNORE_COMMAD_LINE true
@@ -150,13 +153,14 @@ bool setup( int argc, char* argv[], string& data, int& start_frame )
 #if 1
   //data = "/testdata/kitti/2011_09_26/2011_09_26_drive_0001";
   //data = "/testdata/kitti/2011_09_26/2011_09_26_drive_0002";
-  data = "/testdata/kitti/2011_09_26/2011_09_26_drive_0005";
+  //data = "/testdata/kitti/2011_09_26/2011_09_26_drive_0005";
   //data = "/testdata/kitti/2011_09_26/2011_09_26_drive_0048";
+  data = "/testdata/kitti/2011_09_26/2011_09_26_drive_0009";
   iskitti = true;
   theNmeaFile.loadKitti(data);
 #endif
 
-#if 0 
+#if -0 
   data = "/testdata/poligon/akenori/AKN00002.ts"; 
   nmea_file = "/testdata/poligon/akenori/AKN00002.nmea";
   theNmeaFile.load(nmea_file);
@@ -269,7 +273,7 @@ int main( int argc, char* argv[] )
   }
   
   theFrame.pMarkupEditor = new MarkupEditor(iskitti);
-  theFrame.pCamPoseEst = new Camera2DPoseEstimator(theNmeaFile, intrinsics);
+  theFrame.pCamPoseEst = new Camera2DPoseEstimator(theNmeaFile, intrinsics, iskitti);
 
   int res = markup( data, start_frame );
 

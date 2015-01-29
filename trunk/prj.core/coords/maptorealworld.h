@@ -38,11 +38,13 @@ void drawMapPointsOnImage(const std::vector<cv::Point2d> enuMapPoints, const Cam
 class Camera2DPoseEstimator
 {
 public:
-  Camera2DPoseEstimator(const NMEA &nmea_, const cv::Mat &intrinsics_)
+  Camera2DPoseEstimator(const NMEA &nmea_, const cv::Mat &intrinsics_, bool iskitti = true)
     : nmea(nmea_), intrinsics(intrinsics_) 
   {
-    //LinearEstimatePose();
-    EstimatePoseWithOxtsYaw();
+    if (iskitti)
+      EstimatePoseWithOxtsYaw();
+    else
+      LinearEstimatePose();
   }
 
   CameraOnMap GetPoseAtTime(double time);
