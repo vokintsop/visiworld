@@ -28,12 +28,3 @@ bool setWindowText( const char* window_id, const char* window_text )
   return false;
 }
 
-#include "mainframe/mainframe.h"
-
-extern MarkupMainFrame theFrame;
-
-int WaitKey( int delay )// централизованный обработчик cv::waitKey(), копит клавиши в буфере, распределяет клавиши для обработки между окнами
-{
-  return theFrame.waitKey(delay); //пока так
-}
-

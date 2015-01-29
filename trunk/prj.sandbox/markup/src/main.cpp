@@ -4,7 +4,7 @@
 #include "soundui/soundui.h"
 using namespace std;
 
-MarkupMainFrame theFrame;
+extern MarkupMainFrame theFrame;
 
 bool iskitti = false;  // устанавливается в true если работаем со структурой датасета kitti
 
