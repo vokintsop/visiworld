@@ -25,16 +25,24 @@ bool Markup::readFrame( int pos )
   //frame_time = 1000 * iframe  / fps; //int(video.get( CV_CAP_PROP_POS_MSEC  )); // время текущего кадра 
   bool success = false;
   if (iskitti)
-    success = readKitti(pos);  
+  {
+    //success = readKitti(pos);  
+    frame_time = kCap.getCurMsec() / 1000.0 ;
+    success = kCap.read(frame_image);
+
+  }
   else
+  {
+    frame_time = video.get( CV_CAP_PROP_POS_MSEC ) / 1000.0;
     success = video.read(frame_image);
+  }
   if (!success) 
   {
     cout << "Can't read requested frame " << pos << endl;
     return false;
   }
+  msec = cvRound(frame_time * 1000);
   iframe = pos;
-  frame_time = cvRound(1000 * iframe  / fps); //int(video.get( CV_CAP_PROP_POS_MSEC  )); // время текущего кадра 
   return true;
 }
 
@@ -45,10 +53,12 @@ bool Markup::setCurFrame(int newIFrame)
   iframe = newIFrame;
   if (!iskitti)
     return video.set(CV_CAP_PROP_POS_FRAMES, newIFrame);
-
+  else
+    return kCap.setCurFrame(newIFrame);
   return true;
 }
 
+/*
 bool Markup::readKitti(int pos)
 {
   string imgfname = video_file_path + format("/image_03/data/%010d.png", pos);
@@ -59,56 +69,39 @@ bool Markup::readKitti(int pos)
     ++iframe;
   return true;
 }
+*/
 
-bool Markup::loadVideo( string& _video_file_path, int& start_frame )
+bool Markup::loadVideo( const string &_video_file_path)
 {
   if (!iskitti)
   {
     if (!video.open( _video_file_path ))
       return __false( format( "\nCan't open %s\n", _video_file_path.c_str() ) );
 
-    video_file_path = _video_file_path;
-    video_file_name = name_and_extension(video_file_path);
-
-    ///video_short_name = 
-
     fps = video.get( CV_CAP_PROP_FPS );
     frames = int( video.get( CV_CAP_PROP_FRAME_COUNT ) );
     frame_width = int( video.get( CV_CAP_PROP_FRAME_WIDTH ) );
     frame_height = int( video.get( CV_CAP_PROP_FRAME_HEIGHT ) );
-    cout << "Loaded video: " << video_file_path << endl;
-    cout << "fps=" << fps << "\tframes=" << frames << endl;
-    cout << "frame_width=" << frame_width << "\tframe_height=" << frame_height << endl;
+    cout << "Loaded video: " << _video_file_path << endl;
   }
   else
   {
-    vector<double> timestamps;
-    string timeStampFname = _video_file_path + "/image_03/timestamps.txt";
-    if (!readTimeStamps(timeStampFname, timestamps))
+    if (!kCap.open(_video_file_path + "/image_02"))
       return __false(string("error reading kitti sequence ") + _video_file_path + "\n");
-    frames = timestamps.size();
-
-    //now calculate average fps:
-    double mean = 0;
-    for (unsigned int i = 0; i < timestamps.size() - 1; ++i)
-      mean += timestamps[i + 1] - timestamps[i];
-    mean /= (timestamps.size() - 1);
     
-    if (mean == 0)
-      return __false(format("\nError wrong timestamp file: %s\n", _video_file_path.c_str()));
-    
-    fps = 1 / mean;
+    fps = kCap.getFps();
+    frames = kCap.getFramesNum();
+    frame_width = kCap.getImgSize().width;
+    frame_height = kCap.getImgSize().height;
 
-    int img_zero = 0;
-    Mat tmpimg = imread(_video_file_path + format("/image_03/data/%010d.png", img_zero));
-    if (tmpimg.empty())
-      return __false(format("\nError opening kitti sequence %s\n", _video_file_path.c_str()));
-    frame_width = tmpimg.cols;
-    frame_height = tmpimg.rows;
-    cout << "Loaded kitti sequence: " << video_file_path << endl;
-    cout << "fps=" << fps << "\tframes=" << frames << endl;
-    cout << "frame_width=" << frame_width << "\tframe_height=" << frame_height << endl;
+    cout << "Loaded kitti sequence: " << _video_file_path << endl;
   }
+
+  video_file_path = _video_file_path;
+  video_file_name = name_and_extension(video_file_path);
+
+  cout << "fps=" << fps << "\tframes=" << frames << endl;
+  cout << "frame_width=" << frame_width << "\tframe_height=" << frame_height << endl;
   return true;
 }
 

@@ -7,6 +7,8 @@
 #include "streetglass/framedata.h" // данные, распознанные или размеченные на кадре
 #include "streetglass/frameproc.h" // обработка кадра
 
+#include "kitti.h"
+
 class Markup
 {
 protected:
@@ -15,7 +17,7 @@ protected:
 
 ///////////////////////////////////// video -- объект разметки
 protected:
-  bool loadVideo( std::string& _video_file_name, int& start_frame ); // открытие видеопотока и загрузка данных разметки 
+  bool loadVideo( const std::string &_video_file_name); // открытие видеопотока и загрузка данных разметки 
   bool readFrame( int pos ); // считываем запрошенный кадр
 
 protected: // video properties, initialized by loadVideo()
@@ -29,13 +31,17 @@ protected: // video properties, initialized by loadVideo()
   int frame_height; // = int( video.get( CV_CAP_PROP_FRAME_HEIGHT ) );
   cv::Mat frame_image; // кадр, принятый из видеопотока
   int iframe; // номер обрабатываемого фрейма
-  int frame_time; // время фрейма в миллисекундах от начала ролика
+  int msec; // время фрейма в миллисекундах от начала ролика
+  double frame_time; // время фрейма в секундах от начала ролика
 
 /////////////////////////////////////////////// for kitty
 protected:
   bool iskitti;
-  bool readKitti(int frame_pos);
+//  bool readKitti(int frame_pos);
   bool setCurFrame(int newIFrame);
+
+//new more elegant way to read kitti
+  KittiCapture kCap;
 
 //////////////////////////////////////////////// persistence
 protected:
