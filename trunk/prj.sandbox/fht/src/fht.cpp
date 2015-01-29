@@ -2,7 +2,7 @@
 using namespace std;
 using namespace cv;
 
-// shift > 0 если нужен обратный, то разворот изображения
+// shift > 0 
 void fht_vertical_iteration_r(Mat1b &input, Mat1i &output, int u, int d)// изначально u = 0, d = 2^deg
 // output(y, x) = вес, x - координата y - shift
 {
@@ -38,6 +38,7 @@ void fht_vertical_iteration_r(Mat1b &input, Mat1i &output, int u, int d)// изнач
 
 }
 
+//shift < 0
 void fht_vertical_iteration_l(Mat1b &input, Mat1i &output, int u, int d)// изначально u = 0, d = 2^deg
 // output(y, x) = вес, x - координата y - shift
 {
@@ -355,6 +356,13 @@ void CallBackFunc(int event, int x, int y, int flags, void* userdata)
 
 }    
 
+pair<Point, Point>  line_from_haugh(Size &fhtsize, Point &p) // на вход размер склеенной матрицы Хафа и точка пространства, на выход - прямая, соответсвующая точке
+{
+  pair<Point, Point> res;
+  res.first = Point(p.x, 0);
+  res.second = Point(p.x - fhtsize.width / 2 + p.y, fhtsize.height);
+  return res;
+}
 void test_find_vertical_line(Mat1b &input)
 {
   inputTest = input;
