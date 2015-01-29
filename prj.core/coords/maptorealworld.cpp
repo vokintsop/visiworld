@@ -52,10 +52,16 @@ void TransformMapPointCoordinates(const Mat &affineMat,
 void GetImagePoints(const vector<Point2d> &mapPoints, const Mat &intrinsics,
   vector<Point> &imgPts)
 {
-  Vec3d t(-0.32, 0, -1.08);
+  if (mapPoints.empty())
+  {
+    imgPts.clear();
+    return;
+  }
+  Vec3d t(-0.32, 0, -1.08); //Kitti-specific
   Mat pointMat(3, 2 * mapPoints.size(), CV_64F);
   for (unsigned int i = 0; i < mapPoints.size(); ++i)
   {
+    //y point coodrinates are Kitti-specific
     Mat(Vec3d(mapPoints[i].x, 2.5, mapPoints[i].y) + t).copyTo(pointMat.col(2 * i));
     Mat(Vec3d(mapPoints[i].x, -1.5, mapPoints[i].y) + t).copyTo(pointMat.col(2 * i + 1));
   }
@@ -97,7 +103,7 @@ void drawMapPointsOnImage(const vector<Point2d> enuMapPoints, const CameraOnMap&
   imgPts.reserve(2 * camMapPoints.size());
   GetImagePoints(camMapPoints, cam.intrinsics, imgPts);
 
-  for (unsigned int i = 0; 2 * i < imgPts.size(); i += 2)
+  for (unsigned int i = 0; 2 * i < imgPts.size(); ++i)
     line(todraw, imgPts[2 * i], imgPts[2 * i + 1], Scalar(255, 0, 0), 5);
 }
 
