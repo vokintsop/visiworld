@@ -65,11 +65,11 @@ void onTimer( double time )
   theFrame.pGeoMapEditor->exportObjPoints(enPoints);
 
   //CameraOnMap cam = pCamPoseEst->GetPoseAtTime(time);
-  if (iskitti)
-  {
+  //if (iskitti)
+ // {
     drawMapPointsOnImage(enPoints, cam, img);
     imshow("sticks_demonstration", img);
-  }
+  //}
 }
 
 #define IGNORE_COMMAD_LINE true
@@ -160,7 +160,7 @@ bool setup( int argc, char* argv[], string& data, int& start_frame )
   theNmeaFile.loadKitti(data);
 #endif
 
-#if -0 
+#if 0 
   data = "/testdata/poligon/akenori/AKN00002.ts"; 
   nmea_file = "/testdata/poligon/akenori/AKN00002.nmea";
   theNmeaFile.load(nmea_file);
@@ -274,7 +274,7 @@ int main( int argc, char* argv[] )
   
   theFrame.pMarkupEditor = new MarkupEditor(iskitti);
   theFrame.pCamPoseEst = new Camera2DPoseEstimator(theNmeaFile, intrinsics, iskitti);
-
+  namedWindow("sticks_demonstration", CV_WINDOW_FREERATIO);
   int res = markup( data, start_frame );
 
   //dbgPressAnyKey();
