@@ -8,7 +8,7 @@
 
 void fht_vertical(cv::Mat1b &input, cv::Mat1i &outputl, cv::Mat1i &outputr);//находит матрицы fht при сдвиге влево и сдвиге вправо
 
-void test_Haugh(cv::Mat1b &input);//тестирует fht
+void test_Hough(cv::Mat1b &input);//тестирует fht
 
 void vertical_sum_fht_l_r(cv::Mat1i &L, cv::Mat1i &R, cv::Mat1i &result);// склеивает fhtL  и fhtR в одго изображение
 
@@ -20,6 +20,6 @@ std::pair<cv::Point, cv::Point> find_vertical_line_from_two_pt(cv::Mat1i &fht, c
 
 void test_find_vertical_line(cv::Mat1b &input);//функция для выаода наилучшей прямой через 2 точки
 
-std::pair<cv::Point, cv::Point>  line_from_haugh(cv::Size &fhtsize, cv::Point &p); // на вход размер склеенной матрицы Хафа и точка пространства, на выход - прямая, соответсвующая точке
+std::pair<cv::Point, cv::Point>  line_from_hough(cv::Size &fhtsize, cv::Point &p); // на вход размер склеенной матрицы Хафа и точка пространства, на выход - прямая, соответсвующая точке
 
 

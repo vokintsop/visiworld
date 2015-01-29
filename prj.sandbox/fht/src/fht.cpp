@@ -193,7 +193,7 @@ void fht_vertical(Mat1b &input, Mat1i &outputl, Mat1i &outputr)
    
 }
 
-void test_Haugh(Mat1b &input)
+void test_Hough(Mat1b &input)
 {
   Mat1i L, R;
   fht_vertical(input, L, R);
@@ -356,7 +356,7 @@ void CallBackFunc(int event, int x, int y, int flags, void* userdata)
 
 }    
 
-pair<Point, Point>  line_from_haugh(Size &fhtsize, Point &p) // на вход размер склеенной матрицы Хафа и точка пространства, на выход - прямая, соответсвующая точке
+pair<Point, Point>  line_from_hough(Size &fhtsize, Point &p) // на вход размер склеенной матрицы Хафа и точка пространства, на выход - прямая, соответсвующая точке
 {
   pair<Point, Point> res;
   res.first = Point(p.x, 0);
@@ -370,12 +370,12 @@ void test_find_vertical_line(Mat1b &input)
   Mat1i L, R;
   fht_vertical(input, L, R);
   //DrawLines(input, L, R, 5000);
-  Mat1i haugh;
-  vertical_sum_fht_l_r(L, R, haugh);
+  Mat1i hough;
+  vertical_sum_fht_l_r(L, R, hough);
   //imshow ("L", L * 10);
   //imshow ("R", R * 10);
   imshow("m_input", input * 10);
-  fht = haugh;
+  fht = hough;
   setMouseCallback("m_input", CallBackFunc, NULL);
   //cvWaitKey(100);
 }
