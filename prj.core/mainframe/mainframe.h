@@ -9,9 +9,9 @@
 class MarkupMainFrame // центральный синглетон разметчика
 {
 public:
-  Ptr< GeoMapEditor >  pGeoMapEditor; // разметчик карты (вид сверху)
-  Ptr< MarkupEditor >  pMarkupEditor; // разметчик кадра (вид с камеры... какой? сбоку)
-  Ptr< Camera2DPoseEstimator> pCamPoseEst; // ув€зывает карту с ...ЁЁЁ... главной камерой системы
+  cv::Ptr< GeoMapEditor >  pGeoMapEditor; // разметчик карты (вид сверху)
+  cv::Ptr< MarkupEditor >  pMarkupEditor; // разметчик кадра (вид с камеры... какой? сбоку)
+  cv::Ptr< Camera2DPoseEstimator> pCamPoseEst; // ув€зывает карту с ...ЁЁЁ... главной камерой системы
 
   int waitKey( int delay );
 
