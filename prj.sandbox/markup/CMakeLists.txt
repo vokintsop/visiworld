@@ -15,6 +15,8 @@ SET( SOURCES
 
   ${CMAKE_SOURCE_DIR}/prj.core/detect/detect_segment.h
   ${CMAKE_SOURCE_DIR}/prj.core/detect/detect_segment.cpp
+  ${CMAKE_SOURCE_DIR}/prj.core/detect/fht.h
+  ${CMAKE_SOURCE_DIR}/prj.core/detect/fht.cpp
   ${CMAKE_SOURCE_DIR}/prj.core/geomap/geomap.h
   ${CMAKE_SOURCE_DIR}/prj.core/geomap/geomap.cpp
   ${CMAKE_SOURCE_DIR}/prj.core/geomap/geomapeditor.h

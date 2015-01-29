@@ -5,7 +5,6 @@
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
 
 void fht_vertical(cv::Mat1b &input, cv::Mat1i &outputl, cv::Mat1i &outputr);//находит матрицы fht при сдвиге влево и сдвиге вправо
 
@@ -20,4 +19,7 @@ std::pair<cv::Point, cv::Point> find_vertical_line_from_one_pt(cv::Mat1i &fht, c
 std::pair<cv::Point, cv::Point> find_vertical_line_from_two_pt(cv::Mat1i &fht, cv::Point a, cv::Point b, int eps = -1);//найти наилучшую прямую через две точки, eps != -1 значит искать в eps окрестности, в противном случае eps = fht.cols / 100;
 
 void test_find_vertical_line(cv::Mat1b &input);//функция для выаода наилучшей прямой через 2 точки
-//
+
+std::pair<cv::Point, cv::Point>  line_from_haugh(cv::Size &fhtsize, cv::Point &p); // на вход размер склеенной матрицы Хафа и точка пространства, на выход - прямая, соответсвующая точке
+
+
