@@ -32,7 +32,7 @@ void MarkupEditor::updateTitle()
   int numobj = frame_data.objects.size();
   string _title = format("Markup: %s [#%d of %d, %d msec]; type=%s objects on frame=%d sensitivity=%f tracking=%s", 
     video_file_name.c_str(),
-    iframe, frames, frame_time, objType().c_str(), numobj, frameProc.sensitivity, tracking_object? "ON" : "OFF" );
+    iframe, frames, msec, objType().c_str(), numobj, frameProc.sensitivity, tracking_object? "ON" : "OFF" );
   setWindowText( _title.c_str() );
 }
 
@@ -237,8 +237,7 @@ int MarkupEditor::process( string& _video_file_path, int start_frame )
 
       update_image_to_draw();
 
-      double msec = double(frame_time)/1000.;
-      onTimer( msec );
+      onTimer( frame_time );
 
       if (tracking_object)
       {
@@ -384,7 +383,7 @@ void MarkupEditor::setWindowText( const char* window_title )
 ///////////////////////////////////// visibank
 bool MarkupEditor::initialize( string& _video_file_path, int& start_frame )
 {
-  if (!loadVideo(_video_file_path, start_frame)) //не обязательно видео
+  if (!loadVideo(_video_file_path)) //не обязательно видео
     return __false("Failed to load video");
   if (!loadMarkupData( start_frame ))
   {

@@ -59,16 +59,17 @@ inline bool file_readable( const char* name )
 }
 
 
-inline string name_and_extension( string filename )
+inline string name_and_extension( const string &filename )
 {
   // Remove directory if present.
   // Do this before extension removal incase directory has a period character.
   const size_t last_slash_idx = filename.find_last_of("\\/");
+  string newfname = filename;
   if (std::string::npos != last_slash_idx)
   {
-    filename.erase(0, last_slash_idx + 1);
+    newfname.erase(0, last_slash_idx + 1);
   }
-  return filename;
+  return newfname;
 }
 
 ///////////// windows specific (todo -- make for linux)

@@ -58,7 +58,8 @@ KittiCapture::KittiCapture(const string &sequence_path)
   , fps(.0)
   , imgSize()
 {
-  open(seq_path);
+  if (!seq_path.empty())
+    open(seq_path);
 }
 
 bool KittiCapture::open(const string &sequence_path)
@@ -72,10 +73,11 @@ bool KittiCapture::open(const string &sequence_path)
 
   if (timestamps.empty())
     return __false(format("\nError opening kitti sequence %s", seq_path.c_str()));
-
+  
+  double start_time = timestamps[0];
   for (unsigned int i = 0; i < timestamps.size(); ++i)
   {
-    timestamps[i] -= timestamps[0];
+    timestamps[i] -= start_time;
   }
   
   //now calculate average fps:
@@ -141,7 +143,9 @@ int KittiCapture::getFramesNum() const
 
 double KittiCapture::getFrameMsec(int frameid) const
 {
-  return timestamps[frameid];
+  if (frameid > 0 && frameid >= static_cast<int> (timestamps.size()))
+    frameid = timestamps.size() - 1;
+  return 1000.0 * timestamps[frameid];
 }
 
 double KittiCapture::getCurMsec() const

@@ -75,7 +75,7 @@ void GetImagePoints(const vector<Point2d> &mapPoints, const Mat &intrinsics,
   {
     double z_1 = projectedPoints.at<double>(2, 2 * i);
     double z_2 = projectedPoints.at<double>(2, 2 * i + 1);
-    if (z_1 > 0 && z_2 > 0)
+    if (z_1 > 0 && z_2 > 0 && z_1 <= 200.)
     {
       imgPts.push_back(Point(cvRound(projectedPoints.at<double>(0, 2 * i) / z_1), 
         cvRound(projectedPoints.at<double>(1, 2 * i) / z_1)));
@@ -141,7 +141,7 @@ void Camera2DPoseEstimator::EstimatePoseWithOxtsYaw()
 {
   directions.clear();
   directions.reserve(nmea.records.size());
-  for (int i = 0; i < nmea.records.size(); ++i)
+  for (unsigned int i = 0; i < nmea.records.size(); ++i)
   {
     directions.push_back(Vec2d(cos(nmea.records[i].yaw), sin(nmea.records[i].yaw)));
   }  
@@ -151,7 +151,8 @@ CameraOnMap Camera2DPoseEstimator::GetPoseAtTime(double time)
 {
   vector<GNSSRecord>::const_iterator iter = lower_bound(
     nmea.records.begin(), nmea.records.end(), time, compareByTime);
-  
+  if (iter == nmea.records.end())
+    return CameraOnMap();
   unsigned int i = distance(nmea.records.begin(), iter);
   Vec2d dir;
   if (i == directions.size() - 1)

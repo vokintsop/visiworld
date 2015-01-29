@@ -56,7 +56,7 @@ void GeoMapEditor::draw()
     GeoSheet& sh =  gm.sheets[cur_sheet];
     Mat draw = sh.raster.clone();
     Point p1 = sh.en2xy( location );
-    Point p2 = Point(p1.x + direction[0] * 30, p1.y - direction[1] * 30);
+    Point p2 = Point(p1.x + cvRound(direction[0] * 30), p1.y - cvRound(direction[1] * 30));
     circle( draw, p1, 5, Scalar( 0, 0, 255 ), 2 );
     line( draw, p1, p2, Scalar(0, 0, 255), 2 );
 
