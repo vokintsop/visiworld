@@ -160,7 +160,7 @@ std::istream & operator>>(std::istream &istr, GNSSRecord &gnss)
 }
 
 
-bool NMEA::load( const std::string& filename )
+bool NMEA::load( const std::string& filename ) // currently ".nmea" -- akenori OR ".gps" -- blackvue,
 {
   ifstream ifs( filename.c_str() );
   string line;
@@ -169,12 +169,17 @@ bool NMEA::load( const std::string& filename )
 
   double start_time = -1.;
 
+#if 0 // todo
+  string format; // "oxts/data" -- kitti style format, ".nmea" -- akenori, ".gps" -- blackvue, 
+#endif
+
   while ( std::getline( ifs, line ) )
   {
     if (line.empty()) // spaces?
       continue;
 
-    if( line.size() > 0 && line[0] == '[' ) {
+    if( line.size() > 0 && line[0] == '[' ) // ".gps" -- blackvue
+	{
         int start_pos = line.find( "$GP" );
         line = std::string( line, start_pos, line.size() - start_pos );
     }
