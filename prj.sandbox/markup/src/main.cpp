@@ -144,13 +144,13 @@ bool setup( int argc, char* argv[], string& data, int& start_frame )
   data = "/testdata/glass/milano/20140913_123209_598.mp4"; 
 #endif
 
-#if 0
+#if 1
   data = "/testdata/poligon/input/bvu.01/20141127_121836_N.mp4"; 
   nmea_file = "/testdata/poligon/input/bvu.01/20141127_121836_N.gps";
   theNmeaFile.load(nmea_file);
 #endif
 
-#if 1
+#if 0
   //data = "/testdata/kitti/2011_09_26/2011_09_26_drive_0001";
   //data = "/testdata/kitti/2011_09_26/2011_09_26_drive_0002";
   //data = "/testdata/kitti/2011_09_26/2011_09_26_drive_0005";
@@ -160,7 +160,7 @@ bool setup( int argc, char* argv[], string& data, int& start_frame )
   theNmeaFile.loadKitti(data);
 #endif
 
-#if 0 
+#if 0
   data = "/testdata/poligon/akenori/AKN00002.ts"; 
   nmea_file = "/testdata/poligon/akenori/AKN00002.nmea";
   theNmeaFile.load(nmea_file);

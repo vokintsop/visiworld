@@ -5,6 +5,8 @@
 #include <algorithm>
 #include <cassert>
 #include <opencv2/imgproc/imgproc.hpp> 
+#include <cmath>
+#define _USE_MATH_DEFINES
 
 #include <markup/kitti.h>
 #include <ocvutils/precomp.h> 
@@ -67,6 +69,20 @@ double normalize_to_decimal_grad( double x )
   return res;
 } // надо потом учитывать, что мы масштаб по северу и западу получаем разный
 
+double GetSecsFromTimeString(const string &timestring) //string format: ddmmyyhhmmss.ss
+{
+  tm time = {0};
+  int msec = 0;  
+  sscanf(timestring.c_str(), "%2d%2d%2d%2d%2d%2d.%d", &time.tm_mday, &time.tm_mon,
+    &time.tm_year, &time.tm_hour, &time.tm_min, &time.tm_sec, &msec);
+  time.tm_year += 2000 - 1900; //+2000 because year is 14 instead of 2014,
+                               //-1900 because this is how mktime works (epoch)
+  time_t dtime = mktime(&time);
+  if (dtime == -1)
+    return -1.0;
+  return static_cast<double> (dtime) + static_cast<double> (msec) / 100.0;
+}
+
 bool gprmc( string& line, GNSSRecord& rec )
 { //$GPRMC,090450.00,A,5872.77527,N,03674.93726,E,13.517,0.07,271114,,,A*59
   /*
@@ -87,6 +103,42 @@ bool gprmc( string& line, GNSSRecord& rec )
   $GPRMC,113650.0,A,5548.607,N,03739.387,E,000.01,25 5.6,210403,08.7,E*69 
 
   */
+
+  //split gprmc string
+  istringstream istr(line);
+  string word;
+  vector<string> gprmcWords;
+  gprmcWords.reserve(13); //13 records in gprmc string
+
+  while (getline(istr, word, ','))
+    //if (!word.empty())
+      gprmcWords.push_back(word);
+
+  //get time of gprmc record
+  rec.time = GetSecsFromTimeString(gprmcWords[9] + gprmcWords[1]);
+  if (rec.time < 0.)
+    return false;
+
+  //check if gprmc record is good
+  if (gprmcWords[2] != "A")
+    return false;
+
+  //get nord-east coordinates
+  rec.nord = normalize_to_decimal_grad(strtod(gprmcWords[3].c_str(), NULL));
+  if (gprmcWords[4] != "N")
+    rec.nord *= -1;
+  rec.east = normalize_to_decimal_grad(strtod(gprmcWords[5].c_str(), NULL));
+  if (gprmcWords[6] != "E")
+    rec.nord *= -1;
+
+  //get yaw
+  rec.yaw = M_PI * (90.0 - strtod(gprmcWords[8].c_str(), NULL)) / 180.0;
+
+  return true;
+
+  /*
+
+
   
   size_t pos = string::npos;
   size_t len = line.length();
@@ -121,7 +173,7 @@ bool gprmc( string& line, GNSSRecord& rec )
   int hh = hhmm/100; // количество полных часов после полуночи
   rec.time = (hh*60+mm)*60 + ss + _ss;
 
-  eat_comma(line); // skip "A,"
+  eat_comma(line); // skip "A," 
 
   string nord;
   pos = line.find_first_of(',');
@@ -149,7 +201,7 @@ bool gprmc( string& line, GNSSRecord& rec )
 
   // todo .. direction etc
 
-  return true;
+  return true; */
 }
 
 std::istream & operator>>(std::istream &istr, GNSSRecord &gnss)

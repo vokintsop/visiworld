@@ -46,7 +46,7 @@ bool readTimeStamps(const string &fname, vector<double> &timestamps)
     time_t dtime = mktime(&time);
     if (dtime == -1)
       return __false("\nError reading timestamp\n");
-    timestamps.push_back(double(mktime(&time)) + dec_secs);
+    timestamps.push_back(double(dtime) + dec_secs);
   }
   return true;
 }

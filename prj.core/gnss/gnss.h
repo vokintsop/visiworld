@@ -8,7 +8,7 @@
 
 struct GNSSRecord
 {
-  double time; // в секундах после первой записи
+  double time; // в секундах
   // В полночь по гринвичу требуется сшивка!!!
   double nord, east;
 
