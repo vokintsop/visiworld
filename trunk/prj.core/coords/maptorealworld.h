@@ -41,10 +41,10 @@ public:
   Camera2DPoseEstimator(const NMEA &nmea_, const cv::Mat &intrinsics_, bool iskitti = true)
     : nmea(nmea_), intrinsics(intrinsics_) 
   {
-    if (iskitti)
+   // if (iskitti)
       EstimatePoseWithOxtsYaw();
-    else
-      LinearEstimatePose();
+    //else
+     // LinearEstimatePose();
   }
 
   CameraOnMap GetPoseAtTime(double time);
