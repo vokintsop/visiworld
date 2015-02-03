@@ -32,9 +32,10 @@ bool DetectSegment(
         transform(y, x) = abs(grayimg(y, x) - grayimg(y, x + 1));
      }
    }
-   blur(transform, transform, Size(3, 3));
+   //blur(transform, transform, Size(3, 3));
+   //threshold(transform, transform, 0, 255, CV_THRESH_BINARY | CV_THRESH_OTSU);
    //imshow ("fht", transform);
-  
+
    Mat1i L, R;
    fht_vertical(transform, L, R);
    Mat1i FHT;
