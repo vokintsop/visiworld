@@ -234,7 +234,7 @@ void vertical_sum_fht_l_r(Mat1i &L, Mat1i &R, Mat1i &result)
 
 int vertical_sum(Mat1i &fht, int x_up, int len)// len может быть отрицательной при отрицательном сдвиге
 {
-  if (len + fht.rows / 2 >= 0 &&  len + fht.rows / 2 < fht.rows)
+  if (len + fht.rows / 2 >= 0 &&  len + fht.rows / 2 < fht.rows && x_up >= 0 && x_up < fht.cols)
     return fht(len + fht.rows / 2, x_up);
   return -1;
 }
@@ -286,7 +286,7 @@ pair<Point, Point> find_vertical_line_from_one_pt(Mat1i &fht, Point a, int eps)
   int W = -1;
   pair<Point, Point> res = make_pair(a, a);
 
-  for (int i = a.x - eps; i <= a.x + eps; ++i)
+  for (int i = max(0, a.x - eps); i <= min(fht.cols - 1, a.x + eps); ++i)
   {
     for (int i1 = -fht.rows; i1 <= fht.rows; ++i1)
     {
@@ -308,13 +308,15 @@ pair<Point, Point> find_vertical_line_from_two_pt(Mat1i &fht, Point a, Point b, 
     eps = fht.cols / 10;
   }
   int W = -1;
-  pair<Point, Point> res = make_pair(a, b);
+  cout << "eps= " << eps << endl;
+  pair<Point, Point> c = make_pair(a, b), res = c;//vertical_line_from_segment(fht.rows / 2, a, b), res = make_pair(a, b);
 
-  for (int i = a.x - eps; i <= a.x + eps; ++i)
+  for (int i = c.first.x - eps; i <= c.first.x + eps; ++i)
   {
-    for (int i1 = b.x - eps; i1 <= b.x + eps; ++i1)
+	for (int i1 = c.second.x - eps; i1 <= c.second.x + eps; ++i1)
     {
-      int w = count_weight(fht, Point(i, a.y), Point(i1, b.y));
+		//cout << "!!!" << endl;
+      int w = count_weight(fht, Point(i, a.y), Point(i1, b.y - 1));
       if (w > W)
       {
         W = w;
@@ -322,6 +324,7 @@ pair<Point, Point> find_vertical_line_from_two_pt(Mat1i &fht, Point a, Point b, 
       }
     }
   }
+  cout << "w=" << W << endl;
   return res;
 }
 
