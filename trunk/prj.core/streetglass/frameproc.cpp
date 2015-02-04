@@ -177,18 +177,18 @@ bool FrameProc::compute_binmask( int scheme )
     redmask = rg2 + rb2;
     //imshow("redmask_before_threshold", redmask);
 
-//     cv::imwrite( "redmask_input.jpg", redmask );
+    cv::imwrite( "redmask_input.jpg", redmask );
 
     cv::Mat1b tempRedmask = redmask.clone();
     cv::GaussianBlur( tempRedmask, tempRedmask, cv::Size(101, 101), 100, 100 );
-//     cv::imwrite( "GaussianBlur.jpg", tempRedmask );
+    cv::imwrite( "GaussianBlur.jpg", tempRedmask );
     tempRedmask = redmask - tempRedmask;
 
     double min_pix_value = 0, max_pix_value = 0;
     cv::minMaxLoc( tempRedmask, &min_pix_value, &max_pix_value );
     tempRedmask.convertTo( tempRedmask, -1, 255.0 / (max_pix_value - min_pix_value), 
                            -255.0 * min_pix_value / (max_pix_value - min_pix_value) );
-//     cv::imwrite( "tempRedmask0.jpg", tempRedmask );
+    cv::imwrite( "tempRedmask0.jpg", tempRedmask );
 
 //     int i = 1;
 //     cv::Mat img_temp_tempRedmask;
@@ -196,13 +196,13 @@ bool FrameProc::compute_binmask( int scheme )
 //     tempRedmask = img_temp_tempRedmask;
 //     cv::imwrite( "after_bilateralFilter.jpg", tempRedmask );
 
-/*    redmask = tempRedmask;*/
-
-    niblack( tempRedmask, redmask, 5, 0.2, true );
+    /*redmask = tempRedmask;*/
+    // niblack_standart( tempRedmask, redmask, 15, 0.5, 50 * sensitivity, true );
+    niblack( tempRedmask, redmask, 10 * sensitivity, 15, 0.5, true );
 
 //     double thresh = threshold( redmask, redmask, 64 * sensitivity, 255., THRESH_BINARY /*| CV_THRESH_OTSU*/ );
 
-//     cv::imwrite( "redmask.jpg", redmask );
+    cv::imwrite( "redmask.jpg", redmask );
 
     //imshow("redmask_before_morf", redmask);
     //open_vertical( redmask, redmask, 1, 2 );
