@@ -99,6 +99,7 @@ int prev__niblack( cv::Mat1b& src,
 
     dbin = 255 - dbin;
 //     imshow( "blocks", dbin );
+//     imwrite( "blocks.jpg", dbin );
 
     ///double alpha = 0.15; // 0.2;
 
@@ -128,7 +129,8 @@ int prev__niblack( cv::Mat1b& src,
 }
 
 
-int niblack( cv::Mat1b& src, cv::Mat1b& res, 
+int niblack( cv::Mat1b& src, cv::Mat1b& res,
+             int threshold_value,
              int wing /*= 5 */, 
              double alpha /*= 0.15*/,
              bool invert )
@@ -173,12 +175,14 @@ int niblack( cv::Mat1b& src, cv::Mat1b& res,
     // res.create( src.rows, src.cols );
     cv::Mat1b tempResult( src.rows, src.cols );
     tempResult.setTo( invert ? 0 : 255 );
-    double thr1 = threshold(src, tempResult, 0, 255 /*200*/, THRESH_OTSU | ( invert ? THRESH_BINARY : THRESH_BINARY_INV ) );
-//     printf("Thresh sigma %f", thr1 );
-//    imshow( "blocks", tempResult );
+    cv::imwrite( "dispersion.jpg", d );
+    double thr1 = threshold(d, tempResult, threshold_value, 255 /*200*/, /*THRESH_OTSU |*/ THRESH_BINARY );
+//     printf("Thresh sigma %f \n", thr1 );
+//     imshow( "blocks", tempResult );
+    cv::imwrite( "blocks.jpg", tempResult );
 
    
-    wing /= 3;
+    wing *= 3;
 
     for ( int y = 0; y < src.rows; ++y )
     {
@@ -198,7 +202,7 @@ int niblack( cv::Mat1b& src, cv::Mat1b& res,
                 double E = double(s) / size;
                 double sigma = sqrt( (double(sq) / size) - E*E );
                 uchar srcxy = src[y][x];
-                bool is_background = ( invert && 255 - src[y][x] > E - alpha*sigma && src[y][x] < 5 )
+                bool is_background = ( invert && 255 - src[y][x] > 255 - E - alpha*sigma && src[y][x] < 5 )
                                   || ( !invert && src[y][x] > E - alpha*sigma && src[y][x] > 250 );
                 if ( is_background )
                 {
@@ -321,5 +325,78 @@ int niblack_ex( cv::Mat1b& src, cv::Mat1b& res, bool invert )
         }
     }
 
+    return 0;
+}
+
+
+
+//////////////////////////////////////////////////////////////////////////
+
+
+static void CountImageIntegrals( const cv::Mat& inputImage, cv::Mat& sum, cv::Mat& sqsum )
+{
+    cv::Mat image( inputImage.rows, inputImage.cols, CV_64FC1 );
+    for( int x = 0; x < image.rows; ++x )
+    {
+        for( int y = 0; y < image.cols; ++y )
+        {
+            image.at<double>( x, y ) = inputImage.at<uchar>( x, y ) / 255.0;
+        }
+    }
+    cv::integral( image, sum, sqsum );
+}
+
+static int CountThreshold( int x, int y, int width, int height,
+                          const cv::Mat& sum, const cv::Mat& sqsum, double k )
+{ 
+    int numPixel = width * height;
+
+    double M = ( sum.at<double>( y, x ) - sum.at<double>( y, x + width )
+        - sum.at<double>( y + height, x ) + sum.at<double>( y + height, x + width ) ) / numPixel;
+    double M2 = ( sqsum.at<double>( y, x ) - sqsum.at<double>( y, x + width ) 
+        - sqsum.at<double>( y + height, x ) + sqsum.at<double>( y + height, x + width ) ) / numPixel;
+    double D = std::sqrt(( numPixel * std::abs( M2 - M * M ) ) / (numPixel - 1));
+
+    int thresh = static_cast<int>( 255 * ( M - k * D ) ); 
+    return thresh;
+
+}
+
+int niblack_standart( cv::Mat1b& image, cv::Mat1b& res, int size, double k, int threshold, bool invert )
+{
+    int object_value = invert ? 255 : 0;
+    int background_value = invert ? 0 : 255;
+
+    cv::Mat sum, sqsum;
+    CountImageIntegrals( image, sum, sqsum );
+
+    if( size > image.cols || size > image.rows ) {
+        size = std::min( image.cols, image.rows );
+    }
+
+    cv::Mat binImage( image.rows, image.cols, CV_8UC1 );
+    for( int j = 0; j < image.rows; ++j )
+    {
+        for( int i = 0 ; i < image.cols; ++i )
+        {
+            int x = std::max( i - size / 2, 0 );
+            int width = std::min( i + size / 2, image.cols - 1 ) - x - 1;
+            int y = std::max( j - size / 2, 0 );
+            int height = std::min( j + size/2, image.rows - 1 ) - y - 1;
+
+            int T = CountThreshold( x + 1, y + 1, width, height, sum, sqsum, k ) + threshold;
+            uchar value = image.at<uchar>( j, i );
+            if( ( invert && value > T ) || ( !invert && value < T ) )
+            {
+                binImage.at<uchar>( j, i ) = object_value;
+            }
+            else 
+            {
+                binImage.at<uchar>( j, i ) = background_value;
+            }
+        }
+    }
+
+    binImage.copyTo( res );
     return 0;
 }
