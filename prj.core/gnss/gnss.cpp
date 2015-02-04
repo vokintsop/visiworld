@@ -111,8 +111,7 @@ bool gprmc( string& line, GNSSRecord& rec )
   gprmcWords.reserve(13); //13 records in gprmc string
 
   while (getline(istr, word, ','))
-    //if (!word.empty())
-      gprmcWords.push_back(word);
+    gprmcWords.push_back(word);
 
   //get time of gprmc record
   rec.time = GetSecsFromTimeString(gprmcWords[9] + gprmcWords[1]);
