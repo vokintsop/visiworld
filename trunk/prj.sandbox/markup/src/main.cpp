@@ -52,7 +52,7 @@ void onTimer( double time )
   {
     cout << en << endl;
   }
-  CameraOnMap cam = theFrame.pCamPoseEst->GetPoseAtTime(time);
+  CameraPose cam = theFrame.pCamPoseEst->GetPoseAtTime(time);
   if (en != en_prev)
   {
     theFrame.pGeoMapEditor->update_location(en, cam.direction);
@@ -64,7 +64,7 @@ void onTimer( double time )
   vector<Point2d> enPoints;
   theFrame.pGeoMapEditor->exportObjPoints(enPoints);
 
-  //CameraOnMap cam = pCamPoseEst->GetPoseAtTime(time);
+  //CameraPose cam = pCamPoseEst->GetPoseAtTime(time);
   //if (iskitti)
  // {
     drawMapPointsOnImage(enPoints, cam, img);

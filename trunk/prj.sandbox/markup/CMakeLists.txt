@@ -56,6 +56,8 @@ SET( SOURCES
 
   src/main.cpp
   src/track.cpp
+  src/pose.h
+  src/pose.cpp
   )
 
 include_directories(/ ${CMAKE_SOURCE_DIR})

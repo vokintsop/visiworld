@@ -5,17 +5,12 @@
 #include <opencv2/core/core.hpp>
 #include <gnss/gnss.h>
 
+#include <prj.sandbox/markup/src/pose.h>
+
 cv::Point2d Mercator(cv::Point2d nePt);
 cv::Point2d Mercator(const GNSSRecord &nePt);
 
 
-//
-struct CameraOnMap
-{
-  cv::Point2d origin;   //meteres
-  cv::Vec2d direction;  //meteres
-  cv::Mat intrinsics;
-};
 
 /*
   Matrix of affine transform to transform global map points to map points in camera coordinate
@@ -32,8 +27,11 @@ void TransformMapPointCoordinates(const cv::Mat &affineMat,
 void GetImagePoints(const std::vector<cv::Point2d> &mapPoints, const cv::Mat &intrinsics,
   std::vector<cv::Point> &imgPts);
 
-void drawMapPointsOnImage(const std::vector<cv::Point2d> enuMapPoints, const CameraOnMap& cam, 
+void drawMapPointsOnImage(const std::vector<cv::Point2d> enuMapPoints, const CameraPose& cam, 
   cv::Mat &todraw);
+
+
+
 
 class Camera2DPoseEstimator
 {
@@ -47,7 +45,7 @@ public:
      // LinearEstimatePose();
   }
 
-  CameraOnMap GetPoseAtTime(double time);
+  CameraPose GetPoseAtTime(double time);
 
 
 private:
@@ -58,4 +56,37 @@ private:
   void LinearEstimatePose();
   void EstimatePoseWithOxtsYaw();
 };
+
+class CoordinateTransformer
+{
+public:
+
+  CoordinateTransformer(){}
+
+
+  /*
+    [in] mapPoints - набор EN-точек
+    [out] imgPts - набор координат точек в плоскости изображения
+  */
+  bool GetImagePointsFromMapPoints(const std::vector<cv::Point2d> &mapPoints,
+    std::vector<cv::Point2d> &imgPts);
+
+  bool GetMapPointsFromImagePointsOnGround(const std::vector<cv::Point2d> &groundImgPoints,
+    std::vector<cv::Point2d> &mapPoints);
+
+
+
+
+
+
+private:
+  CameraPose camPose;
+
+  bool MapPointsToCameraCoordinates(const std::vector<cv::Point2d> &mapPoints,
+    std::vector<cv::Point3d> &points3D);
+  bool Project3DPointsToImage(const std::vector<cv::Point3d> &points3D,
+    std::vector<cv::Point2d> &imgPts);
+};
+
+
 #endif //MAPTOREALWORLD_H__
