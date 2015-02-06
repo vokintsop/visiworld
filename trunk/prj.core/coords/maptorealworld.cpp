@@ -9,7 +9,7 @@ using namespace std;
 static const double R = 6378137.0; //meters
 static const double iR = 1 / R;//6378137.0; //meters
 
-static inline Point2d Mercator(Point2d nePt)
+inline Point2d Mercator(Point2d nePt)
 {
   Point2d result;
   result.x = R * M_PI * nePt.x / 180;
@@ -17,7 +17,7 @@ static inline Point2d Mercator(Point2d nePt)
   return result;
 }
 
-static inline Point2d Mercator(const GNSSRecord &nePt)
+inline Point2d Mercator(const GNSSRecord &nePt)
 {
   return Mercator(Point2d(nePt.east, nePt.nord));
 }
