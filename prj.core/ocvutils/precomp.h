@@ -1,4 +1,7 @@
 // precomp.h -- project default context -- starter for .cpp files
+#ifndef __PRECOMP_H
+#define __PRECOMP_H
+
 
 #include <cassert>
 #include <climits>
@@ -26,7 +29,6 @@ using namespace cv;
 #ifdef _WINDOWS
 #include <conio.h>   
 #else
-int _getch(void) { return 0; } // TODO: Linux
 #endif
 
 inline void dbgPressAnyKey( int sound_ui_mood = 0 )
@@ -99,3 +101,4 @@ inline bool ensure_folder( string folder )
   return false;
 }
 
+#endif // __PRECOMP_H
