@@ -8,6 +8,8 @@ IF( MSVC )
     ${CMAKE_SOURCE_DIR}/prj.core/ocvutils/ocvgui.h
     ${CMAKE_SOURCE_DIR}/prj.core/ocvutils/ocvgui.cpp
     ${CMAKE_SOURCE_DIR}/prj.core/ocvutils/ticker.h
+    ${CMAKE_SOURCE_DIR}/prj.core/soundui/soundui.h
+    ${CMAKE_SOURCE_DIR}/prj.core/soundui/soundui.cpp
     src/explore.cpp 
     src/imagerecord.h 
     src/main.cpp 
