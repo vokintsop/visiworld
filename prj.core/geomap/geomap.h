@@ -122,7 +122,12 @@ public:
     int thickness = getDrawThickness();
     int node_radius = getNodeRadius();
     cv::Point pt_prev;
-    for (int i=0; i< int(pts.size()); i++)
+    if (pts.size() > 0)
+    {
+      pt_prev = sheet.en2xy( pts[0] );
+      cv::circle( display, pt_prev, getNodeRadius(), color, thickness );
+    }
+    for (int i=1; i< int(pts.size()); i++)
     {
       cv::Point pt = sheet.en2xy( pts[i] );
       cv::circle( display, pt, getNodeRadius(), color, thickness );

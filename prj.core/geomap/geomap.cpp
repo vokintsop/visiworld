@@ -1,5 +1,5 @@
 #include "ocvutils/precomp.h"
-#include "geomap/geomapeditor.h"
+#include "geomap/geomap.h"
 
 
 bool GeoSheet::create( const char* sheet_file_name )

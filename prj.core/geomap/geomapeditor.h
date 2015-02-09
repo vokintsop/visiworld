@@ -2,6 +2,10 @@
 #define __GEOMAPEDITOR_H
 
 #include <geomap/geomap.h>
+
+using namespace cv;
+
+#include "ocvutils/ocvkeys.h"
 #include <ocvutils/ocvgui.h>
 
 class GeoMapEditor 
@@ -13,6 +17,8 @@ class GeoMapEditor
   cv::Point2d location;
   cv::Vec2d direction;
   int iObjType; // индекс активного типа объекта 
+
+//  bool non_stop_mode;
 public:
   void update_title();
   void update_location( cv::Point2d en, cv::Vec2d dir = cv::Vec2d(0, 1));
@@ -63,6 +69,40 @@ public:
     return false; // пока не умеем обрабавать ничего
   }
 
+  void update_window( bool quickly = false )  // _только_ здесь реальна€ отрисовка с отдачей управлени€
+  {
+//     if (draw_image_dirty)
+//     {
+//       imshow( title, draw_image );
+//       draw_image_dirty = false;
+//     }
+    //update_title();
+    update_image_to_draw();
+
+    int key = kNoKeyPressed;
+    if (pressed_keys.size() == 0)
+      key = waitKey( (/*non_stop_mode ||*/ quickly) ? 1 : 0);
+    if (key != kNoKeyPressed)
+      std::cout << "GeoMapEditor: Key pressed " << key << std::endl;
+    if (key != kNoKeyPressed && pressed_keys.size() < 1000)
+      pressed_keys.push_back( key ); // отложено до processEvents()
+  }
+
+//  void drawRubbering(); // отрисовка текущего состо€ни€ выт€гивани€ недоноска
+  void update_image_to_draw()
+  {
+    //draw_image = frame_image.clone(); 
+    draw();
+    //drawObjects(); // TO DO separate
+//    drawRubbering();
+    update_title();
+    //draw_image_dirty = true;
+  }
+
+  std::deque< int > pressed_keys; // очередь необработанных клавиш
+
+  int processEvents();
+  int processKeys();
 
   AGMTypes agmTypes; // текущие поддерживаемые типы объектов
   std::string objType() { return agmTypes.objTypes[iObjType]; }; // активный тип объекта 
