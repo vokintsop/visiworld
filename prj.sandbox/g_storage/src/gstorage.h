@@ -6,7 +6,7 @@
 #include <string>
 #include <set>
 
-#include "geomap/geomap.h"
+#include <opencv2/imgproc/imgproc.hpp>
 
 const double EPS_DOUBLE = 0.0001;
 
@@ -28,6 +28,10 @@ struct ValueIndex
 typedef std::set<ValueIndex> TSetValueIndex;
 
 class GStorage;
+struct GMObject;
+
+typedef cv::Point2d ENPoint2d; // точка в координатах EN с двойной точностью (x=east, y=nord) 
+typedef cv::Point3d ENUPoint3d; // точка в координатах ENU с двойной точностью (x=east, y=nord, z=up)
 
 // надо сделать расстояние между объектами функцией GMObject, чтобы при переходе на 3D не менять код
 // или template для типа координат, но это хуже
@@ -88,6 +92,7 @@ private:
 
   std::string root_folder;
 };
+
 #endif // __GSTORAGE_H
 
 
