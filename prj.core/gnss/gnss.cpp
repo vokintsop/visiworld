@@ -131,7 +131,7 @@ bool gprmc( string& line, GNSSRecord& rec )
     rec.nord *= -1;
 
   //get yaw
-  rec.yaw = M_PI * (90.0 - strtod(gprmcWords[8].c_str(), NULL)) / 180.0;
+  rec.yaw = M_PI * (strtod(gprmcWords[8].c_str(), NULL)) / 180.0;
 
   return true;
 

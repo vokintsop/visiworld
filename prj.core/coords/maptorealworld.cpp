@@ -3,6 +3,8 @@
 #include <math.h>
 #include <iostream>
 
+#include <opencv2/highgui/highgui.hpp>
+
 using namespace cv;
 using namespace std;
 
@@ -25,8 +27,8 @@ inline Point2d Mercator(const GNSSRecord &nePt)
 static inline Point2d iMercator(Point2d meterPoint, Point2d origin = Point2d())
 {
   Point2d nePt;
-  meterPoint.x -= origin.x;
-  meterPoint.y -= origin.y;
+  meterPoint.x += origin.x;
+  meterPoint.y += origin.y;
   nePt.x = iR * meterPoint.x * 180 / M_PI;
   nePt.y = atan(exp(iR * meterPoint.y)) * 360 / M_PI - 90;
   return nePt;
@@ -36,11 +38,11 @@ Mat CalcAffineTransform(Point2d origin, Point2d pt, Vec2d dir)
 {
   dir = dir / norm(dir);
   Mat t = (Mat_<double>(2, 1) << pt.x - origin.x, pt.y - origin.y);
-  Mat R = (Mat_<double>(2, 2) << dir[1], -dir[0], dir[0], dir[1]);
+  Mat R = (Mat_<double>(2, 2) << -dir[1], -dir[0], -dir[0], dir[1]);
   Mat A = Mat::zeros(2, 3, R.type());
 
-  R.copyTo(A(Range(0, 2), Range(0, 2)));
-  Mat(R * t).copyTo(A(Range(0, 2), Range(2, 3)));
+  Mat(R.inv()).copyTo(A(Range(0, 2), Range(0, 2)));
+  Mat(-R.inv() * t).copyTo(A(Range(0, 2), Range(2, 3)));
 
   return A;
 }
@@ -56,11 +58,12 @@ void TransformMapPointCoordinates(const Mat &affineMat,
     Mat(Vec3d(mapPoints[i].x, mapPoints[i].y, 1), false).copyTo(pointMat.col(i));
   
   Mat resmat = affineMat * pointMat;
+  cout << resmat << endl;
   for (int i = 0; i < resmat.cols; ++i)
     resMapPoints.push_back(Point2d(resmat.at<double>(0, i), resmat.at<double>(1, i)));
 }
 
-void GetImagePoints(const vector<Point2d> &mapPoints, const Mat &intrinsics,
+void GetImagePoints(const vector<Point2d> &mapPoints, const Mat &intrinsics, Vec3d t,
   vector<Point> &imgPts)
 {
   if (mapPoints.empty())
@@ -68,20 +71,19 @@ void GetImagePoints(const vector<Point2d> &mapPoints, const Mat &intrinsics,
     imgPts.clear();
     return;
   }
-  Vec3d t(-0.32, 0, -1.08); //Kitti-specific
+  //Vec3d t = cam; //Kitti-specific
   Mat pointMat(3, 2 * mapPoints.size(), CV_64F);
   for (unsigned int i = 0; i < mapPoints.size(); ++i)
   {
-    //y point coodrinates are Kitti-specific
-    Mat(Vec3d(mapPoints[i].x, 2.5, mapPoints[i].y) + t).copyTo(pointMat.col(2 * i));
-    Mat(Vec3d(mapPoints[i].x, -1.5, mapPoints[i].y) + t).copyTo(pointMat.col(2 * i + 1));
+    Mat(Vec3d(mapPoints[i].x, 4, -mapPoints[i].y) + t).copyTo(pointMat.col(2 * i));
+    Mat(Vec3d(mapPoints[i].x, 0, -mapPoints[i].y) + t).copyTo(pointMat.col(2 * i + 1));
   }
 
   Mat projectedPoints = intrinsics * pointMat;
-  Mat t0to2 = (Mat_<double>(3,1) << 44.8573, 0.2164, 0.0027);
-  Mat toextract;
-  repeat(t0to2, 1, pointMat.cols, toextract);
-  projectedPoints += toextract;
+  //Mat t0to2 = (Mat_<double>(3,1) << 44.8573, 0.2164, 0.0027);
+  //Mat toextract;
+  //repeat(t0to2, 1, pointMat.cols, toextract);
+  //projectedPoints += toextract;
   for (unsigned int i = 0; i < mapPoints.size(); ++i)
   {
     double z_1 = projectedPoints.at<double>(2, 2 * i);
@@ -98,23 +100,32 @@ void GetImagePoints(const vector<Point2d> &mapPoints, const Mat &intrinsics,
   }
 }
 
-void drawMapPointsOnImage(const vector<Point2d> enuMapPoints, 
+void drawMapPointsOnImage(const vector<Point2d> &enuMapPoints, 
   const CameraPose& cam, Mat &todraw)
 {
   vector<Point2d> meterMapPoints(enuMapPoints.size(), Point2d());
   for (unsigned int i = 0; i < enuMapPoints.size(); ++i)
     meterMapPoints[i] = Mercator(enuMapPoints[i]);
 
-  Mat A = CalcAffineTransform(cam.origin, Point2d(0,0), cam.direction);
-  //cout << A << endl;
-  vector<Point2d> camMapPoints;
-  //meterMapPoints.push_back(cam.origin);
+  Mat A = CalcAffineTransform(Point2d(0,0), cam.origin, cam.direction);
+  vector<Point2d> camMapPoints;  
   camMapPoints.reserve(meterMapPoints.size());
   TransformMapPointCoordinates(A, meterMapPoints, camMapPoints);
- // cout << camMapPoints[0] << endl;
+  //==============
+  Mat img = Mat::zeros(1000, 1000, CV_8UC3);
+  for (int i = 0; i < camMapPoints.size(); ++i)
+  {
+    circle(img, Point(500 + camMapPoints[i].x * 1000. / 300., 
+      500 + camMapPoints[i].y * 1000 / 300),
+      4, Scalar(0,0,255));
+  }
+  circle(img, Point(500,500), 50, Scalar(255,255,255));
+  line(img, Point(500,500), Point(500,400), Scalar(255,255,255));
+  imshow("radar", img);
+  //==============
   vector<Point> imgPts;
   imgPts.reserve(2 * camMapPoints.size());
-  GetImagePoints(camMapPoints, cam.intrinsics, imgPts);
+  GetImagePoints(camMapPoints, Mat(cam.intrinsics), cam.t, imgPts);
 
   for (unsigned int i = 0; 2 * i < imgPts.size(); ++i)
     line(todraw, imgPts[2 * i], imgPts[2 * i + 1], Scalar(255, 0, 0), 5);
@@ -155,10 +166,8 @@ void Camera2DPoseEstimator::EstimatePoseWithOxtsYaw()
   directions.clear();
   directions.reserve(nmea.records.size());
   for (unsigned int i = 0; i < nmea.records.size(); ++i)
-  {
-    directions.push_back(Vec2d(cos(nmea.records[i].yaw), 
-      sin(nmea.records[i].yaw)));
-  }  
+    directions.push_back(Vec2d(cos(0.5 * M_PI - nmea.records[i].yaw), 
+      -sin(0.5 * M_PI - nmea.records[i].yaw)));
 }
 
 CameraPose Camera2DPoseEstimator::GetPoseAtTime(double time)
@@ -166,15 +175,16 @@ CameraPose Camera2DPoseEstimator::GetPoseAtTime(double time)
   vector<GNSSRecord>::const_iterator iter = lower_bound(
     nmea.records.begin(), nmea.records.end(), time, compareByTime);
   if (iter == nmea.records.end())
-    return CameraPose();
+    iter = nmea.records.end() - 1;
+    //return CameraPose();
   unsigned int i = distance(nmea.records.begin(), iter);
   Vec2d dir;
-  if (i == directions.size() - 1)
+  if (i == directions.size() - 1 || i == 0)
     dir = directions[i];
   else
   {
-    double prevtime = iter->time;
-    double nexttime = (iter + 1)->time;
+    double prevtime = (iter - 1)->time;
+    double nexttime = iter->time;
     dir = (time - prevtime) / (nexttime - prevtime) * directions[i + 1] +
       (nexttime - time) / (nexttime - prevtime) * directions[i];
   }
@@ -185,6 +195,8 @@ CameraPose Camera2DPoseEstimator::GetPoseAtTime(double time)
   double east = 0, nord = 0;
   nmea.getEastNord(time, east, nord);
   result.origin = Mercator(Point2d(east, nord));
+  result.t = t;
+  result.FillExtrinsics();
   return result;
 }
 
@@ -214,7 +226,7 @@ bool CoordinateTransformer::MapPointsToCameraCoordinates(
     meterPt.x -= camPose.origin.x;
     meterPt.y -= camPose.origin.y;
 
-    points3D.push_back(Point3d(meterPt.y, 0, meterPt.x));
+    points3D.push_back(Point3d(-meterPt.y, 0, meterPt.x));
   }
   return true;
 }
@@ -225,17 +237,16 @@ bool CoordinateTransformer::Project3DPointsToImage(
 {
   //Mat MatOf3DPoints = ; 
   imgPts.reserve(points3D.size());
-  Mat projectionMat = camPose.GetProjectionMatrix();
+  Matx34d projMat = camPose.GetProjectionMatrix();
   for (unsigned int i = 0; i < points3D.size(); ++i)
   {
-    Mat homo4DPt = (Mat_<double>(4, 1) << 
-      points3D[i].x, points3D[i].y, points3D[i].z, 1);
-    Mat projHomoPt = projectionMat * homo4DPt;
-    double w = projHomoPt.at<double>(2, 0);
-    if (w == 0)
+    Vec4d homo4DPt(points3D[i].x, points3D[i].y, points3D[i].z, 1);
+    Vec3d projHomoPt = projMat * homo4DPt;
+    if (projHomoPt[2] == 0)
       return false;
-    imgPts.push_back(Point2d(projHomoPt.at<double>(0, 0) / w, 
-      projHomoPt.at<double>(1, 0) / w));
+    if (projHomoPt[2] > 0)
+      imgPts.push_back(Point2d(projHomoPt[0] / projHomoPt[2], 
+        projHomoPt[1] / projHomoPt[2]));
   }
   return true;
 }
@@ -291,4 +302,32 @@ bool CoordinateTransformer::GetMapPointsFromImagePointsOnGround(
     mapPoints[i] = iMercator(mapPoints[i], camPose.origin);
 
   return true;
+}
+
+
+void DrawMapObjectsOnFrame(Mat &img, 
+  const vector<Point2d> &enPts, 
+  const vector<pair<Point2d, Point2d> > &enSegms,
+  const CameraPose &cam)
+{
+  CoordinateTransformer ctrans(cam);
+  for (unsigned int i = 0; i < enSegms.size(); ++i)
+  {
+    vector<Point2d> tmp, res;
+    tmp.push_back(enSegms[i].first);
+    tmp.push_back(enSegms[i].second);
+
+    ctrans.GetImagePointsFromMapPoints(tmp, res);
+    if (res.size() == 2)
+      line(img, res[0], res[1], Scalar(0,255,0));
+  }
+
+  vector<Point2d> imgPts;
+  ctrans.GetImagePointsFromMapPoints(enPts, imgPts);
+  for (unsigned int i = 0; i < imgPts.size(); ++i)
+  {
+    circle(img, imgPts[i], 2, Scalar(0,0,255), 5);
+  }
+
+  drawMapPointsOnImage(enPts, cam, img);
 }
