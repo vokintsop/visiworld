@@ -134,8 +134,8 @@ public:
       if (i>0)
       {
         cv::line( display, pt_prev, pt, color, thickness );
-        pt_prev = pt;
       }
+      pt_prev = pt;
     }
   } 
 };

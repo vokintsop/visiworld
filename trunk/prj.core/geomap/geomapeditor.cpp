@@ -56,7 +56,7 @@ void GeoMapEditor::draw()
     GeoSheet& sh =  gm.sheets[cur_sheet];
     Mat draw = sh.raster.clone();
     Point p1 = sh.en2xy( location );
-    Point p2 = Point(p1.x + cvRound(direction[0] * 30), p1.y - cvRound(direction[1] * 30));
+    Point p2 = Point(p1.x + cvRound(direction[0] * 30), p1.y + cvRound(direction[1] * 30));
     circle( draw, p1, 5, Scalar( 0, 0, 255 ), 2 );
     line( draw, p1, p2, Scalar(0, 0, 255), 2 );
 
@@ -442,4 +442,83 @@ int GeoMapEditor::processKeys() // здесь обработка клавиш до выхода из цикла обр
     return key; // неизвестная клавиша -- снаружи разберутся
   } // while (1)
   return kNoKeyPressed;
+}
+
+void GeoMapEditor::exportObjPoints(vector<Point2d> &enPoints)
+{
+  for (unsigned int i = 0; i < gm.objects.size(); ++i)
+  {
+    AGM_Point *ptPoint;
+    try
+    {
+      ptPoint = static_cast<AGM_Point *> (gm.objects.at(i).obj);
+    }
+    catch(std::out_of_range &e)
+    {
+      std::cout << "error, GeoMap::objects subscript out of range:\n" << e.what() << std::endl;
+      return;
+    }
+    catch(std::bad_cast &)
+    {
+    }
+    catch(cv::Exception &e)
+    {
+      std::cout << "cv::Exception cought:\n" << e.what() << std::endl;
+      return;
+    }
+    catch(std::exception &e)
+    {
+      std::cout << "std::exception\n" << e.what() << std::endl;
+      return;
+    }
+    catch(...)
+    {
+      std::cout << "unknown exception cought\n";
+    }
+    enPoints.push_back(ptPoint->pts[0]);
+  }
+}
+
+void GeoMapEditor::exportGMOjbects(vector<Point2d> &enSticks, 
+    vector<pair<Point2d, Point2d> > &enSegments)
+{
+  for (unsigned int i = 0; i < gm.objects.size(); ++i)
+  {
+    AGM_Point *ptPoint = NULL;
+    AGM_Segm *ptSegm = NULL;
+    try
+    {
+      AGMObject *pObj = gm.objects.at(i).obj;
+      if (pObj->pts.size() == 1)
+        ptPoint = static_cast<AGM_Point *> (pObj);
+      else if (pObj->pts.size() == 2)
+        ptSegm = static_cast<AGM_Segm *> (pObj);
+    }
+    catch(std::out_of_range &e)
+    {
+      std::cout << "error, GeoMap::objects subscript out of range:\n" << e.what() << std::endl;
+      return;
+    }
+    catch(std::bad_cast &)
+    {
+    }
+    catch(cv::Exception &e)
+    {
+      std::cout << "cv::Exception cought:\n" << e.what() << std::endl;
+      return;
+    }
+    catch(std::exception &e)
+    {
+      std::cout << "std::exception\n" << e.what() << std::endl;
+      return;
+    }
+    catch(...)
+    {
+      std::cout << "unknown exception cought\n";
+    }
+    if (ptPoint)
+      enSticks.push_back(ptPoint->pts[0]);
+    if (ptSegm)
+      enSegments.push_back(make_pair(ptSegm->pts[0], ptSegm->pts[1]));
+  }
 }

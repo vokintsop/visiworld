@@ -11,25 +11,16 @@ struct CameraPose
 {
   //on map
   cv::Point2d origin;   //meteres
-  cv::Vec2d direction;  //meteres
+  cv::Vec2d direction;  //Map image coordinates(x: from left to right, y: from up to down)
   
   //3d
-  cv::Mat intrinsics;
-  cv::Mat R;
-  cv::Mat t;
+  cv::Matx33d intrinsics;
+  cv::Matx33d R;
+  cv::Vec3d t;
 
-  inline cv::Mat GetProjectionMatrix()
-  {
-    //return (I|0) * (R|t)
-    cv::Mat initMat;
-    cv::hconcat(intrinsics, cv::Mat::zeros(3, 1, intrinsics.type()), initMat);
-    cv::Mat tmp, transMat;
-    cv::hconcat(R, t, tmp);
-    cv::Mat botLine = (cv::Mat_<double>(1, 4) << 0, 0, 0, 1);
-    cv::vconcat(tmp, botLine, transMat);
+  cv::Matx34d GetProjectionMatrix();
 
-    return initMat * transMat;
-  }
+  bool FillExtrinsics();
 };
 
 

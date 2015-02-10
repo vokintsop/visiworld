@@ -23,40 +23,10 @@ public:
   void update_title();
   void update_location( cv::Point2d en, cv::Vec2d dir = cv::Vec2d(0, 1));
   void draw();
-  void exportObjPoints( std::vector<cv::Point2d> &enPoints )
-  {
-    for (unsigned int i = 0; i < gm.objects.size(); ++i)
-    {
-      AGM_Point *ptPoint;
-      try
-      {
-        ptPoint = static_cast<AGM_Point *> (gm.objects.at(i).obj);
-      }
-      catch(std::out_of_range &e)
-      {
-        std::cout << "error, GeoMap::objects subscript out of range:\n" << e.what() << std::endl;
-        return;
-      }
-      catch(std::bad_cast &)
-      {
-      }
-      catch(cv::Exception &e)
-      {
-        std::cout << "cv::Exception cought:\n" << e.what() << std::endl;
-        return;
-      }
-      catch(std::exception &e)
-      {
-        std::cout << "std::exception\n" << e.what() << std::endl;
-        return;
-      }
-      catch(...)
-      {
-        std::cout << "unknown exception cought\n";
-      }
-      enPoints.push_back(ptPoint->pts[0]);
-    }
-  }
+  void exportObjPoints( std::vector<cv::Point2d> &enPoints );
+
+  void exportGMOjbects(std::vector<cv::Point2d> &enSticks, 
+    std::vector<std::pair<cv::Point2d, cv::Point2d> > &enSegments);
 public:
   GeoMapEditor( const char* sheets_list_file=NULL );
   ~GeoMapEditor()
