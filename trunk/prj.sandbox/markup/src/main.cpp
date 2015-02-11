@@ -281,8 +281,28 @@ int main( int argc, char* argv[] )
     t = (Mat_<double>(3, 1) << 0, 1.12, 0);*/
   }
   
-  camParamsFS["K"] >> intrinsics;
-  camParamsFS["t"] >> t;
+  if (!camParamsFS.isOpened())
+  {
+    cout << "Error opening cam_params.yml" << endl;
+    return -1;
+  }
+  try
+  {
+    camParamsFS["K"] >> intrinsics;
+    camParamsFS["t"] >> t;
+  }
+  catch (cv::Exception &e)
+  {
+    cout << "Cannot read cam_params.yml" << endl;
+    cout << e.what() << endl;
+    return -1;
+  }
+
+  if (intrinsics.empty() || t.empty())
+  {
+    cout << "Incorrect cam_params.yml file" << endl;
+    return -1;
+  }
 
   theFrame.pMarkupEditor = new MarkupEditor(iskitti);
   theFrame.pCamPoseEst = new Camera2DPoseEstimator(theNmeaFile, intrinsics, t, iskitti);
