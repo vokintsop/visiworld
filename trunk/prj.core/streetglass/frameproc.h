@@ -26,8 +26,8 @@ public:
 #define FP_ALL 0xffff
 
   bool process( cv::Mat& input_bgr720,
-    //int scheme = FP_ALL ); // подготовка основных рабочих битмапов
-    int scheme = FP_NONE ); // подготовка основных рабочих битмапов
+    int scheme = FP_ALL ); // подготовка основных рабочих битмапов
+//    int scheme = FP_NONE ); // подготовка основных рабочих битмапов
   bool draw( cv::Mat& display, const std::string& objType ); // визуализация
 
   // вариант 1
