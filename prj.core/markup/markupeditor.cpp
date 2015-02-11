@@ -231,8 +231,16 @@ int MarkupEditor::process( string& _video_file_path, int start_frame )
     {
       if (!readFrame(next_frame))
         break;
+	
+	  int scheme = FP_NONE;
+	  if (objType().find( "AFO_Red" ) == 0)
+		  scheme |= FP_REDCC;
+	  if (objType().find( "AFO_Blu" ) == 0)
+		  scheme |= FP_BLUCC;
+	  if (objType().find( "AFO_Gre" ) == 0)
+		  scheme |= FP_GRECC;
 
-      if (!frameProc.process(frame_image))
+      if (!frameProc.process(frame_image, scheme))
         cout << "frameProc.process(frame_image) failed";
 
       update_image_to_draw();
