@@ -2,6 +2,7 @@
 
 #include "mainframe/mainframe.h"
 #include "soundui/soundui.h"
+
 using namespace std;
 
 extern MarkupMainFrame theFrame;
@@ -53,21 +54,21 @@ void onTimer( double time )
     cout << en << endl;
   }
   CameraPose cam = theFrame.pCamPoseEst->GetPoseAtTime(time);
+  //FillPoseMats(cam);
   if (en != en_prev)
   {
     theFrame.pGeoMapEditor->update_location(en, cam.direction);
   }
-  
+  vector<Point2d> enPoints;
+  vector<pair<Point2d, Point2d> > enSegms;
   Mat img = theFrame.pMarkupEditor->GetBaseImageCopy();
   if (img.empty())
     return;
-  vector<Point2d> enPoints;
-  theFrame.pGeoMapEditor->exportObjPoints(enPoints);
+  theFrame.pGeoMapEditor->exportGMOjbects(enPoints, enSegms);
+  DrawMapObjectsOnFrame(img, enPoints, enSegms, cam);
 
-  //CameraPose cam = pCamPoseEst->GetPoseAtTime(time);
-  //if (iskitti)
- // {
-    drawMapPointsOnImage(enPoints, cam, img);
+
+  
     imshow("sticks_demonstration", img);
   //}
 }
@@ -248,7 +249,7 @@ bool setup( int argc, char* argv[], string& data, int& start_frame )
 
 
 int main( int argc, char* argv[] )
-{  
+{
   cout << "markup.exe <video.avi|.mov|.mp4> [<#start_frame>]" << endl; 
   int start_frame = -1;
   string data;
@@ -257,23 +258,34 @@ int main( int argc, char* argv[] )
     return -1;
   
   Mat intrinsics;
+  Mat t;
+  FileStorage camParamsFS;
   if (iskitti)
   {
     theFrame.pGeoMapEditor = new GeoMapEditor("/testdata/kitti/map"); 
+    camParamsFS.open("/testdata/kitti/2011_09_26/cam_params.yml", FileStorage::READ);
+    /*
     intrinsics = (Mat_<double>(3, 3) << 721.5377, 0.000000, 609.5593,
                                     0.000000,  721.5377,  172.8540,
                                     0.000000, 0.000000, 1.000000);
+    t = (Mat_<double>(3, 1) << -0.32, 0, -1.08);*/
   }
   else
   {
     theFrame.pGeoMapEditor = new GeoMapEditor("/testdata/poligon/map"); 
+    camParamsFS.open("/testdata/poligon/input/bvu.01/cam_params.yml", FileStorage::READ);
+    /*
     intrinsics = (Mat_<double>(3, 3) << 997.89280, 0.00000, 1013.89921,
 	                                  0.00000, 918.43316, 594.69025,
 		                                0.00000, 0.00000, 1.00000 );
+    t = (Mat_<double>(3, 1) << 0, 1.12, 0);*/
   }
   
+  camParamsFS["K"] >> intrinsics;
+  camParamsFS["t"] >> t;
+
   theFrame.pMarkupEditor = new MarkupEditor(iskitti);
-  theFrame.pCamPoseEst = new Camera2DPoseEstimator(theNmeaFile, intrinsics, iskitti);
+  theFrame.pCamPoseEst = new Camera2DPoseEstimator(theNmeaFile, intrinsics, t, iskitti);
   namedWindow("sticks_demonstration", CV_WINDOW_FREERATIO);
   int res = markup( data, start_frame );
 
