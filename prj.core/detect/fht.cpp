@@ -375,3 +375,33 @@ void test_find_vertical_line(Mat1b &input)
   setMouseCallback("m_input", CallBackFunc, NULL);
   //cvWaitKey(100);
 }
+
+void count_fht(int k,Mat3b input, Mat1i &FHT)//строит Хафа по изображению, k - коеффициент сжатия 
+{
+
+   Mat1b grayimg;
+	 cvtColor(input, grayimg, CV_RGB2GRAY);
+
+	
+   Mat1b gr1;
+   resize(grayimg, gr1, Size(grayimg.cols / k, grayimg.rows));
+   grayimg = gr1;
+
+   Mat1b transform = grayimg - grayimg;
+   for (int y = 0; y < grayimg.rows - 1; ++y)
+   {
+     for (int x = 0; x < grayimg.cols - 1; ++x)
+     {
+       //if (y > grayimg.rows * 2 / 3)
+        transform(y, x) = abs(grayimg(y, x) - grayimg(y, x + 1));
+     }
+   }
+   //blur(transform, transform, Size(3, 3));
+   //threshold(transform, transform, 0, 255, CV_THRESH_BINARY | CV_THRESH_OTSU);
+   //imshow ("fht", transform);
+
+   Mat1i L, R;
+   fht_vertical(transform, L, R);
+
+   vertical_sum_fht_l_r(L, R, FHT);
+}

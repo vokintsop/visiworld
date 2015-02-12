@@ -19,3 +19,6 @@ std::pair<cv::Point, cv::Point> find_vertical_line_from_one_pt(cv::Mat1i &fht, c
 std::pair<cv::Point, cv::Point> find_vertical_line_from_two_pt(cv::Mat1i &fht, cv::Point a, cv::Point b, int eps = -1);//найти наилучшую прямую через две точки, eps != -1 значит искать в eps окрестности, в противном случае eps = fht.cols / 100;
 
 void test_find_vertical_line(cv::Mat1b &input);//функция для выаода наилучшей прямой через 2 точки
+
+
+void count_fht(int k,cv::Mat3b input, cv::Mat1i &FHT);//строит Хафа по изображению, k - коеффициент сжатия 
