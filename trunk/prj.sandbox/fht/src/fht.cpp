@@ -305,7 +305,7 @@ pair<Point, Point> find_vertical_line_from_two_pt(Mat1i &fht, Point a, Point b, 
 {
   if (eps == -1)
   {
-    eps = fht.cols / 10;
+    eps = 1; //= fht.cols /30;
   }
   int W = -1;
   pair<Point, Point> res = make_pair(a, b);
