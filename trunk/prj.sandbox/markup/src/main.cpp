@@ -147,6 +147,7 @@ bool setup( int argc, char* argv[], string& data, int& start_frame )
 
 #if 1
   data = "/testdata/poligon/input/bvu.01/20141127_121836_N.mp4"; 
+  //data = "/testdata/poligon/input/bvu.01/20141127_121836_N.mp4.rect.avi"; 
   nmea_file = "/testdata/poligon/input/bvu.01/20141127_121836_N.gps";
   theNmeaFile.load(nmea_file);
 #endif
