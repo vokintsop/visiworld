@@ -162,8 +162,9 @@ public:
   AGM_Point( ENPoint2d pt, const char* _type = "AGM_Point", int flags=0 ):
     AGMObject( pt, _type, flags )
     {}
-  virtual cv::Scalar getDrawColor() { return cv::Scalar(255,255,0); } 
-  virtual int getDrawThickness() { return 2; } 
+  virtual cv::Scalar getDrawColor() { return cv::Scalar(255,0, 255); } 
+  virtual int getDrawThickness() { return 3; } 
+  virtual int getNodeRadius() { return 7; }
 };
 
 class AGM_Segm : public AGMObject
