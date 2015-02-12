@@ -2,6 +2,7 @@
 #include "streetglass/frameproc.h"
 #include "detect/detect_segment.h"
 #include "binarize/niblack.h"
+#include "detect/fht.h"
 
 void resize4max( Mat1b& inp, Mat1b& out )
 {
@@ -78,6 +79,40 @@ static void open_vertical( Mat& in, Mat& ou, int anx, int any, bool inverted = f
 
 }
 
+void FrameProc::count_fht()
+{
+   int k = kFHT;
+
+   Mat1b grayimg;
+	 cvtColor(bgr720, grayimg, CV_RGB2GRAY);
+
+	
+   Mat1b gr1;
+   resize(grayimg, gr1, Size(grayimg.cols / k, grayimg.rows));
+   grayimg = gr1;
+
+   Mat1b transform = grayimg - grayimg;
+   for (int y = 0; y < grayimg.rows - 1; ++y)
+   {
+     for (int x = 0; x < grayimg.cols - 1; ++x)
+     {
+       //if (y > grayimg.rows * 2 / 3)
+        transform(y, x) = abs(grayimg(y, x) - grayimg(y, x + 1));
+     }
+   }
+   //blur(transform, transform, Size(3, 3));
+   //threshold(transform, transform, 0, 255, CV_THRESH_BINARY | CV_THRESH_OTSU);
+   //imshow ("fht", transform);
+
+   Mat1i L, R;
+   fht_vertical(transform, L, R);
+   Mat1i FHT;
+   vertical_sum_fht_l_r(L, R, FHT);
+   //imwrite("C:/visiroad_3/FHT.jpg", FHT / 10);
+   fht = FHT;
+ //  imwrite ("C:/visiroad_3/fht.jpg", FHT);
+}
+
 bool FrameProc::process( cv::Mat& input_bgr720, int scheme )// подготовка основных рабочих битмапов
 {
 
@@ -87,8 +122,11 @@ bool FrameProc::process( cv::Mat& input_bgr720, int scheme )// подготовка основн
 
   //bgr720 = input_bgr720.clone();
   bgr720 = input_bgr720; //.clone();
+  count_fht();
   if (detailed_visualization)
     imwrite("/temp/markup/bgr_image.png", bgr720);
+
+  
 
 
   //Mat1b ii; cvtColor( bgr720, ii, COLOR_BGR2GRAY );
@@ -280,7 +318,7 @@ bool FrameProc::detect_segment(  // детектирует наилучший сегмент в области указ
   std::vector< cv::Point >& pts // in-out, одна или несколько точек, в окрестности которых надо искать отрезок
   )
 {
-  return DetectSegment( bgr720, pts );
+  return DetectSegment( fht, pts, kFHT );
 }
 
 

@@ -6,6 +6,10 @@
 
 class FrameProc  // промежуточные данные, накапливаемые в процессе распознавания кадра
 {
+private:
+  cv::Mat1i fht; // матрица преобразования Хафа (считается один раз для всего кадра)
+  void count_fht();
+  static const int kFHT = 7; // коеффициент сжатия
 public:
   double sensitivity; // в зависимости от уровня разменивает ошибки первого рода на ошибки второго рода
   bool detailed_visualization; // режим подробного показа
@@ -24,6 +28,7 @@ public:
 
 #define FP_NONE 0
 #define FP_ALL 0xffff
+
 
   bool process( cv::Mat& input_bgr720,
     int scheme = FP_ALL ); // подготовка основных рабочих битмапов

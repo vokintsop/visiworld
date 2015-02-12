@@ -3,6 +3,7 @@ bool DetectSegment(
 
 
 
-	cv::Mat3b& bgr, 
-	std::vector< cv::Point >& pts 
+	cv::Mat1i& bgr, 
+	std::vector< cv::Point >& pts,
+  int k // коеффициент сжатия
 );
