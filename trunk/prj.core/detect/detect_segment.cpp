@@ -8,40 +8,12 @@
 
 
 bool DetectSegment( 
-	cv::Mat3b& bgr, 
-	std::vector< cv::Point >& pts 
+	cv::Mat1i& FHT, 
+	std::vector< cv::Point >& pts,
+  int k // коеффициент сжатия
 )
 {
-
-  const int k = 5; // коеффициент сжатия
-
-   Mat1b grayimg;
-	 cvtColor(bgr, grayimg, CV_RGB2GRAY);
-
-   cout << pts.size() << endl;
-	
-   Mat1b gr1;
-   resize(grayimg, gr1, Size(grayimg.cols / k, grayimg.rows));
-   grayimg = gr1;
-
-   Mat1b transform = grayimg - grayimg;
-   for (int y = 0; y < grayimg.rows - 1; ++y)
-   {
-     for (int x = 0; x < grayimg.cols - 1; ++x)
-     {
-        transform(y, x) = abs(grayimg(y, x) - grayimg(y, x + 1));
-     }
-   }
-   //blur(transform, transform, Size(3, 3));
-   //threshold(transform, transform, 0, 255, CV_THRESH_BINARY | CV_THRESH_OTSU);
-   //imshow ("fht", transform);
-
-   Mat1i L, R;
-   fht_vertical(transform, L, R);
-   Mat1i FHT;
-   vertical_sum_fht_l_r(L, R, FHT);
-   //imwrite("C:/visiroad_3/FHT.jpg", FHT / 10);
-
+   //imshow ("FHT", FHT);
    for (int i = 0; i < pts.size(); ++i)
      pts[i].x /= k;
    cout << "DetectSegment(" << pts << ")...";
