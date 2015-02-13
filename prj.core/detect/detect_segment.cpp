@@ -10,7 +10,8 @@
 bool DetectSegment( 
 	cv::Mat1i& FHT, 
 	std::vector< cv::Point >& pts,
-  int k // коеффициент сжатия
+  int k, // коеффициент сжатия
+  int rows// размер исходного изображения
 )
 {
    //imshow ("FHT", FHT);
@@ -23,6 +24,7 @@ bool DetectSegment(
      pts.resize(2);
      pair <Point, Point> res;
      res = find_vertical_line_from_one_pt(FHT, pts[0]);
+     res = vertical_line_from_segment(rows, res.first, res.second);
      pts.resize(2);
      res.first.x *= k;
      res.second.x *= k;
@@ -37,6 +39,8 @@ bool DetectSegment(
      pair <Point, Point> res;
      
      res = find_vertical_line_from_two_pt(FHT, pts[0], pts[1]);
+     res = vertical_line_from_segment(rows, res.first, res.second);
+
      res.first.x *= k;
      res.second.x *= k;
      pts[0] = res.first;
