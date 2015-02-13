@@ -379,14 +379,20 @@ void test_find_vertical_line(Mat1b &input)
 void count_fht(int k,Mat3b input, Mat1i &FHT)//строит ’афа по изображению, k - коеффициент сжати€ 
 {
 
-   Mat1b grayimg;
+   Mat1b transform;
+   AnotherSuperFilter(input, transform);
+
+   Mat1b gr1;
+   resize(transform, gr1, Size(transform.cols / k, transform.rows));
+   transform = gr1;
+   /*Mat1b grayimg;
 	 cvtColor(input, grayimg, CV_RGB2GRAY);
 
 	
    Mat1b gr1;
    resize(grayimg, gr1, Size(grayimg.cols / k, grayimg.rows));
    grayimg = gr1;
-
+   blur(grayimg, grayimg, Size(3, 3));
    Mat1b transform = grayimg - grayimg;
    for (int y = 0; y < grayimg.rows - 1; ++y)
    {
@@ -395,13 +401,49 @@ void count_fht(int k,Mat3b input, Mat1i &FHT)//строит ’афа по изображению, k - к
        //if (y > grayimg.rows * 2 / 3)
         transform(y, x) = abs(grayimg(y, x) - grayimg(y, x + 1));
      }
-   }
+   }*/
    //blur(transform, transform, Size(3, 3));
    //threshold(transform, transform, 0, 255, CV_THRESH_BINARY | CV_THRESH_OTSU);
-   //imshow ("fht", transform);
+   //imshow ("fht", transform * 5);
 
    Mat1i L, R;
    fht_vertical(transform, L, R);
 
    vertical_sum_fht_l_r(L, R, FHT);
+}
+
+void SuperFilter(Mat3b &input, Mat1b &res)
+{
+  Mat1b grayimg;
+	cvtColor(input, grayimg, CV_RGB2GRAY);
+  blur(grayimg, grayimg, Size(3, 3));
+  const int k = 10;
+  const double delta = 1; // константа во сколько раз может отличатьс€ €ркость границы плиты от самой плиты
+  const int eps  = 255; // наибольшее взможное отличие €ркости плит
+  res = grayimg - grayimg;
+  for (int y = 0; y < grayimg.rows; ++y)
+  {
+    for (int x = k; x < grayimg.cols - k; ++x)
+    {
+      int l = grayimg(y, x - k);
+      int r = grayimg(y, x + k);
+      int c = grayimg(y, x);
+      if (c < l * delta && c < r * delta && abs(l - r) < eps)// а не ввести ли проверку на серость? асфальт - серый остальное - нет
+      {
+        res(y, x) = min(l - c, r - c);
+      }
+    }
+  }
+  //imshow ("res", res* 5);
+}
+void AnotherSuperFilter(Mat3b &input, Mat1b &res)
+{
+  Mat1b grayimg;
+	cvtColor(input, grayimg, CV_RGB2GRAY);
+  //blur(grayimg, grayimg, Size(3, 3));
+  Mat g1, g2, result;
+  GaussianBlur(grayimg, g1, Size(1, 1), 0);
+  GaussianBlur(grayimg, g2, Size(3, 3), 0);
+  res = abs(g1 - g2);
+  //imshow ("res", res* 5);
 }

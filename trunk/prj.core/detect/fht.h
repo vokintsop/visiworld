@@ -22,3 +22,12 @@ void test_find_vertical_line(cv::Mat1b &input);//функция для выаода наилучшей пр
 
 
 void count_fht(int k,cv::Mat3b input, cv::Mat1i &FHT);//строит Хафа по изображению, k - коеффициент сжатия 
+
+std::pair<cv::Point, cv::Point> vertical_line_from_segment(int rows, cv::Point a, cv::Point b); //считает отрезок до нужной длины
+
+
+//// Дальнейшее - это тестирование разного рода фильтров -- самый лучший из них будет использован в программе
+
+void SuperFilter(cv::Mat3b &input, cv::Mat1b &res);// супер-фильтр ^_________^
+
+void AnotherSuperFilter(cv::Mat3b &input, cv::Mat1b &res); // супер-пупер 
