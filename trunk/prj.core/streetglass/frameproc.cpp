@@ -92,7 +92,8 @@ bool FrameProc::process( cv::Mat& input_bgr720, int scheme )// подготовка основн
   fht_up_vertical = Mat1i(0,0);
   fht_down_vertical = Mat1i(0,0);
   fht_horizontal = Mat1i(0,0);
-  kROI = input_bgr720.rows * 3 / 5; // пока так
+  kROI_up = input_bgr720.rows * 3 / 5; // пока так
+  kROI_down = input_bgr720.rows * 3 / 5;
   if (detailed_visualization)
     imwrite("/temp/markup/bgr_image.png", bgr720);
 
@@ -288,47 +289,48 @@ bool FrameProc::detect_segment(  // детектирует наилучший сегмент в области указ
   std::vector< cv::Point >& pts // in-out, одна или несколько точек, в окрестности которых надо искать отрезок
   )
 {
-  if (pts.size() >= 2 && min(pts[0].y, pts[1].y) < kROI && max(pts[0].y, pts[1].y) >= kROI)
-  {
-    cout << "Error: pts in diffrent ROI" << endl;// данная ошибка означает, что мы пытаемся искать отрезок в разных РОИ ( то есть на границе столбов и дороги)
-    return true;//false ?
-  }
-  Mat3b ROIup(bgr720,Rect(0, 0, bgr720.cols, kROI));
-  Mat3b ROIdown(bgr720,Rect(0, kROI, bgr720.cols, bgr720.rows - kROI));
+  Mat3b ROIup(bgr720,Rect(0, 0, bgr720.cols, kROI_up));
+  Mat3b ROIdown(bgr720,Rect(0, kROI_down, bgr720.cols, bgr720.rows - kROI_down));
+  
   // !!!! Этот кусок кода потому что снизу  видно машину!!!!!!!
    int k = 200;
    Mat3b ROIdown1(bgr720,Rect(0, bgr720.rows - k, bgr720.cols, k));
    ROIdown1 = 0;
   ///////////////////////////////////////////////////////////////
-  Mat1b o;
-  //AnotherSuperFilter(bgr720, o);
-  //imshow("ROIup", ROIup);
-  //imshow("ROIdown", ROIdown);
-  if (fht_up_vertical.size() == Size(0, 0) && pts[0].y < kROI)
-    count_fht(kFHT_vertical, ROIup, fht_up_vertical);
-  if (fht_down_vertical.size() == Size(0, 0) && pts[0].y >= kROI)
-    count_fht(kFHT_vertical, ROIdown, fht_down_vertical);
-  if (pts[0].y < kROI)
+  
+  bool ch_down = 1, ch_up = 1;
+  for (int i = 0; i < pts.size(); ++i)
   {
-    
-    bool t =DetectSegment( fht_up_vertical, pts, kFHT_vertical, kROI);
-    for (int i = 0; i < pts.size(); ++i)
-      cout <<pts[i].x << " " << pts[i].y << endl;
-    cout <<kROI << endl;
- 
+    if (pts[i].y < kROI_down)
+      ch_down = 0;
+    if (pts[i].y >= kROI_up)
+      ch_up = 0;
   }
-  else
+  if (ch_down)
   {
+    if (fht_down_vertical.size() == Size(0, 0))
+      count_fht(kFHT_vertical, ROIdown, fht_down_vertical);
     for (int i = 0; i < pts.size(); ++i)
     {
-      pts[i].y -= kROI;
+      pts[i].y -= kROI_down;
     }
-    DetectSegment( fht_down_vertical, pts, kFHT_vertical, bgr720.rows - kROI );
+    bool t = DetectSegment( fht_down_vertical, pts, kFHT_vertical, bgr720.rows - kROI_down );
     for (int i = 0; i < pts.size(); ++i)
     {
-      pts[i].y += kROI;
+      pts[i].y += kROI_down;
     }
+    return t;
   }
+  if (ch_up)
+  {
+    if (fht_up_vertical.size() == Size(0, 0))
+      count_fht(kFHT_vertical, ROIup, fht_up_vertical);
+    bool t =DetectSegment( fht_up_vertical, pts, kFHT_vertical, kROI_up);
+    return t;
+  }
+  cout << "Error: pts in diffrent ROI" << endl;// данная ошибка означает, что мы пытаемся искать отрезок в разных РОИ ( то есть на границе столбов и дороги)
+  return true;//false ?
+
 }
 
 

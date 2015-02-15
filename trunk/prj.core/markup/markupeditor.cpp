@@ -182,6 +182,7 @@ int MarkupEditor::processKeys() // здесь обработка клавиш до выхода из цикла обр
           non_stop_mode = true;
           tracked_rect = afo->rect;
           tracking_object = true;
+          
           cout << "Start tracking " << afo->type << afo->rect << endl;
         }
 
@@ -247,25 +248,47 @@ int MarkupEditor::process( string& _video_file_path, int start_frame )
 
       onTimer( frame_time );
 
-      if (tracking_object)
+#ifdef TRACK_SEGM
+      const int k = 1;
+      if (iframe > 0 && iframe % k == 0)
       {
-        FrameData& frame_data = marked_frames[iframe];
-        if (trackObject( tracked_rect, ADD_OBJECT_RECT | ADD_OBJECT_TRACKED ) && frame_data.objects.size() > 0)
+        FrameData& frame_data = marked_frames[iframe - k];
+        
+        for (int i = 0; i < frame_data.objects.size(); ++i)
+        {
+          //cout << frame_data.objects[i]->type << endl;
+         // while (true){}
+          if (frame_data.objects[i]->type == "AFO_Segm")
+          {
+            //while (true)
+            //  cout << "^_^" << endl;
+              vector<Point> p;
+             p.push_back(static_cast<AFO_Segm&>(*frame_data.objects[i]).u);
+             p.push_back(static_cast<AFO_Segm&>(*frame_data.objects[i]).v);
+              trackObject(p, ADD_OBJECT_SEGM| ADD_OBJECT_TRACKED);
+              update_window();
+          }
+        }
+    
+      }
+
+#endif
+        
+        /*if (trackObject( tracked_rect, ADD_OBJECT_RECT | ADD_OBJECT_TRACKED ) && frame_data.objects.size() > 0)
         {
           tracked_rect = frame_data.objects.back()->rect;
-          update_window();
+          
         }
         else
         {
           tracking_object = false;
           non_stop_mode = false;
           update_window();
-        }
+        }*/
         //////////if (!track_forward)
         //////////  iframe -= 2;
-      }
+      
     }
-    
     processEvents();
 
     if (pressed_keys.size() > 0)

@@ -128,6 +128,8 @@ private:
 #define RUBBERING_SEGMENT 2 // вытягиваем отрезок -- от точки или от последней вершины ломаной
 #define RUBBERING_POLYGON 3 // уже вытянута часть многоугольника, и мы свободно водим мышкой планируя начать вытягивать следующее ребро многоугольника
 
+#define TRACK_SEGM // тречит все отрезки! На данный моент очень-очень медлененно!!!
+
 //#define RUBBERING_IMAGE 3 -- например пытаемся отскроллировать картинку, на будущее
   std::vector< cv::Point > rubbering_pts; // накопленные точки
 
@@ -135,6 +137,7 @@ private:
   bool tracking_object; // включается в дополнение к non_stop_mode в режиме автоматического поиска и добавления объекта
   bool track_forward; // true -- вперед, иначе назад (ctrl-enter)
   Rect tracked_rect; // прямоугольник для поиска на следующем кадре
+ 
 
   //Mat base_image; // background image
   Mat draw_image; // background image + marked objects
@@ -198,7 +201,7 @@ public:
   int processEvents(); // returns navigation key
 
 #define ADD_OBJECT_RECT      0x0001 // пытаемся добавить прямоугольник
-//#define ADD_OBJECT_SEGM      0x0002 // пытаемся добавить отрезок
+#define ADD_OBJECT_SEGM      0x0002 // пытаемся добавить отрезок
 //#define ADD_OBJECT_LINE      0x0004 // пытаемся добавить линию
 //#define ADD_OBJECT_QUAD      0x0008  // пытаемся добавить квадрангл
 //..
@@ -221,6 +224,10 @@ public:
 
   bool trackObject( // пытаемся добавить новый объект протащив старый с прежнего кадра 
     cv::Rect& rect, // note: in-out -- подкручиваем ректангл по законам трекинга для данного объекта
+    int flags );
+
+  bool trackObject( // пытаемся добавить новый объект протащив старый с прежнего кадра 
+    cv::vector<cv::Point> &pt, // note: in-out -- подкручиваем ректангл по законам трекинга для данного объекта
     int flags );
 
   //bool addMouseLineObject( // пытаемся добавить новый объект вытянув или кликнув мышкой

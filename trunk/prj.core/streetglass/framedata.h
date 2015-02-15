@@ -141,7 +141,7 @@ public:
 
 class AFO_Segm : public AFrameObject  // отрезок "общего назначения"
 {
-  cv::Point u,v;
+public: cv::Point u,v;
 public:
   AFO_Segm( std::string type, cv::Point u, cv::Point v, int flags ):
       AFrameObject( type, cv::Rect(u, v), flags ), u(u), v(v)

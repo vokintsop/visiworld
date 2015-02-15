@@ -21,7 +21,7 @@ std::pair<cv::Point, cv::Point> find_vertical_line_from_two_pt(cv::Mat1i &fht, c
 void test_find_vertical_line(cv::Mat1b &input);//функция для выаода наилучшей прямой через 2 точки
 
 
-void count_fht(int k,cv::Mat3b input, cv::Mat1i &FHT);//строит Хафа по изображению, k - коеффициент сжатия 
+void count_fht(int k, cv::Mat3b input, cv::Mat1i &FHT);//строит Хафа по изображению, k - коеффициент сжатия 
 
 std::pair<cv::Point, cv::Point> vertical_line_from_segment(int rows, cv::Point a, cv::Point b); //считает отрезок до нужной длины
 
