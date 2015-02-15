@@ -66,6 +66,15 @@ bool operator !(const Rect_< T >& a)
   return a.width <=0 || a.height <=0;
 }
 
+bool MarkupEditor:: trackObject( // пытаемся добавить новый объект протащив старый с прежнего кадра 
+    cv::vector<cv::Point> &pts, // note: in-out -- подкручиваем ректангл по законам трекинга для данного объекта
+    int flags)
+{
+   if (objType() == "AFO_Segm")
+    frameProc.detect_segment( pts );
+
+  return addObject(pts, flags);
+}
 
 bool MarkupEditor::trackObject( // пытаемся добавить новый объект протащив старый с прежнего кадра 
     cv::Rect& rect, // note: in-out -- подкручиваем ректангл по законам трекинга для данного объекта
@@ -238,6 +247,7 @@ bool MarkupEditor::adjustObjectRectangle(
   , int flags
   )
 {
+  
   if (objType() == "AFO_Rect" || objType() == "AFO_Point" || objType() == "AFO_Segm" )
     return true;
 

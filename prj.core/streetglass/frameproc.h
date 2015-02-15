@@ -11,7 +11,8 @@ private:
   cv::Mat1i fht_down_vertical;// матрица хафа - для плит
   cv::Mat1i fht_horizontal;// пока в разработке
   static const int kFHT_vertical = 7; // коеффициент сжатия
-  int kROI; // коеффициент разделения РОИ up и down 
+  int kROI_up; // коеффициент разделения РОИ up (0 ... kROI_up) - размер изображения по Y 
+  int kROI_down;// (kROI_down ... bgr720.rows)
 public:
   double sensitivity; // в зависимости от уровня разменивает ошибки первого рода на ошибки второго рода
   bool detailed_visualization; // режим подробного показа
