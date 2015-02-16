@@ -1,6 +1,7 @@
 #include "ocvutils/precomp.h"
 #include "streetglass/frameproc.h"
 #include "detect/detect_segment.h"
+//#include "detect/detect_red_white_borders.h"
 #include "binarize/niblack.h"
 #include "detect/fht.h"
 
@@ -333,6 +334,12 @@ bool FrameProc::detect_segment(  // детектирует наилучший сегмент в области указ
 
 }
 
-
+//const Point delimiter(-0x7fff, -0x7fff);
+//bool FrameProc::detect_red_white_barriers(  // детектирует набор красно-белых перил или бордюров и возвращает ломаные в координатах изображени€
+//  std::vector< cv::Point >& barrier_points // in-out, если бордюров несколько, раздел€ютс€ точкой с отрицательными координатами -0x7fff -0x7fff
+//  )
+//{
+//  return __false("DetectRedWhiteBorders() not implemented"); DetectRedWhiteBorders( redcc, barrier_points );
+//}
 
 
