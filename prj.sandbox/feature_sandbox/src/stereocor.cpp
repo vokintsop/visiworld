@@ -32,7 +32,7 @@ void StereoCorrespond(Ptr<FeatureDetector> featureDetector,
   double rootRadius = 5.0;
   double minRadius = 0.15;
   Ptr<CNType> coverNet(new CNType(&ruler, rootRadius, minRadius));
-  Ptr<SimpleFrame> lFrame = NULL, rFrame = NULL;
+  Ptr<SimpleFrame> lFrame, rFrame;
   vector<Ptr<SimpleFrame> > lastFrames;
   lastFrames.reserve(10);
   for (int iFrame = 0; iFrame < nFrames; ++iFrame)
@@ -73,7 +73,11 @@ void TryCorrespondStereo(Ptr<CNType> &coverNet, Ptr<SimpleFrame> &lFrame, Ptr<Si
     pt.x += lFrame->src.cols;
     cv::circle(todraw, pt, 1, cv::Scalar(255,0,0), 2);
     double dist = 0.2;
+#if CV_MAJOR_VERSION > 2
+    int iSph = coverNet->findNearestSphere(make_pair(rFrame.get(), i), dist);
+#else
     int iSph = coverNet->findNearestSphere(make_pair(rFrame.obj, i), dist);
+#endif
     /*
     if (iSph == -1) //no newarest point found
       iSph = coverNet->insert(make_pair(rFrame, i)); //creating new coverNet Sphere

@@ -2,6 +2,8 @@
 using namespace std;
 using namespace cv;
 
+#include <opencv2/imgproc/imgproc.hpp> //for cv::line
+
 // shift > 0 
 void fht_vertical_iteration_r(Mat1b &input, Mat1i &output, int u, int d)// изначально u = 0, d = 2^deg
 // output(y, x) = вес, x - координата y - shift

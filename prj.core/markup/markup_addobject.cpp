@@ -67,7 +67,7 @@ bool operator !(const Rect_< T >& a)
 }
 
 bool MarkupEditor:: trackObject( // пытаемся добавить новый объект протащив старый с прежнего кадра 
-    cv::vector<cv::Point> &pts, // note: in-out -- подкручиваем ректангл по законам трекинга для данного объекта
+    std::vector<cv::Point> &pts, // note: in-out -- подкручиваем ректангл по законам трекинга для данного объекта
     int flags)
 {
    if (objType() == "AFO_Segm")

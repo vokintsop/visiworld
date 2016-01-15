@@ -3,8 +3,6 @@
 
 #include <geomap/geomap.h>
 
-using namespace cv;
-
 #include "ocvutils/ocvkeys.h"
 #include <ocvutils/ocvgui.h>
 

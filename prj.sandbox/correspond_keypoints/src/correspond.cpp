@@ -57,7 +57,11 @@ void CorrespondStereoWithCNet(
   for (unsigned int i = 0; i < rFrame->kps.size(); ++i)
   {
     Point pt = rFrame->kps[i].pt;    
+#if CV_MAJOR_VERSION > 2
+    int iSph = coverNet->findNearestSphere(make_pair(rFrame.get(), i), dist);
+#else
     int iSph = coverNet->findNearestSphere(make_pair(rFrame.obj, i), dist);
+#endif
     if (iSph != -1)
     {
       ++matchNumber;

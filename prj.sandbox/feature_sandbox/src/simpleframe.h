@@ -17,7 +17,12 @@ class SimpleFrame
 {
 public:
   SimpleFrame(const cv::Mat &bgr = cv::Mat(), 
-    cv::Ptr<HCoords> &hc_ = cv::Ptr<HCoords>(NULL),
+#if CV_MAJOR_VERSION > 2
+    cv::Ptr<HCoords> hc_ = cv::Ptr<HCoords>(),
+#else
+    cv::Ptr<HCoords> hc_ = cv::Ptr<HCoords>(NULL),
+#endif
+ 
     int iFrame_ = 0)
     :src(bgr.clone()), iFrame(iFrame_), hc(hc_) 
   {
