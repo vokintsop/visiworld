@@ -3,7 +3,6 @@
 
 #include <markup/markup.h>
 
-using namespace cv;
 #include "ocvutils/ocvkeys.h"
 #include "ocvutils/ocvgui.h"
 
@@ -136,15 +135,15 @@ private:
   bool non_stop_mode; // как долго ждать нажатия клавиш
   bool tracking_object; // включается в дополнение к non_stop_mode в режиме автоматического поиска и добавления объекта
   bool track_forward; // true -- вперед, иначе назад (ctrl-enter)
-  Rect tracked_rect; // прямоугольник для поиска на следующем кадре
+  cv::Rect tracked_rect; // прямоугольник для поиска на следующем кадре
  
 
   //Mat base_image; // background image
-  Mat draw_image; // background image + marked objects
+  cv::Mat draw_image; // background image + marked objects
   bool draw_image_dirty; // отрисованная картинка draw_image не соответствует внутреннему состоянию
 public:
   MarkupEditor( bool iskitti = false, const char* title = "markup1" );
-  int process( string& _video_file_name, int start_frame=0 ); // обработка ролика
+  int process( std::string& _video_file_name, int start_frame=0 ); // обработка ролика
 
   FrameProc frameProc; // обработчик кадра
 
@@ -227,7 +226,7 @@ public:
     int flags );
 
   bool trackObject( // пытаемся добавить новый объект протащив старый с прежнего кадра 
-    cv::vector<cv::Point> &pt, // note: in-out -- подкручиваем ректангл по законам трекинга для данного объекта
+    std::vector<cv::Point> &pt, // note: in-out -- подкручиваем ректангл по законам трекинга для данного объекта
     int flags );
 
   //bool addMouseLineObject( // пытаемся добавить новый объект вытянув или кликнув мышкой

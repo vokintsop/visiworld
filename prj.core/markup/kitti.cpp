@@ -5,6 +5,7 @@
 #include <iterator>
 
 #include <cstdio>
+#include <ctime>
 
 using namespace std;
 

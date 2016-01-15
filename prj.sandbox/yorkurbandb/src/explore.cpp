@@ -1,11 +1,13 @@
 // explore.cpp
 
-#include "ocvutils/precomp.h"
+
 #include "ocvutils/ocvkeys.h"
 #include "ocvutils/ocvgui.h"
 #include "imagerecord.h"
 
+//#include <opencv2/imgproc/imgproc.hpp>
 
+#include "ocvutils/precomp.h"
 using namespace std;
 using namespace cv;
 

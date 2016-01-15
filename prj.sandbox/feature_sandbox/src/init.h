@@ -18,7 +18,11 @@ inline void InitCoverNet(cv::Ptr<CNType> &coverNet, cv::Ptr<SimpleFrame> &pivotF
     return;
   for (unsigned int i = 0; i < pivotFrame->kps.size(); ++i)
   {
+#if CV_MAJOR_VERSION > 2
+    coverNet->insert(std::make_pair(pivotFrame.get(), i));
+#else
     coverNet->insert(std::make_pair(pivotFrame.obj, i));
+#endif
   }
 }
 

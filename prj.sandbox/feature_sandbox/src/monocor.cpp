@@ -31,7 +31,7 @@ void MonoCorrespondTime(Ptr<FeatureDetector> featureDetector,
   double rootRadius = 5.0;
   double minRadius = 0.15;
   Ptr<CNType> coverNet(new CNType(&ruler, rootRadius, minRadius));
-  Ptr<SimpleFrame> pivotFrame = NULL, curFrame = NULL;
+  Ptr<SimpleFrame> pivotFrame, curFrame;
   vector<Ptr<SimpleFrame> > lastFrames;
   lastFrames.reserve(10);
   int coverNetFlush = 0;
@@ -78,9 +78,18 @@ void TryCorrespond(Ptr<CNType> &coverNet, Ptr<SimpleFrame> &curFrame)
   {
     cv::circle(todraw, curFrame->kps[i].pt, 1, cv::Scalar(255,0,0), 2);
     double dist = 0.2;
+#if CV_MAJOR_VERSION > 2
+    int iSph = coverNet->findNearestSphere(make_pair(curFrame.get(), i), dist);
+#else
     int iSph = coverNet->findNearestSphere(make_pair(curFrame.obj, i), dist);
+#endif
+    
     if (iSph == -1) //no newarest point found
+#if CV_MAJOR_VERSION > 2
+      iSph = coverNet->insert(make_pair(curFrame.get(), i)); //creating new coverNet Sphere
+#else
       iSph = coverNet->insert(make_pair(curFrame.obj, i)); //creating new coverNet Sphere
+#endif
     if (iSph != -1)
     {
       SimpleFrame *tmp = coverNet->getSphere(iSph).center.first;

@@ -1,4 +1,3 @@
-
 #include <opencv/cv.h>
 #include <opencv/highgui.h>
 
@@ -6,7 +5,11 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp> 
-#include <opencv2/nonfree/features2d.hpp>
+#if CV_MAJOR_VERSION > 2
+#include <opencv2/xfeatures2d/nonfree.hpp>
+#else
+#include <opencv2/nonfree/nonfree.hpp>
+#endif
 
 using namespace std;
 using namespace cv;
@@ -54,7 +57,7 @@ class FramePoint : public cv::KeyPoint // особая точка на изображении
 void detect_points( Mat& img, vector< KeyPoint >& pts )
 {
 
-#if 1
+#if 0
   cv::SURF detector( 4000, 4, 2, 
     true, 
     true  // no orientation
@@ -72,7 +75,7 @@ void detect_points( Mat& img, vector< KeyPoint >& pts )
   detector.detect( img, pts );
 #endif
 
-#if 0
+#if 1
   BRISK detector; // slow...
   detector.detect( img, pts );
 #endif

@@ -451,7 +451,11 @@ void GeoMapEditor::exportObjPoints(vector<Point2d> &enPoints)
     AGM_Point *ptPoint;
     try
     {
+#if CV_MAJOR_VERSION > 2
+      ptPoint = static_cast<AGM_Point *> (gm.objects.at(i).get());
+#else
       ptPoint = static_cast<AGM_Point *> (gm.objects.at(i).obj);
+#endif
     }
     catch(std::out_of_range &e)
     {
@@ -488,7 +492,11 @@ void GeoMapEditor::exportGMOjbects(vector<Point2d> &enSticks,
     AGM_Segm *ptSegm = NULL;
     try
     {
+#if CV_MAJOR_VERSION > 2
+      AGMObject *pObj = gm.objects.at(i).get();
+#else
       AGMObject *pObj = gm.objects.at(i).obj;
+#endif
       if (pObj->pts.size() == 1)
         ptPoint = static_cast<AGM_Point *> (pObj);
       else if (pObj->pts.size() == 2)

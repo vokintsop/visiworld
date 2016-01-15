@@ -86,12 +86,6 @@ ENDIF()
 # Functions.
 
 
-# -----------------------------------------------------------------------
-# Include directories.
-INCLUDE_DIRECTORIES(
-  ${root_dir}/prj.core
-  ${root_dir}/prj.sandbox
-  ${root_dir}/prj.thirdparty)
 
 # Compiler specific flags.
 IF( MSVC )
@@ -124,6 +118,14 @@ ENDIF()
 # -----------------------------------------------------------------------
 
 find_package(OpenCV REQUIRED)
+
+# -----------------------------------------------------------------------
+# Include directories.
+INCLUDE_DIRECTORIES(
+  ${OpenCV_INCLUDE_DIRS}
+  ${root_dir}/prj.core
+  ${root_dir}/prj.sandbox
+  ${root_dir}/prj.thirdparty)
 
 # -----------------------------------------------------------------------
 # Add project collections to build tree.

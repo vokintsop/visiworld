@@ -2,7 +2,13 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/features2d/features2d.hpp>
+
+#if CV_MAJOR_VERSION > 2
+#include <opencv2/xfeatures2d/nonfree.hpp>
+#else
 #include <opencv2/nonfree/nonfree.hpp>
+#endif
+
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
@@ -54,6 +60,7 @@ void FillStandartFeatureDetectorParameters()
 void InitFeatureDetector()
 {
   FillStandartFeatureDetectorParameters();
+#if CV_MAJOR_VERSION < 3
   initModule_nonfree();
   featureDetector = FeatureDetector::create(featureType);
   for (map<string, int>::const_iterator iter = featureDetectorInts.begin();
@@ -68,11 +75,14 @@ void InitFeatureDetector()
     iter != featureDetectorBools.end();
     ++iter)
     featureDetector->setBool(iter->first, iter->second);
+#endif
 }
 
 void InitDescriptorExtractor()
 {
+#if CV_MAJOR_VERSION < 3
   descriptorExtractor = DescriptorExtractor::create(featureType);
+#endif
 }
 
 void Init()

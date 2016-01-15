@@ -87,7 +87,7 @@ void TryClusterise(CoverNet<PointType, Metrics> &cnet)
   for (int level = 1; level < cnet.getCountOfLevels(); ++level)
   {
     cout << "level " << level << ": , radius = " << cnet.getRadius(level) << endl;
-    for (int i = 0; i < std::min((unsigned int) 10, cluster_candidates[level].size()); ++i)
+    for (int i = 0; i < std::min(10, static_cast<int> (cluster_candidates[level].size())); ++i)
     {
       Point3d point = *(cnet.getSphere(cluster_candidates[level].at(i).second).center);
       double tmpnorm = norm(point);
@@ -107,7 +107,11 @@ void DumbbellCorrespond(Ptr<CNType> &coverNet, Ptr<SimpleFrame> &pivotFrame, Ptr
   for (unsigned int i = 0; i < curFrame->kps.size(); ++i)
   {
     double dist = 0.2;
+#if CV_MAJOR_VERSION > 2
+    int iSph = coverNet->findNearestSphere(make_pair(curFrame.get(), i), dist);
+#else
     int iSph = coverNet->findNearestSphere(make_pair(curFrame.obj, i), dist);
+#endif
     if (iSph != -1)
     {
       int ikp = coverNet->getSphere(iSph).center.second;
@@ -161,7 +165,7 @@ void MonoCorrespondDumbbells(Ptr<FeatureDetector> featureDetector,
   double rootRadius = 5.0;
   double minRadius = 0.15;
   Ptr<CNType> coverNet(new CNType(&ruler, rootRadius, minRadius));
-  Ptr<SimpleFrame> pivotFrame = NULL, curFrame = NULL;
+  Ptr<SimpleFrame> pivotFrame, curFrame;
   int coverNetFlush = 0;
   int iFrame = 29.0 * 13; //int iFrame = 0;
   cap.set(CV_CAP_PROP_POS_FRAMES, iFrame);

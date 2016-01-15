@@ -11,6 +11,7 @@
 #include <markup/kitti.h>
 #include <ocvutils/precomp.h> 
 #include <mainframe/mainframe.h>
+#include <ctime>
 using namespace std;
 
 
@@ -131,7 +132,7 @@ bool gprmc( string& line, GNSSRecord& rec )
     rec.nord *= -1;
 
   //get yaw
-  rec.yaw = M_PI * (strtod(gprmcWords[8].c_str(), NULL)) / 180.0;
+  rec.yaw = CV_PI * (strtod(gprmcWords[8].c_str(), NULL)) / 180.0;
 
   return true;
 

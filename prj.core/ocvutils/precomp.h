@@ -19,17 +19,19 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp> 
 
-using namespace std;
-using namespace cv;
-
 #include "ocvutils/ocvutils.h"
 #include "soundui/soundui.h"
 
-
 #ifdef _WINDOWS
-#include <conio.h>   
+#include <conio.h> 
+#include <windows.h>
+#undef min
+#undef max
 #else
 #endif
+
+using namespace std;
+using namespace cv;
 
 inline void dbgPressAnyKey( int sound_ui_mood = 0 )
 {
@@ -73,13 +75,6 @@ inline string name_and_extension( const string &filename )
   }
   return newfname;
 }
-
-///////////// windows specific (todo -- make for linux)
-#ifdef _WINDOWS
-#include <windows.h>
-#undef min
-#undef max
-#endif // _WINDOWS
 
 inline void set_window_text( const char* title, const char* text )
 {
