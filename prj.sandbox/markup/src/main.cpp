@@ -263,7 +263,11 @@ int main( int argc, char* argv[] )
   FileStorage camParamsFS;
   if (iskitti)
   {
+#if CV_MAJOR_VERSION > 2
+    theFrame.pGeoMapEditor.reset(new GeoMapEditor("/testdata/kitti/map")); 
+#else
     theFrame.pGeoMapEditor = new GeoMapEditor("/testdata/kitti/map"); 
+#endif
     camParamsFS.open("/testdata/kitti/2011_09_26/cam_params.yml", FileStorage::READ);
     /*
     intrinsics = (Mat_<double>(3, 3) << 721.5377, 0.000000, 609.5593,
@@ -273,7 +277,11 @@ int main( int argc, char* argv[] )
   }
   else
   {
+#if CV_MAJOR_VERSION > 2
+    theFrame.pGeoMapEditor.reset(new GeoMapEditor("/testdata/poligon/map")); 
+#else
     theFrame.pGeoMapEditor = new GeoMapEditor("/testdata/poligon/map"); 
+#endif
     camParamsFS.open("/testdata/poligon/input/bvu.01/cam_params.yml", FileStorage::READ);
     /*
     intrinsics = (Mat_<double>(3, 3) << 997.89280, 0.00000, 1013.89921,
@@ -305,8 +313,13 @@ int main( int argc, char* argv[] )
     return -1;
   }
 
+#if CV_MAJOR_VERSION > 2
+  theFrame.pMarkupEditor.reset(new MarkupEditor(iskitti));
+  theFrame.pCamPoseEst.reset(new Camera2DPoseEstimator(theNmeaFile, intrinsics, t, iskitti));
+#else
   theFrame.pMarkupEditor = new MarkupEditor(iskitti);
   theFrame.pCamPoseEst = new Camera2DPoseEstimator(theNmeaFile, intrinsics, t, iskitti);
+#endif
   namedWindow("sticks_demonstration", CV_WINDOW_FREERATIO);
   int res = markup( data, start_frame );
 

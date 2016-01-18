@@ -16,7 +16,6 @@
 #include <map>
 
 
-
 using namespace cv;
 using namespace std;
 
@@ -107,8 +106,11 @@ int main( int argc, char** argv )
   
   VideoCapture lcap(format(filenameFormat.c_str(), "left", iEpisode)), rcap(format(filenameFormat.c_str(), "right", iEpisode));
   FileStorage fs(format(filenameFormat.c_str(), "", iEpisode) + ".xml", FileStorage::WRITE);
+#if CV_MAJOR_VERSION > 2
+  int nFrames = cvRound(lcap.get(cv::CAP_PROP_FRAME_COUNT));
+#else
   int nFrames = cvRound(lcap.get(CV_CAP_PROP_FRAME_COUNT));
- 
+#endif 
   Mat lbgr;
   Mat rbgr;
   KeyPointDescriptorRuler ruler;
@@ -120,8 +122,13 @@ int main( int argc, char** argv )
     char c = 0;
     if (!lcap.read(lbgr) || !rcap.read(rbgr))
       return 0;
+#if CV_MAJOR_VERSION > 2
+    lFrame.reset(new SimpleFrame(lbgr, iFrame));
+    rFrame.reset(new SimpleFrame(rbgr, iFrame));
+#else
     lFrame = new SimpleFrame(lbgr, iFrame);
     rFrame = new SimpleFrame(rbgr, iFrame);
+#endif
     lFrame->preprocess(featureDetector, descriptorExtractor);
     rFrame->preprocess(featureDetector, descriptorExtractor);
     //keypoints detected
