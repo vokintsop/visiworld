@@ -176,11 +176,21 @@ void MonoCorrespondDumbbells(Ptr<FeatureDetector> featureDetector,
       return;
     if (!(iFrame % 4))
     {
+#if CV_MAJOR_VERSION > 2
+      curFrame.reset(new SimpleFrame(bgr, hcoords, iFrame));
+#else
       curFrame = new SimpleFrame(bgr, hcoords, iFrame);
+#endif
+
       curFrame->preprocess(featureDetector, descriptorExtractor);
       if (coverNetFlush == 0)
       {
+#if CV_MAJOR_VERSION > 2
+        coverNet.reset(new CNType(&ruler, rootRadius, minRadius));
+#else
         coverNet = new CNType(&ruler, rootRadius, minRadius);
+#endif
+        
         pivotFrame = curFrame;
         InitCoverNet(coverNet, pivotFrame);
         coverNetFlush = 0;

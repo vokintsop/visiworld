@@ -27,7 +27,11 @@ public:
     :src(bgr.clone()), iFrame(iFrame_), hc(hc_) 
   {
     if (!hc)
+#if CV_MAJOR_VERSION > 2
+      hc.reset(new HCoords(src.cols, src.rows));
+#else
       hc = new HCoords(src.cols, src.rows);
+#endif
   }
 
   void preprocess(cv::Ptr<cv::FeatureDetector> detector, 

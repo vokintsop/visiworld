@@ -40,11 +40,17 @@ void StereoCorrespond(Ptr<FeatureDetector> featureDetector,
     char c = 0;
     if (!lcap.read(lbgr) || !rcap.read(rbgr))
       return;
+#if CV_MAJOR_VERSION > 2
+    lFrame.reset(new SimpleFrame(lbgr, hcoords, iFrame));
+    rFrame.reset(new SimpleFrame(rbgr, hcoords, iFrame));
+    coverNet.reset(new CNType(&ruler, rootRadius, minRadius));
+#else
     lFrame = new SimpleFrame(lbgr, hcoords, iFrame);
     rFrame = new SimpleFrame(rbgr, hcoords, iFrame);
+    coverNet = new CNType(&ruler, rootRadius, minRadius);
+#endif
     lFrame->preprocess(featureDetector, descriptorExtractor);
     rFrame->preprocess(featureDetector, descriptorExtractor);
-    coverNet = new CNType(&ruler, rootRadius, minRadius);
     InitCoverNet(coverNet, lFrame);
     TryCorrespondStereo(coverNet, lFrame, rFrame);
     c = cvWaitKey(1);
