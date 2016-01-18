@@ -8,6 +8,18 @@
 
 #include "ccdata.h"
 
+struct CCBaseMy :
+  public CCBase2
+{
+  int isphere; // индекс сферы в дереве, к которой была привязана компонента, -1 -- не привязана
+  CCBaseMy():isphere(-1){}
+};
+
+typedef CCData_<CCBaseMy> CCData;
+
+
+
+
 struct PageData
 {
   // input

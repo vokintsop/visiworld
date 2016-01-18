@@ -87,6 +87,8 @@ bool PageData::compute( const char* filename )
   }
 #endif
   src = imread( filename, IMREAD_GRAYSCALE );
+  if (src.empty())
+    return false;
 ////////////// preprocess image
   if (ROI.area() > 0)
     src = src( ROI ); 
