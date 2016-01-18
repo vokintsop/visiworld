@@ -114,7 +114,7 @@ class CoverNet
 
   std::vector< double > levelsRadii;
 public:
-  int getCountOfLevels() { return levelsRadii.size(); }
+  int getCountOfLevels() { return int( levelsRadii.size() ); }
   int getSphereLevel( int i_sphere ) { return spheres[i_sphere].level; }
   double getRadius( int level ) { return levelsRadii[level]; }
   double getMinRadius( int level ) { return minRadius; }
@@ -353,7 +353,7 @@ int CoverNet<PointType, Metrics>::insert(
 
     do {
       spheres.push_back( CoverSphere<PointType>( iSphereLevel, pt, parent, distance_to_parent ) );
-      iLastSphere = spheres.size()-1;
+      iLastSphere = int( spheres.size() ) -1;
       iLastSphereLevel = iSphereLevel;
       if (parent >=0) // not root
       {
